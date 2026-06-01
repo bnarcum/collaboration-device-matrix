@@ -55,8 +55,64 @@ export function estimateBillboardPlane(
   })
 }
 
-/** Relative display height for 2D aisle tiles (boards / tall desk devices). */
+/** Aisle tall-shelf img-wrap dimensions (must match index.css). */
+export const AISLE_TALL_IMG_WRAP = { width: 260, height: 460 } as const
+
+/** Reference board for cross-vendor aisle scale (75" Cisco Board Pro G2). */
+const AISLE_REF_BOARD = {
+  displayWidth: 1.7,
+  displayHeight: 1.05,
+  aspect: 1.5097,
+} as const
+
+export interface AisleImageRatios {
+  /** Rendered height as a fraction of the img-wrap height (0–1). */
+  heightRatio: number
+  /** Rendered width as a fraction of the img-wrap width (0–1). */
+  widthRatio: number
+}
+
+/**
+ * Fit a product photo in the aisle tall shelf using the same display-width /
+ * display-height rules as 3D billboards, then map plane size to CSS pixels.
+ */
+export function aisleProductImageRatios(device: Device): AisleImageRatios {
+  const aspect = devicePhotoAspect(device.id) ?? 1
+  const { planeW, planeH } = computeBillboardPlane(
+    device.size[0],
+    device.size[1],
+    aspect,
+    { photoScale: devicePhotoScale(device) },
+  )
+
+  const refPlane = computeBillboardPlane(
+    AISLE_REF_BOARD.displayWidth,
+    AISLE_REF_BOARD.displayHeight,
+    AISLE_REF_BOARD.aspect,
+  )
+
+  const { width: wrapW, height: wrapH } = AISLE_TALL_IMG_WRAP
+  const pxPerUnit = wrapW / refPlane.planeW
+
+  let renderW = planeW * pxPerUnit
+  let renderH = planeH * pxPerUnit
+
+  if (renderW > wrapW) {
+    renderW = wrapW
+    renderH = renderW / aspect
+  }
+  if (renderH > wrapH) {
+    renderH = wrapH
+    renderW = renderH * aspect
+  }
+
+  return {
+    heightRatio: renderH / wrapH,
+    widthRatio: renderW / wrapW,
+  }
+}
+
+/** @deprecated Use aisleProductImageRatios — kept for callers migrating gradually. */
 export function aisleImageHeightRatio(device: Device): number {
-  const refHeight = 1.05
-  return (device.size[1] / refHeight) * devicePhotoScale(device)
+  return aisleProductImageRatios(device).heightRatio
 }

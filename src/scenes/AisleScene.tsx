@@ -3,7 +3,7 @@ import type { Category, Device } from '../data/types'
 import { CATEGORY_LABELS } from '../data/types'
 import { deviceImage } from '../data/deviceImages'
 import { useReducedMotion } from '../hooks/useReducedMotion'
-import { aisleImageHeightRatio } from '../three/billboardSizing'
+import { aisleProductImageRatios } from '../three/billboardSizing'
 
 interface Props {
   /** Already category-filtered list (mirrors what the 3D scenes receive). */
@@ -312,10 +312,8 @@ interface TileProps {
 
 function Tile({ device, size, selected, onSelect, registerTile }: TileProps) {
   const src = deviceImage(device.id)
-  const heightRatio =
-    device.shape === 'board' || device.category === 'desk'
-      ? aisleImageHeightRatio(device)
-      : 1
+  const aisleSized = device.shape === 'board' || device.category === 'desk'
+  const imageRatios = aisleSized ? aisleProductImageRatios(device) : null
   const ref = useCallback(
     (node: HTMLButtonElement | null) => registerTile(device.id, node),
     [device.id, registerTile],
@@ -328,10 +326,14 @@ function Tile({ device, size, selected, onSelect, registerTile }: TileProps) {
       className={`aisle-tile aisle-tile--${size}`}
       data-vendor={device.vendorId}
       data-shape={device.shape}
+      data-aisle-sized={aisleSized ? 'true' : undefined}
       data-selected={selected ? 'true' : 'false'}
       style={
-        heightRatio !== 1
-          ? ({ '--aisle-img-height-ratio': heightRatio } as CSSProperties)
+        imageRatios
+          ? ({
+              '--aisle-img-height-ratio': imageRatios.heightRatio,
+              '--aisle-img-width-ratio': imageRatios.widthRatio,
+            } as CSSProperties)
           : undefined
       }
       aria-label={`${device.name} — ${device.family}`}
