@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#05080f"/>
+  <rect x="80" y="80" width="1040" height="470" rx="24" fill="#0a1220" stroke="rgba(255,255,255,0.08)"/>
+  <text x="120" y="220" fill="#f7fafc" font-family="Inter, system-ui, sans-serif" font-size="56" font-weight="700">A/V Device Matrix</text>
+  <text x="120" y="290" fill="#8b9cb3" font-family="Inter, system-ui, sans-serif" font-size="28">Logitech · Poly · Neat · Interactive 3D</text>
+  <circle cx="180" cy="380" r="10" fill="#00b8fc"/>
+  <text x="210" y="388" fill="#f7fafc" font-family="Inter, system-ui, sans-serif" font-size="22">Logitech</text>
+  <circle cx="380" cy="380" r="10" fill="#6161ff"/>
+  <text x="410" y="388" fill="#f7fafc" font-family="Inter, system-ui, sans-serif" font-size="22">Poly</text>
+  <circle cx="520" cy="380" r="10" fill="#ffffff"/>
+  <text x="550" y="388" fill="#f7fafc" font-family="Inter, system-ui, sans-serif" font-size="22">Neat</text>
+</svg>

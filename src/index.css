@@ -1,0 +1,1649 @@
+:root {
+  /* Cisco brand palette (publicly documented) — default chrome for the matrix */
+  --cisco-primary: #049fd9;
+  --cisco-indigo: #004baf;
+  --cisco-ocean: #097dbc;
+  --brand-primary: var(--cisco-primary);
+  --brand-secondary: var(--cisco-indigo);
+
+  /* App tokens */
+  --bg-1: #05080f;
+  --bg-2: #0a1220;
+  --fg-1: #f7fafc;
+  --fg-2: rgba(247, 250, 252, 0.78);
+  --fg-3: rgba(247, 250, 252, 0.55);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --accent: var(--brand-primary);
+
+  color-scheme: dark;
+  font-family:
+    'CiscoSansTT', 'Cisco Sans', Inter, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background:
+    radial-gradient(
+      1200px 800px at 80% -10%,
+      rgba(0, 184, 252, 0.12),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 600px at -10% 90%,
+      rgba(97, 97, 255, 0.14),
+      transparent 60%
+    ),
+    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+  color: var(--fg-1);
+  overflow: hidden;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 999px;
+  padding: 0.5rem 0.95rem;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    transform 120ms ease;
+  white-space: nowrap;
+}
+
+button:hover {
+  background: rgba(4, 159, 217, 0.18);
+  border-color: var(--brand-primary);
+}
+
+/* Selected / toggled-on pills — scoped so highlight states elsewhere
+   (e.g. search keyboard focus) don't inherit solid-fill + dark text. */
+.vendor-switch button[data-active='true'],
+.mode-switch button[data-active='true'],
+.filters button[data-active='true'],
+.compare-tray button[data-active='true'],
+.drawer button[data-active='true'] {
+  background: var(--brand-primary);
+  color: #001724;
+  border-color: var(--brand-primary);
+  font-weight: 600;
+}
+
+a {
+  color: var(--brand-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Layout */
+.app {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1rem;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+  background: rgba(5, 8, 15, 0.55);
+  backdrop-filter: blur(14px);
+  z-index: 5;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.brand-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(
+    135deg,
+    var(--brand-primary) 0%,
+    var(--brand-secondary) 100%
+  );
+  display: grid;
+  place-items: center;
+  color: white;
+  font-weight: 800;
+  font-size: 13px;
+  box-shadow: 0 8px 24px rgba(4, 159, 217, 0.35);
+}
+
+.brand-title {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.brand-sub {
+  font-size: 0.72rem;
+  color: var(--fg-3);
+  margin-top: 0.2rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.vendor-switch {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+}
+
+.mode-switch {
+  margin-left: auto;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+
+/* ── Topbar resource pills (source, RoomOS, components, designer) ─ */
+.designer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.85rem 0.45rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(4, 159, 217, 0.45);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 75, 175, 0.22) 0%,
+    rgba(4, 159, 217, 0.22) 100%
+  );
+  color: var(--fg-1);
+  text-decoration: none;
+  font-weight: 500;
+  line-height: 1;
+  box-shadow: 0 6px 18px rgba(0, 75, 175, 0.22);
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.designer-link:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 75, 175, 0.36) 0%,
+    rgba(4, 159, 217, 0.36) 100%
+  );
+  border-color: var(--brand-primary);
+  box-shadow: 0 8px 22px rgba(4, 159, 217, 0.36);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+.designer-link:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+.designer-link-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(0, 75, 175, 0.45);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.designer-link-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.designer-link-label {
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  color: var(--fg-1);
+}
+
+.designer-link-meta {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+@media (max-width: 1100px) {
+  .vendor-switch {
+    order: 8;
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
+
+  .mode-switch {
+    margin-left: 0;
+  }
+
+  .search-wrap {
+    order: 10;
+    flex: 1 1 100%;
+  }
+
+  .search-input-wrap {
+    max-width: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .source-link-text,
+  .designer-link-text {
+    display: none;
+  }
+
+  .source-link,
+  .designer-link {
+    padding: 0.35rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .brand-sub {
+    display: none;
+  }
+
+  .vendor-switch,
+  .mode-switch {
+    margin-left: 0;
+  }
+}
+
+/* ── Search bar ────────────────────────────────────────────────── */
+.search-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 1 1 160px;
+  min-width: 0;
+}
+
+.search-input-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  max-width: 280px;
+  padding: 0.4rem 0.55rem 0.4rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.04);
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.search-input-wrap:focus-within {
+  border-color: var(--brand-primary);
+  background: rgba(4, 159, 217, 0.08);
+}
+
+.search-input-icon {
+  font-size: 0.95rem;
+  opacity: 0.65;
+  margin-right: 0.35rem;
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--fg-1);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  padding: 0;
+}
+
+.search-input::placeholder {
+  color: var(--fg-3);
+}
+
+.search-kbd {
+  flex-shrink: 0;
+  margin-left: 0.45rem;
+}
+
+.search-icon-pill {
+  padding: 0.45rem 0.65rem;
+  font-size: 1rem;
+}
+
+.search-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: min(360px, 80vw);
+  max-height: 340px;
+  overflow-y: auto;
+  background: rgba(8, 12, 22, 0.96);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
+  padding: 4px;
+  z-index: 20;
+}
+
+.search-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--fg-1);
+  text-align: left;
+  cursor: pointer;
+}
+
+.search-result[data-highlighted='true'],
+.search-result:hover {
+  background: rgba(4, 159, 217, 0.18);
+  color: var(--fg-1);
+  border-color: transparent;
+  font-weight: 500;
+}
+
+.search-result[data-highlighted='true'] .search-result-meta,
+.search-result:hover .search-result-meta {
+  color: var(--fg-2);
+}
+
+.search-result-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.search-result-name {
+  font-size: 0.88rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-result-meta {
+  font-size: 0.7rem;
+  color: var(--fg-3);
+}
+
+.search-result-cat {
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(4, 159, 217, 0.18);
+  border: 1px solid rgba(4, 159, 217, 0.4);
+  color: #cfe7f5;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.search-empty {
+  padding: 0.7rem 0.8rem;
+  color: var(--fg-3);
+  font-size: 0.85rem;
+}
+
+.source-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.85rem 0.45rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(4, 159, 217, 0.45);
+  background: linear-gradient(
+    135deg,
+    rgba(4, 159, 217, 0.18) 0%,
+    rgba(0, 75, 175, 0.18) 100%
+  );
+  color: var(--fg-1);
+  text-decoration: none;
+  font-weight: 500;
+  line-height: 1;
+  box-shadow: 0 6px 18px rgba(4, 159, 217, 0.18);
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.source-link:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(4, 159, 217, 0.32) 0%,
+    rgba(0, 75, 175, 0.32) 100%
+  );
+  border-color: var(--brand-primary);
+  box-shadow: 0 8px 22px rgba(4, 159, 217, 0.32);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .source-link,
+  .source-link:hover,
+  .designer-link,
+  .designer-link:hover,
+  .finder-choice:hover {
+    transform: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+.source-link:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+.source-link-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(4, 159, 217, 0.35);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.source-link-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.source-link-label {
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+  color: var(--fg-1);
+}
+
+.source-link-meta {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.source-link--gated .source-link-meta {
+  color: #e8b86d;
+}
+
+.canvas-wrap {
+  position: relative;
+  overflow: hidden;
+}
+
+.canvas-wrap canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.overlay > * {
+  pointer-events: auto;
+}
+
+.filters {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  max-width: 70%;
+  padding: 0.6rem 0.7rem;
+  border-radius: 18px;
+  background: rgba(5, 8, 15, 0.55);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+}
+
+.compare-tray {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 14px;
+  background: rgba(5, 8, 15, 0.55);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+  max-width: 320px;
+}
+
+.compare-tray h3 {
+  margin: 0 0 0.25rem;
+  font-size: 0.85rem;
+  color: var(--fg-3);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.compare-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.86rem;
+}
+
+.compare-row button {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.75rem;
+}
+
+/* Drawer */
+.drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 10;
+}
+
+.drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(440px, 100%);
+  background: rgba(8, 12, 22, 0.92);
+  border-left: 1px solid var(--line-strong);
+  padding: 1.25rem;
+  overflow-y: auto;
+  z-index: 11;
+  box-shadow: -30px 0 60px rgba(0, 0, 0, 0.4);
+}
+
+.drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.drawer h2 {
+  margin: 0 0 0.2rem;
+  font-size: 1.15rem;
+}
+
+.drawer .tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand-primary);
+  margin-bottom: 0.4rem;
+}
+
+.drawer .vendor-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-left: 0.5rem;
+  margin-bottom: 0.4rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.drawer .vendor-tag[data-vendor='cisco'] {
+  background: #049fd9;
+  border-color: #049fd9;
+  color: #001724;
+}
+
+.drawer .vendor-tag[data-vendor='logitech'] {
+  background: #00b8fc;
+  border-color: #00b8fc;
+  color: #001724;
+}
+
+.drawer .vendor-tag[data-vendor='poly'] {
+  background: #6161ff;
+  border-color: #6161ff;
+  color: #001724;
+}
+
+.drawer .vendor-tag[data-vendor='neat'] {
+  background: #ffffff;
+  border-color: #a3a3a3;
+  color: #001724;
+}
+
+.drawer .tagline {
+  color: var(--fg-2);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.drawer-photo {
+  display: grid;
+  place-items: center;
+  padding: 1.1rem 0.5rem;
+  margin: 0 0 1rem;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(4, 159, 217, 0.12),
+    transparent 65%
+  );
+  border-radius: 14px;
+  min-height: 170px;
+}
+
+.drawer-photo img {
+  max-width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.45));
+}
+
+.drawer h4 {
+  margin: 1.1rem 0 0.4rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.drawer ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.9rem;
+  color: var(--fg-2);
+}
+
+.drawer li {
+  margin: 0.2rem 0;
+}
+
+.drawer p.spec {
+  margin: 0.2rem 0;
+  font-size: 0.9rem;
+  color: var(--fg-2);
+}
+
+.price-pill {
+  display: inline-block;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.85rem;
+  border-radius: 999px;
+  background: rgba(4, 159, 217, 0.15);
+  border: 1px solid rgba(4, 159, 217, 0.4);
+  color: var(--brand-primary);
+  margin-top: 0.25rem;
+}
+
+.kbd {
+  font-size: 0.72rem;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--line-strong);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  color: var(--fg-2);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.help {
+  font-size: 0.78rem;
+  color: var(--fg-3);
+}
+
+/* ── Finder ────────────────────────────────────────────────────── */
+.finder-panel {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(640px, calc(100% - 2rem));
+  padding: 1rem 1.1rem 1.1rem;
+  border-radius: 16px;
+  background: rgba(8, 12, 22, 0.78);
+  border: 1px solid var(--line-strong);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+  z-index: 4;
+}
+
+.finder-step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  margin-bottom: 0.4rem;
+}
+
+.finder-back {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+}
+
+.finder-title {
+  margin: 0 0 0.85rem;
+  font-size: 1.15rem;
+  color: var(--fg-1);
+  letter-spacing: -0.005em;
+}
+
+.finder-choices {
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.finder-choice {
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line-strong);
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    transform 120ms ease;
+}
+
+.finder-choice:hover {
+  border-color: var(--brand-primary);
+  background: rgba(4, 159, 217, 0.12);
+  transform: translateY(-1px);
+}
+
+.finder-choice-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.finder-choice-hint {
+  color: var(--fg-3);
+  font-size: 0.72rem;
+}
+
+.finder-summary {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(8, 12, 22, 0.78);
+  border: 1px solid var(--line-strong);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+  z-index: 4;
+  max-width: calc(100% - 2rem);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.finder-summary-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.chip-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  padding: 0 0.25rem;
+}
+
+.chip {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(4, 159, 217, 0.15);
+  border: 1px solid rgba(4, 159, 217, 0.4);
+  color: var(--fg-1);
+  font-size: 0.82rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.chip:hover {
+  background: rgba(4, 159, 217, 0.28);
+  border-color: var(--brand-primary);
+}
+
+.chip-edit {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brand-primary);
+  opacity: 0.85;
+}
+
+.finder-restart {
+  padding: 0.25rem 0.7rem;
+  font-size: 0.78rem;
+}
+
+@media (max-width: 720px) {
+  .finder-panel {
+    top: 0.6rem;
+    width: calc(100% - 1.2rem);
+    padding: 0.75rem 0.85rem 0.85rem;
+  }
+  .finder-choices {
+    grid-template-columns: 1fr 1fr;
+  }
+  .finder-title {
+    font-size: 1rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 720px) {
+  .filters {
+    max-width: calc(100% - 2rem);
+  }
+  .compare-tray {
+    left: 1rem;
+    right: 1rem;
+    max-width: none;
+  }
+}
+
+/* ── Drawer external resource links ────────────────────────────── */
+.drawer-resource-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.drawer-external-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(4, 159, 217, 0.45);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 75, 175, 0.18) 0%,
+    rgba(4, 159, 217, 0.18) 100%
+  );
+  color: var(--fg-1);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.drawer-external-link:hover {
+  border-color: var(--brand-primary);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 75, 175, 0.32) 0%,
+    rgba(4, 159, 217, 0.32) 100%
+  );
+  text-decoration: none;
+}
+
+.drawer-external-link--gated {
+  align-items: flex-start;
+}
+
+.drawer-external-link-note {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #e8b86d;
+}
+
+.drawer-resource-links .drawer-external-link {
+  margin-top: 0;
+}
+
+.drawer-external-link + .drawer-resource-links {
+  margin-top: 0.5rem;
+}
+
+.drawer-product-page-link {
+  margin-top: 0.85rem;
+}
+
+/* ── Compare modal: copy-link button ───────────────────────────── */
+.compare-copy-link {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  border-radius: 999px;
+  border: 1px solid rgba(4, 159, 217, 0.45);
+  background: rgba(4, 159, 217, 0.14);
+  color: var(--fg-1);
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.compare-copy-link:hover {
+  background: rgba(4, 159, 217, 0.26);
+  border-color: var(--brand-primary);
+}
+
+.compare-copy-link[data-copied='true'] {
+  background: rgba(4, 159, 217, 0.4);
+  border-color: var(--brand-primary);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   AISLE — 2D horizontal-scrolling shelf view (replaces 3D Showcase)
+
+   Studio-floor backdrop with two stacked shelves per category bay.
+   Devices render as bottom-anchored cutout <img> tags with CSS
+   contact shadows; sections sit side-by-side and the user scrolls
+   left↔right. Visually: warm off-white floor, pale concrete plank
+   with a Cisco-blue trim band at the front edge.
+   ──────────────────────────────────────────────────────────────── */
+
+.aisle-root {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background:
+    linear-gradient(
+      180deg,
+      #0a0e18 0%,
+      #06090f 55%,
+      #05080f 100%
+    );
+  color: #e5eaf0;
+  overflow: hidden;
+}
+
+.aisle-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.aisle-scroller {
+  position: absolute;
+  inset: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  scrollbar-color: rgba(229, 234, 240, 0.25) transparent;
+  scrollbar-width: thin;
+  /* Reserve space for the global category-filter pill (`.filters`)
+     which sits at bottom: 1rem inside the shared overlay. Without
+     this, the bottom shelf and its device captions visually tuck
+     under the pill. The filter pill is contained to other views by
+     pointer-events on .overlay > *, but its physical footprint still
+     overlaps this scroller. */
+  padding-bottom: 96px;
+}
+
+.aisle-root[data-reduced-motion='true'] .aisle-scroller {
+  scroll-behavior: auto;
+}
+
+.aisle-scroller::-webkit-scrollbar {
+  height: 8px;
+}
+
+.aisle-scroller::-webkit-scrollbar-thumb {
+  background: rgba(229, 234, 240, 0.18);
+  border-radius: 999px;
+}
+
+.aisle-scroller::-webkit-scrollbar-thumb:hover {
+  background: rgba(229, 234, 240, 0.32);
+}
+
+.aisle-track {
+  display: flex;
+  align-items: stretch;
+  gap: 72px;
+  padding: 16px 96px 8px;
+  height: 100%;
+  min-width: max-content;
+}
+
+.aisle-empty {
+  align-self: center;
+  margin: auto;
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  background: rgba(8, 14, 26, 0.7);
+  border: 1px solid rgba(4, 159, 217, 0.45);
+  color: #e5eaf0;
+  font-size: 0.95rem;
+  backdrop-filter: blur(8px);
+}
+
+/* ── Section bay ───────────────────────────────────────────────── */
+.aisle-section {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  min-width: 320px;
+  height: 100%;
+}
+
+.aisle-sign {
+  align-self: center;
+  margin: 6px 0 14px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(8, 14, 26, 0.7);
+  border: 1px solid rgba(4, 159, 217, 0.55);
+  color: #e5eaf0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+}
+
+.aisle-shelves {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+/* ── Shelf ─────────────────────────────────────────────────────── */
+.aisle-shelf {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.aisle-shelf--top {
+  flex: 0.85;
+}
+
+.aisle-shelf--bottom {
+  flex: 1;
+}
+
+/*  Surface — where products visually sit. Bottom-anchored with a
+    little breathing room at the top of the shelf. */
+.aisle-shelf-surface {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 24px;
+  padding: 12px 12px 0;
+  min-height: 0;
+  position: relative;
+}
+
+/*  Plank — a thin "shelf board" the products rest on. Subtle gradient
+    + inset shadow gives 3D-ish thickness without faking perspective.  */
+.aisle-shelf-plank {
+  flex: 0 0 auto;
+  height: 22px;
+  position: relative;
+  background:
+    linear-gradient(
+      180deg,
+      #131824 0%,
+      #0c1018 55%,
+      #070a12 100%
+    );
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+    0 6px 14px rgba(0, 0, 0, 0.5);
+}
+
+/*  Cisco-blue trim band along the front edge so each shelf reads as
+    a distinct retail bay. */
+.aisle-shelf-trim {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--brand-primary);
+  box-shadow:
+    0 0 12px rgba(4, 159, 217, 0.65),
+    0 0 24px rgba(4, 159, 217, 0.25);
+}
+
+/* ── Boards (tall) variant ─────────────────────────────────────── */
+.aisle-section--tall {
+  min-width: 380px;
+}
+
+.aisle-section--tall .aisle-shelf--full {
+  flex: 1;
+}
+
+.aisle-section--tall .aisle-shelf-surface {
+  gap: 32px;
+}
+
+/* ── Tile (one device on a shelf) ──────────────────────────────── */
+.aisle-tile {
+  flex: 0 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 10px;
+  transition:
+    transform 160ms ease,
+    filter 160ms ease;
+  isolation: isolate;
+}
+
+.aisle-tile:hover,
+.aisle-tile:focus-visible {
+  outline: none;
+  background: transparent;
+  border-color: transparent;
+}
+
+.aisle-tile:focus-visible {
+  box-shadow: 0 0 0 2px var(--brand-primary);
+}
+
+.aisle-tile:hover {
+  transform: translateY(-5px);
+}
+
+.aisle-root[data-reduced-motion='true'] .aisle-tile,
+.aisle-root[data-reduced-motion='true'] .aisle-tile:hover {
+  transform: none;
+  transition: none;
+}
+
+.aisle-tile--small {
+  width: 168px;
+}
+
+.aisle-tile--large {
+  width: 220px;
+}
+
+.aisle-tile--tall {
+  width: 260px;
+}
+
+.aisle-tile-img-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1;
+}
+
+.aisle-tile--small .aisle-tile-img-wrap {
+  height: 180px;
+}
+
+.aisle-tile--large .aisle-tile-img-wrap {
+  height: 240px;
+}
+
+.aisle-tile--tall .aisle-tile-img-wrap {
+  height: 460px;
+}
+
+.aisle-tile-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  display: block;
+  -webkit-user-drag: none;
+  user-select: none;
+  filter:
+    drop-shadow(0 10px 14px rgba(0, 0, 0, 0.7))
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55));
+  transition: filter 160ms ease;
+}
+
+.aisle-tile:hover .aisle-tile-img {
+  filter:
+    drop-shadow(0 14px 20px rgba(0, 0, 0, 0.78))
+    drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
+}
+
+.aisle-tile-fallback {
+  display: grid;
+  place-items: center;
+  width: 80%;
+  height: 60%;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1a1d24, #0e1115);
+  border: 1px solid var(--line);
+  color: #c5cad3;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 0.4rem;
+}
+
+/*  Anchor pool — sits behind the img, hugs the bottom of the shelf
+    surface. On the dark backdrop a dark shadow disappears, so this
+    is a SUBTLE BLUE-TINTED GLOW that anchors the product to the
+    plank. The selected-state glow below is just a brighter version
+    of the same effect. */
+.aisle-tile-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  transform: translateX(-50%);
+  width: 72%;
+  height: 18px;
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(4, 159, 217, 0.18) 0%,
+    rgba(4, 159, 217, 0.08) 45%,
+    rgba(4, 159, 217, 0) 75%
+  );
+  filter: blur(6px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.aisle-tile:hover .aisle-tile-shadow {
+  width: 84%;
+  height: 22px;
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(4, 159, 217, 0.28) 0%,
+    rgba(4, 159, 217, 0.12) 45%,
+    rgba(4, 159, 217, 0) 75%
+  );
+}
+
+/*  Selection glow — Cisco-blue radial halo on the shelf under the
+    selected device. Sits behind the contact shadow. */
+.aisle-tile-glow {
+  position: absolute;
+  left: 50%;
+  bottom: -12px;
+  transform: translateX(-50%);
+  width: 110%;
+  height: 80px;
+  background: radial-gradient(
+    50% 50% at 50% 65%,
+    rgba(4, 159, 217, 0.55) 0%,
+    rgba(4, 159, 217, 0.18) 35%,
+    rgba(4, 159, 217, 0) 70%
+  );
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 200ms ease;
+}
+
+.aisle-tile[data-selected='true'] .aisle-tile-glow {
+  opacity: 1;
+}
+
+.aisle-tile[data-selected='true'] .aisle-tile-img {
+  filter:
+    drop-shadow(0 14px 22px rgba(4, 159, 217, 0.55))
+    drop-shadow(0 4px 8px rgba(4, 159, 217, 0.35));
+}
+
+/* ── Caption ──────────────────────────────────────────────────── */
+.aisle-tile-caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  padding: 0 4px;
+  text-align: center;
+}
+
+.aisle-tile-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #f0f3f7;
+  line-height: 1.15;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.aisle-tile[data-vendor='logitech'] .aisle-tile-name {
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #00b8fc;
+  border: 1px solid #00b8fc;
+  color: #001724;
+}
+
+.aisle-tile[data-vendor='poly'] .aisle-tile-name {
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #6161ff;
+  border: 1px solid #6161ff;
+  color: #001724;
+}
+
+.aisle-tile[data-vendor='neat'] .aisle-tile-name {
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #a3a3a3;
+  color: #001724;
+}
+
+/* Poly voice products use same vendor pill colors as Studio (data-vendor='poly'). */
+
+.aisle-tile-meta {
+  font-size: 0.66rem;
+  color: rgba(229, 234, 240, 0.65);
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.aisle-tile--small .aisle-tile-name {
+  font-size: 0.74rem;
+}
+
+.aisle-tile--small .aisle-tile-meta {
+  font-size: 0.62rem;
+}
+
+/* ── Edge fades ───────────────────────────────────────────────── */
+.aisle-fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 56px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.aisle-fade--left {
+  left: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(5, 8, 15, 0.96) 0%,
+    rgba(5, 8, 15, 0) 100%
+  );
+}
+
+.aisle-fade--right {
+  right: 0;
+  background: linear-gradient(
+    270deg,
+    rgba(5, 8, 15, 0.96) 0%,
+    rgba(5, 8, 15, 0) 100%
+  );
+}
+
+/* ── Chevron buttons ──────────────────────────────────────────── */
+.aisle-chevron {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(4, 159, 217, 0.4);
+  background: rgba(8, 14, 26, 0.75);
+  color: #e5eaf0;
+  font-size: 1.5rem;
+  line-height: 1;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  z-index: 3;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.aisle-chevron:hover {
+  background: rgba(8, 14, 26, 0.9);
+  border-color: rgba(4, 159, 217, 0.8);
+  color: var(--brand-primary);
+  transform: translateY(-50%) scale(1.04);
+}
+
+.aisle-root[data-reduced-motion='true'] .aisle-chevron:hover {
+  transform: translateY(-50%);
+}
+
+.aisle-chevron:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+.aisle-chevron--left {
+  left: 12px;
+}
+
+.aisle-chevron--right {
+  right: 12px;
+}
+
+/* ── Floor strip (full width, below scroller) ─────────────────── */
+/*  Reads as ambient Cisco-blue light spilling onto the floor from
+    the shelf trim, rather than a redundant stripe. */
+.aisle-floor {
+  flex: 0 0 auto;
+  height: 30px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(4, 159, 217, 0.08) 50%,
+    transparent 100%
+  );
+  border-top: 1px solid var(--line);
+  box-shadow: inset 0 6px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* ── Mobile / narrow viewports ────────────────────────────────── */
+@media (max-width: 768px) {
+  .aisle-scroller {
+    /* Filter pill wraps tighter on narrow screens, so we can give a
+       touch more vertical real estate back to the shelves. */
+    padding-bottom: 84px;
+  }
+
+  .aisle-track {
+    gap: 48px;
+    padding: 12px 56px 4px;
+  }
+
+  .aisle-section {
+    min-width: 260px;
+  }
+
+  .aisle-section--tall {
+    min-width: 300px;
+  }
+
+  .aisle-tile--small {
+    width: 128px;
+  }
+
+  .aisle-tile--large {
+    width: 168px;
+  }
+
+  .aisle-tile--tall {
+    width: 200px;
+  }
+
+  .aisle-tile--small .aisle-tile-img-wrap {
+    height: 140px;
+  }
+
+  .aisle-tile--large .aisle-tile-img-wrap {
+    height: 180px;
+  }
+
+  .aisle-tile--tall .aisle-tile-img-wrap {
+    height: 320px;
+  }
+
+  .aisle-tile-name {
+    font-size: 0.7rem;
+  }
+
+  .aisle-tile-meta {
+    font-size: 0.6rem;
+  }
+
+  .aisle-chevron {
+    width: 36px;
+    height: 36px;
+    font-size: 1.2rem;
+  }
+
+  .aisle-fade {
+    width: 32px;
+  }
+}

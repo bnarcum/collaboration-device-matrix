@@ -1,0 +1,486 @@
+import { useCallback, useEffect, useMemo } from 'react'
+import type { CSSProperties } from 'react'
+import { Canvas } from '@react-three/fiber'
+import { DEVICES, devicesForVendor } from './data/catalog'
+import {
+  CATEGORY_LABELS,
+  CATEGORY_ORDER,
+  ROOM_SIZE_ORDER,
+  VENDOR_LABELS,
+  VENDOR_ORDER,
+} from './data/types'
+import type { Category, Device, RoomSize, VendorId } from './data/types'
+import { VENDORS } from './data/vendors'
+import { ShowroomScene } from './scenes/ShowroomScene'
+import { AisleScene } from './scenes/AisleScene'
+import { FinderScene } from './scenes/FinderScene'
+import { DeviceDrawer } from './ui/DeviceDrawer'
+import { CompareTray } from './ui/CompareTray'
+import { CompareModal } from './ui/CompareModal'
+import { FinderOverlay, type FinderState } from './ui/FinderOverlay'
+import { SearchBar } from './ui/SearchBar'
+import {
+  enumCodec,
+  idArrayCodec,
+  idCodec,
+  useUrlState,
+} from './hooks/useUrlState'
+
+type Mode = 'showroom' | 'showcase' | 'finder'
+const MODES: readonly Mode[] = ['showroom', 'showcase', 'finder']
+
+type VendorFilter = VendorId | 'all'
+const VENDOR_FILTERS: readonly VendorFilter[] = [...VENDOR_ORDER, 'all']
+
+const MAX_COMPARE = 3
+
+const DEVICES_BY_ID = new Map(DEVICES.map((d) => [d.id, d]))
+
+const FILTER_VALUES: readonly (Category | 'all')[] = ['all', ...CATEGORY_ORDER]
+
+export default function App() {
+  const [vendor, setVendor] = useUrlState<VendorFilter>(
+    'vendor',
+    'cisco',
+    enumCodec(VENDOR_FILTERS, 'cisco'),
+  )
+  const [mode, setMode] = useUrlState<Mode>(
+    'view',
+    'showroom',
+    enumCodec(MODES, 'showroom'),
+  )
+  const [selectedId, setSelectedId] = useUrlState<string | null>(
+    'device',
+    null,
+    idCodec,
+  )
+  const [filter, setFilter] = useUrlState<Category | 'all'>(
+    'filter',
+    'all',
+    enumCodec(FILTER_VALUES, 'all'),
+  )
+  const [roomSize, setRoomSize] = useUrlState<RoomSize | null>(
+    'room',
+    null,
+    enumCodec(ROOM_SIZE_ORDER, null),
+  )
+  const [finderForRaw, setFinderForRaw] = useUrlState<string | null>(
+    'for',
+    null,
+    enumCodec(['any', ...CATEGORY_ORDER], null),
+  )
+  const [compareIds, setCompareIds] = useUrlState<string[]>(
+    'compare',
+    [],
+    idArrayCodec,
+  )
+  const [compareOpen, setCompareOpenRaw] = useUrlState<boolean>(
+    'compareOpen',
+    false,
+    {
+      parse: (raw) => raw === '1',
+      serialize: (v) => (v ? '1' : null),
+    },
+  )
+
+  const catalog = useMemo(() => devicesForVendor(vendor), [vendor])
+
+  useEffect(() => {
+    if (selectedId !== null && !DEVICES_BY_ID.has(selectedId)) {
+      setSelectedId(null)
+    }
+    setCompareIds((prev) => {
+      const cleaned: string[] = []
+      const seen = new Set<string>()
+      for (const id of prev) {
+        if (!DEVICES_BY_ID.has(id)) continue
+        if (seen.has(id)) continue
+        seen.add(id)
+        cleaned.push(id)
+        if (cleaned.length >= MAX_COMPARE) break
+      }
+      const same =
+        cleaned.length === prev.length && cleaned.every((v, i) => prev[i] === v)
+      return same ? prev : cleaned
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (selectedId && !catalog.some((d) => d.id === selectedId)) {
+      setSelectedId(null)
+    }
+  }, [catalog, selectedId, setSelectedId])
+
+  const selected: Device | null = useMemo(
+    () => (selectedId ? DEVICES_BY_ID.get(selectedId) ?? null : null),
+    [selectedId],
+  )
+
+  const compare: Device[] = useMemo(
+    () =>
+      compareIds
+        .map((id) => DEVICES_BY_ID.get(id))
+        .filter((d): d is Device => !!d),
+    [compareIds],
+  )
+
+  const finderState: FinderState = useMemo(() => {
+    if (!roomSize) return { step: 0 }
+    if (finderForRaw === null) return { step: 1, roomSize }
+    return {
+      step: 2,
+      roomSize,
+      category:
+        finderForRaw === 'any' ? undefined : (finderForRaw as Category),
+    }
+  }, [roomSize, finderForRaw])
+
+  const setFinderState = useCallback(
+    (s: FinderState) => {
+      if (s.step === 0) {
+        setRoomSize(null)
+        setFinderForRaw(null)
+      } else if (s.step === 1) {
+        setRoomSize(s.roomSize ?? null)
+        setFinderForRaw(null)
+      } else {
+        setRoomSize(s.roomSize ?? null)
+        setFinderForRaw(s.category ?? 'any')
+      }
+    },
+    [setRoomSize, setFinderForRaw],
+  )
+
+  const visibleDevices = useMemo(
+    () =>
+      filter === 'all'
+        ? catalog
+        : catalog.filter((d) => d.category === filter),
+    [catalog, filter],
+  )
+
+  const selectDevice = useCallback(
+    (d: Device | null) => {
+      setSelectedId(d?.id ?? null)
+    },
+    [setSelectedId],
+  )
+
+  const toggleCompare = useCallback(
+    (d: Device) => {
+      setCompareIds((prev) => {
+        const exists = prev.includes(d.id)
+        if (exists) return prev.filter((id) => id !== d.id)
+        if (prev.length >= MAX_COMPARE) return prev
+        return [...prev, d.id]
+      })
+    },
+    [setCompareIds],
+  )
+
+  const setCompareOpen = useCallback(
+    (open: boolean) => setCompareOpenRaw(open),
+    [setCompareOpenRaw],
+  )
+
+  const activeVendorTheme =
+    vendor === 'logitech' || vendor === 'poly' || vendor === 'neat'
+      ? VENDORS[vendor]
+      : null
+
+  const partnerVendor =
+    vendor === 'logitech' || vendor === 'poly' || vendor === 'neat'
+      ? vendor
+      : null
+
+  useEffect(() => {
+    const base =
+      'Collaboration Device Matrix · Cisco · Logitech · Poly · Neat'
+    document.title = selected ? `${selected.name} · ${base}` : base
+  }, [selected])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const target = document.activeElement as HTMLElement | null
+      const tag = target?.tagName?.toLowerCase()
+      const editable =
+        tag === 'input' ||
+        tag === 'textarea' ||
+        tag === 'select' ||
+        target?.isContentEditable === true
+      if (e.key === 'Escape') {
+        if (compareOpen) {
+          setCompareOpen(false)
+          e.preventDefault()
+          return
+        }
+        if (selected) {
+          selectDevice(null)
+          e.preventDefault()
+          return
+        }
+      }
+      if (editable) return
+      if (e.metaKey || e.ctrlKey || e.altKey) return
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
+      if (!selected) return
+      const peers = catalog.filter((d) => d.category === selected.category)
+      if (peers.length === 0) return
+      const idx = peers.findIndex((d) => d.id === selected.id)
+      if (idx < 0) return
+      const dir = e.key === 'ArrowRight' ? 1 : -1
+      const next = peers[(idx + dir + peers.length) % peers.length]
+      selectDevice(next)
+      e.preventDefault()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [selected, selectDevice, compareOpen, setCompareOpen, catalog])
+
+  return (
+    <div
+      className="app"
+      data-vendor={vendor}
+      style={
+        activeVendorTheme
+          ? ({
+              '--brand-primary': activeVendorTheme.primary,
+              '--brand-secondary': activeVendorTheme.secondary,
+            } as CSSProperties)
+          : undefined
+      }
+    >
+      <header className="topbar">
+        <div className="brand">
+          <div className="brand-logo" aria-hidden>
+            ⩕
+          </div>
+          <div>
+            <div className="brand-title">Collaboration Device Matrix</div>
+            <div className="brand-sub">
+              Cisco · compare Logitech, Poly &amp; Neat
+            </div>
+          </div>
+        </div>
+        <nav className="vendor-switch" aria-label="Manufacturer">
+          {VENDOR_ORDER.map((v) => (
+            <button
+              key={v}
+              data-active={vendor === v ? 'true' : 'false'}
+              onClick={() => setVendor(v)}
+            >
+              {VENDOR_LABELS[v]}
+            </button>
+          ))}
+          <button
+            data-active={vendor === 'all' ? 'true' : 'false'}
+            onClick={() => setVendor('all')}
+          >
+            All
+          </button>
+        </nav>
+        <nav className="mode-switch" aria-label="View mode">
+          <button
+            data-active={mode === 'showroom' ? 'true' : 'false'}
+            onClick={() => setMode('showroom')}
+          >
+            Showroom
+          </button>
+          <button
+            data-active={mode === 'showcase' ? 'true' : 'false'}
+            onClick={() => setMode('showcase')}
+          >
+            Aisle
+          </button>
+          <button
+            data-active={mode === 'finder' ? 'true' : 'false'}
+            onClick={() => setMode('finder')}
+          >
+            Finder
+          </button>
+        </nav>
+        <SearchBar devices={catalog} onSelect={(d) => selectDevice(d)} />
+        <div className="topbar-actions">
+          <a
+            className="source-link"
+            href="https://www.webex.com/content/dam/wbx/us/documents/pdf/Collaboration_Device_Product_Matrix_Brochure.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open the official Cisco/Webex Collaboration Device Product Matrix source document (PDF, opens in a new tab)"
+            title="Collaboration Device Product Matrix (PDF)"
+          >
+            <span className="source-link-icon" aria-hidden>
+              ⤓
+            </span>
+            <span className="source-link-text">
+              <span className="source-link-label">Source Document</span>
+              <span className="source-link-meta">Cisco · Webex · PDF</span>
+            </span>
+          </a>
+          <a
+            className="source-link"
+            href="https://roomos.cisco.com/doc/Welcome/Welcome"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open Cisco RoomOS documentation (opens in a new tab)"
+            title="Cisco RoomOS documentation"
+          >
+            <span className="source-link-icon" aria-hidden>
+              ⊞
+            </span>
+            <span className="source-link-text">
+              <span className="source-link-label">Cisco RoomOS ↗</span>
+              <span className="source-link-meta">Device documentation</span>
+            </span>
+          </a>
+          <a
+            className="designer-link"
+            href="https://designer.webex.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open Cisco Workspace Designer to plan a room (opens in a new tab)"
+            title="Open Cisco Workspace Designer"
+          >
+            <span className="designer-link-icon" aria-hidden>
+              ⌗
+            </span>
+            <span className="designer-link-text">
+              <span className="designer-link-label">Cisco Workspace Designer ↗</span>
+              <span className="designer-link-meta">Plan a room</span>
+            </span>
+          </a>
+          {partnerVendor && (() => {
+            const cfg = VENDORS[partnerVendor]
+            const link = cfg.resourceLinks[0]
+            if (!link) return null
+            return (
+              <a
+                key={partnerVendor}
+                className="source-link"
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Open ${link.label} (opens in a new tab)`}
+                title={link.label}
+              >
+                <span className="source-link-icon" aria-hidden>
+                  {link.icon ?? '↗'}
+                </span>
+                <span className="source-link-text">
+                  <span className="source-link-label">{link.label}</span>
+                  <span className="source-link-meta">{cfg.name}</span>
+                </span>
+              </a>
+            )
+          })()}
+        </div>
+      </header>
+
+      <div className="canvas-wrap">
+        {mode === 'showcase' ? (
+          <AisleScene
+            devices={visibleDevices}
+            selected={selected}
+            onSelect={(d) => selectDevice(d)}
+            filter={filter}
+          />
+        ) : (
+          <Canvas
+            camera={{ position: cameraFor(mode), fov: 45 }}
+            dpr={[1, 2]}
+            gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
+          >
+            {mode === 'showroom' && (
+              <ShowroomScene
+                devices={visibleDevices}
+                selected={selected}
+                onSelect={(d) => selectDevice(d)}
+              />
+            )}
+            {mode === 'finder' && (
+              <FinderScene
+                devices={catalog}
+                selected={selected}
+                step={finderState.step}
+                filter={{
+                  roomSize: finderState.roomSize,
+                  category: finderState.category,
+                }}
+                onSelect={(d) => selectDevice(d)}
+              />
+            )}
+          </Canvas>
+        )}
+
+        <div className="overlay">
+          {(mode === 'showroom' || mode === 'showcase') && (
+            <Filters value={filter} onChange={setFilter} />
+          )}
+          {mode === 'finder' && (
+            <FinderOverlay state={finderState} setState={setFinderState} />
+          )}
+          <CompareTray
+            items={compare}
+            onRemove={(d) => toggleCompare(d)}
+            onOpen={(d) => selectDevice(d)}
+            onCompareAll={() => setCompareOpen(true)}
+          />
+        </div>
+
+        <DeviceDrawer
+          device={selected}
+          onClose={() => selectDevice(null)}
+          inCompare={!!selected && compare.some((c) => c.id === selected.id)}
+          canAddCompare={compare.length < MAX_COMPARE}
+          onToggleCompare={toggleCompare}
+        />
+
+        <CompareModal
+          items={compare}
+          open={compareOpen}
+          onClose={() => setCompareOpen(false)}
+        />
+      </div>
+    </div>
+  )
+}
+
+function cameraFor(mode: Mode): [number, number, number] {
+  switch (mode) {
+    case 'showroom':
+      return [9, 6, 9]
+    case 'showcase':
+      return [0, 5, 14]
+    case 'finder':
+      return [0, 4.5, 9]
+  }
+}
+
+function Filters({
+  value,
+  onChange,
+}: {
+  value: Category | 'all'
+  onChange: (c: Category | 'all') => void
+}) {
+  return (
+    <div className="filters" role="toolbar" aria-label="Category filter">
+      <button
+        data-active={value === 'all' ? 'true' : 'false'}
+        onClick={() => onChange('all')}
+      >
+        All
+      </button>
+      {CATEGORY_ORDER.map((c) => (
+        <button
+          key={c}
+          data-active={value === c ? 'true' : 'false'}
+          onClick={() => onChange(c)}
+        >
+          {CATEGORY_LABELS[c]}
+        </button>
+      ))}
+    </div>
+  )
+}

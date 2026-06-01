@@ -1,0 +1,72 @@
+# Build the Vite app and publish it to GitHub Pages.
+# After the first run, go to: Settings → Pages → Source: GitHub Actions.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+# Pin minimal permissions for OIDC-based Pages deploy.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Ensure only one Pages deploy runs at a time; cancel queued duplicates.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Resolve base path
+        id: base
+        run: |
+          # When deploying to user.github.io, base path is "/".
+          # Otherwise it's "/<repo-name>/".
+          repo="${GITHUB_REPOSITORY##*/}"
+          owner_lower="$(echo "${GITHUB_REPOSITORY%%/*}" | tr '[:upper:]' '[:lower:]')"
+          if [ "$repo" = "${owner_lower}.github.io" ]; then
+            echo "base=/" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=/${repo}/" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build
+        env:
+          VITE_BASE_PATH: ${{ steps.base.outputs.base }}
+        run: npm run build
+
+      - name: SPA-style 404 fallback for client routing
+        run: cp dist/index.html dist/404.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
