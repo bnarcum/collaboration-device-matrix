@@ -3,7 +3,7 @@
 Cisco-first interactive 3D catalog of collaboration endpoints, with **Logitech**, **Poly**, and **Neat** products for side-by-side browsing and comparison.
 
 - **Default view:** Cisco devices (from the official Collaboration Device Product Matrix brochure)
-- **Manufacturer switcher:** Cisco · Logitech · Poly · Neat · **All** (cross-vendor compare)
+- **Manufacturer toggles:** Turn Cisco, Logitech, Poly, and/or Neat on or off; **All** selects every vendor (URL: `?vendor=cisco,poly` or `?vendor=all`)
 - **Modes:** Showroom (3D rings), Aisle (shelves), Finder (guided match)
 
 ## Development

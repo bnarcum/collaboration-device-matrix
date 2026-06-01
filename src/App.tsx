@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useMemo } from 'react'
 import type { CSSProperties } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { DEVICES, devicesForVendor } from './data/catalog'
+import {
+  DEVICES,
+  devicesForVendors,
+  normalizeVendorSelection,
+} from './data/catalog'
 import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
@@ -24,13 +28,13 @@ import {
   idArrayCodec,
   idCodec,
   useUrlState,
+  vendorSelectionCodec,
 } from './hooks/useUrlState'
 
 type Mode = 'showroom' | 'showcase' | 'finder'
 const MODES: readonly Mode[] = ['showroom', 'showcase', 'finder']
 
-type VendorFilter = VendorId | 'all'
-const VENDOR_FILTERS: readonly VendorFilter[] = [...VENDOR_ORDER, 'all']
+const DEFAULT_VENDORS: VendorId[] = ['cisco']
 
 const MAX_COMPARE = 3
 
@@ -39,10 +43,10 @@ const DEVICES_BY_ID = new Map(DEVICES.map((d) => [d.id, d]))
 const FILTER_VALUES: readonly (Category | 'all')[] = ['all', ...CATEGORY_ORDER]
 
 export default function App() {
-  const [vendor, setVendor] = useUrlState<VendorFilter>(
+  const [selectedVendors, setSelectedVendors] = useUrlState<VendorId[]>(
     'vendor',
-    'cisco',
-    enumCodec(VENDOR_FILTERS, 'cisco'),
+    DEFAULT_VENDORS,
+    vendorSelectionCodec(VENDOR_ORDER, DEFAULT_VENDORS),
   )
   const [mode, setMode] = useUrlState<Mode>(
     'view',
@@ -83,7 +87,32 @@ export default function App() {
     },
   )
 
-  const catalog = useMemo(() => devicesForVendor(vendor), [vendor])
+  const catalog = useMemo(
+    () => devicesForVendors(selectedVendors),
+    [selectedVendors],
+  )
+
+  const allVendorsSelected = useMemo(
+    () =>
+      VENDOR_ORDER.every((v) => selectedVendors.includes(v)) &&
+      selectedVendors.length === VENDOR_ORDER.length,
+    [selectedVendors],
+  )
+
+  const toggleVendor = useCallback((v: VendorId) => {
+    setSelectedVendors((prev) => {
+      const norm = normalizeVendorSelection(prev, VENDOR_ORDER)
+      if (norm.includes(v)) {
+        const next = norm.filter((id) => id !== v)
+        return next.length === 0 ? norm : next
+      }
+      return normalizeVendorSelection([...norm, v], VENDOR_ORDER)
+    })
+  }, [setSelectedVendors])
+
+  const selectAllVendors = useCallback(() => {
+    setSelectedVendors([...VENDOR_ORDER])
+  }, [setSelectedVendors])
 
   useEffect(() => {
     if (selectedId !== null && !DEVICES_BY_ID.has(selectedId)) {
@@ -184,15 +213,26 @@ export default function App() {
     [setCompareOpenRaw],
   )
 
-  const activeVendorTheme =
-    vendor === 'logitech' || vendor === 'poly' || vendor === 'neat'
-      ? VENDORS[vendor]
+  const solePartnerVendor = useMemo((): VendorId | null => {
+    if (selectedVendors.length !== 1) return null
+    const only = selectedVendors[0]
+    return only === 'logitech' || only === 'poly' || only === 'neat'
+      ? only
       : null
+  }, [selectedVendors])
 
-  const partnerVendor =
-    vendor === 'logitech' || vendor === 'poly' || vendor === 'neat'
-      ? vendor
-      : null
+  const activeVendorTheme = solePartnerVendor
+    ? VENDORS[solePartnerVendor]
+    : null
+
+  const partnerVendors = useMemo(
+    () =>
+      selectedVendors.filter(
+        (v): v is 'logitech' | 'poly' | 'neat' =>
+          v === 'logitech' || v === 'poly' || v === 'neat',
+      ),
+    [selectedVendors],
+  )
 
   useEffect(() => {
     const base =
@@ -241,7 +281,7 @@ export default function App() {
   return (
     <div
       className="app"
-      data-vendor={vendor}
+      data-vendors={selectedVendors.join(',')}
       style={
         activeVendorTheme
           ? ({
@@ -263,19 +303,27 @@ export default function App() {
             </div>
           </div>
         </div>
-        <nav className="vendor-switch" aria-label="Manufacturer">
-          {VENDOR_ORDER.map((v) => (
-            <button
-              key={v}
-              data-active={vendor === v ? 'true' : 'false'}
-              onClick={() => setVendor(v)}
-            >
-              {VENDOR_LABELS[v]}
-            </button>
-          ))}
+        <nav className="vendor-switch" role="group" aria-label="Manufacturers">
+          {VENDOR_ORDER.map((v) => {
+            const on = selectedVendors.includes(v)
+            return (
+              <button
+                key={v}
+                type="button"
+                data-active={on ? 'true' : 'false'}
+                aria-pressed={on}
+                onClick={() => toggleVendor(v)}
+              >
+                {VENDOR_LABELS[v]}
+              </button>
+            )
+          })}
           <button
-            data-active={vendor === 'all' ? 'true' : 'false'}
-            onClick={() => setVendor('all')}
+            type="button"
+            className="vendor-switch-all"
+            data-active={allVendorsSelected ? 'true' : 'false'}
+            aria-pressed={allVendorsSelected}
+            onClick={selectAllVendors}
           >
             All
           </button>
@@ -350,7 +398,7 @@ export default function App() {
               <span className="designer-link-meta">Plan a room</span>
             </span>
           </a>
-          {partnerVendor && (() => {
+          {partnerVendors.map((partnerVendor) => {
             const cfg = VENDORS[partnerVendor]
             const link = cfg.resourceLinks[0]
             if (!link) return null
@@ -373,7 +421,7 @@ export default function App() {
                 </span>
               </a>
             )
-          })()}
+          })}
         </div>
       </header>
 

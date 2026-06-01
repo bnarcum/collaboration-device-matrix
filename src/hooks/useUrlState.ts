@@ -112,6 +112,52 @@ export function enumCodec<V extends string>(
   }
 }
 
+/** Multi-manufacturer filter: comma-separated vendor ids; `all` = every vendor. */
+export function vendorSelectionCodec<V extends string>(
+  order: readonly V[],
+  defaultSelection: readonly V[] = [order[0]],
+): UrlCodec<V[]> {
+  const allowed = new Set<string>(order)
+  const defaultNorm = normalizeVendorList(defaultSelection, order)
+  const allNorm = [...order]
+
+  function normalizeVendorList(input: readonly V[], ord: readonly V[]): V[] {
+    const want = new Set(input)
+    const out: V[] = []
+    for (const id of ord) {
+      if (want.has(id)) out.push(id)
+    }
+    return out.length > 0 ? out : defaultNorm
+  }
+
+  function key(v: readonly V[]): string {
+    return normalizeVendorList(v, order).join(',')
+  }
+
+  return {
+    parse: (raw) => {
+      if (!raw) return defaultNorm
+      if (raw === 'all') return allNorm
+      const pieces = raw.split(',')
+      const parsed: V[] = []
+      const seen = new Set<string>()
+      for (const piece of pieces) {
+        const t = piece.trim()
+        if (!t || !allowed.has(t) || seen.has(t)) continue
+        seen.add(t)
+        parsed.push(t as V)
+      }
+      return normalizeVendorList(parsed, order)
+    },
+    serialize: (v) => {
+      const norm = normalizeVendorList(v, order)
+      if (key(norm) === key(defaultNorm)) return null
+      if (key(norm) === key(allNorm)) return 'all'
+      return norm.join(',')
+    },
+  }
+}
+
 /** Comma-separated enum array. Unknown values are dropped silently. */
 export function enumArrayCodec<V extends string>(
   allowed: readonly V[],
