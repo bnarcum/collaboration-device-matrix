@@ -111,6 +111,8 @@ HOLE_PUNCH: dict[str, dict[str, float]] = {
     "img-5ada38fb4a": {"min_area_pct": 0.04},  # Headset 520
     "img-bf6dfa019e": {"min_area_pct": 0.04},  # Headset 560
     "img-8cb7938ed5": {"min_area_pct": 0.04},  # Headset 730 (twin)
+    "img-da6d23e902": {"min_area_pct": 0.04},  # Voyager 4300
+    "img-e0546342cc": {"min_area_pct": 0.04},  # Voyager Focus 2
 }
 HOLE_PUNCH_BLACK_TOL = 30  # RGB.min() < this counts as "deep black"
 HOLE_PUNCH_OPAQUE_TOL = 200  # alpha >= this is "fully opaque foreground"
