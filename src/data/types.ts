@@ -61,6 +61,11 @@ export interface Device {
   surface: string
   shape: Shape
   size: [number, number, number]
+  /**
+   * Fine-tune product-photo billboard scale (1 = default). Use when vendor
+   * hero art includes stands or padding that skews cross-vendor comparison.
+   */
+  photoScale?: number
 }
 
 export const CATEGORY_LABELS: Record<Category, string> = {

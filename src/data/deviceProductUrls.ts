@@ -93,6 +93,14 @@ export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
     'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/tap.html',
   'logitech-tap-scheduler':
     'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/tap-scheduler.html',
+  'logitech-zone-wired-2':
+    'https://www.logitech.com/en-us/products/headsets/zone-wired-2-business.html',
+  'logitech-zone-wireless-2':
+    'https://www.logitech.com/en-us/products/headsets/zone-wireless-2-business-headset.html',
+  'logitech-zone-vibe-wireless':
+    'https://www.logitech.com/en-us/shop/p/zone-vibe-wireless',
+  'logitech-zone-true-wireless':
+    'https://www.logitech.com/en-us/products/headsets/zone-true-wireless-earbuds.985-001089.html',
 
   'poly-studio-x30':
     'https://www.poly.com/us/en/products/video-conferencing/studio-room-solutions/studio-x30',

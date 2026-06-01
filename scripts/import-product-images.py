@@ -35,6 +35,25 @@ IMAGE_SOURCES: dict[str, str] = {
         "https://resource.logitech.com/content/dam/logitech/en/products/"
         "video-conferencing/meetup/gallery/meetup-gallery-global-1.png"
     ),
+    "logitech-zone-wired-2": (
+        "https://resource.logitech.com/content/dam/logitech/en/products/"
+        "headsets/zone-wired-2/gallery/"
+        "b2b-zone-wired2-business-headset-graphite-gallery1.png"
+    ),
+    "logitech-zone-wireless-2": (
+        "https://resource.logitech.com/content/dam/logitech/en/products/"
+        "headsets/zone-wireless-2/gallery/zone-wireless-2-graphite-1.png"
+    ),
+    "logitech-zone-vibe-wireless": (
+        "https://resource.logitech.com/content/dam/logitech/en/products/"
+        "headsets/zone-vibe-wireless/gallery/"
+        "zone-vibe-wireless-mic-down-graphite-1-new.png"
+    ),
+    "logitech-zone-true-wireless": (
+        "https://resource.logitech.com/content/dam/logitech/en/products/"
+        "video-conferencing/zone-true-wireless-earbuds/"
+        "zone-true-wireless-earbuds-gallery-1-graphite.png"
+    ),
     # Poly — HP worldwide DAM (also embedded on poly.com)
     "poly-studio-x30": (
         "https://www.hp.com/content/dam/sites/worldwide/poly/video-conferencing/"
@@ -131,7 +150,7 @@ IMAGE_SOURCES: dict[str, str] = {
         "https://www.hp.com/content/dam/sites/worldwide/poly/headsets/"
         "Poly_encore_pro_700_series_desktop@2x.jpg"
     ),
-    # Neat — product card art from cdn.neat.no
+    # Neat — product card art from cdn.neat.no (board-pro shared by 65"/75")
     "neat-bar": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/bar-2--2x.jpg",
     "neat-bar-pro": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/bar-pro--2x.jpg",
     "neat-board-50": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/board-50--2x.jpg",

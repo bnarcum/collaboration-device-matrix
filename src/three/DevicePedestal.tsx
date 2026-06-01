@@ -1,13 +1,17 @@
-import { useMemo, useRef } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { Html, SpotLight } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import type { Device } from '../data/types'
-import { DeviceModel } from './DeviceModel'
-import { PhotoBillboard } from './PhotoBillboard'
-import { deviceImage } from '../data/deviceImages'
+import { deviceImage, devicePhotoAspect } from '../data/deviceImages'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { DeviceFloatingLabel } from '../ui/DeviceFloatingLabel'
+import { DeviceModel } from './DeviceModel'
+import {
+  estimateBillboardPlane,
+  type BillboardPlane,
+} from './billboardSizing'
+import { PhotoBillboard } from './PhotoBillboard'
 
 interface Props {
   device: Device
@@ -40,11 +44,23 @@ export function DevicePedestal({
   const baseY = position[1]
   const imageUrl = deviceImage(device.id)
   const prefersReducedMotion = useReducedMotion()
+  const displaySize = useMemo(
+    () => [device.size[0], device.size[1]] as [number, number],
+    [device.size],
+  )
+
+  const initialPlane = useMemo(
+    () => estimateBillboardPlane(device, scale),
+    [device, scale],
+  )
+  const [billboard, setBillboard] = useState<BillboardPlane>(initialPlane)
+
+  const onPlaneSize = useCallback((plane: BillboardPlane) => {
+    setBillboard(plane)
+  }, [])
 
   useFrame((_, dt) => {
     if (!group.current) return
-    // Photos are billboarded — spinning the parent has no visual effect
-    // and breaks hover affordance, so only spin primitives.
     if (spin && !imageUrl && !prefersReducedMotion)
       group.current.rotation.y += dt * 0.25
     if (selected && !prefersReducedMotion) {
@@ -55,12 +71,7 @@ export function DevicePedestal({
     }
   })
 
-  // Pick a billboard size scaled to the device's natural footprint so
-  // small things (earbuds) don't dwarf big things (boards).
-  const targetSize = Math.max(
-    0.7,
-    Math.min(1.8, Math.max(device.size[0], device.size[1]) * 0.9) * scale,
-  )
+  const { planeH, footprint } = billboard
 
   return (
     <group
@@ -84,24 +95,26 @@ export function DevicePedestal({
     >
       {imageUrl ? (
         <>
-          {/* Invisible click target sized to the billboard's footprint */}
-          <mesh position={[0, targetSize / 2, 0]} visible={false}>
-            <boxGeometry args={[targetSize, targetSize, 0.3]} />
+          <mesh position={[0, planeH / 2, 0]} visible={false}>
+            <boxGeometry args={[footprint, planeH, 0.3]} />
             <meshBasicMaterial />
           </mesh>
-          <group position={[0, targetSize / 2, 0]}>
+          <group position={[0, planeH / 2, 0]}>
             <PhotoBillboard
               url={imageUrl}
-              targetSize={targetSize}
+              displaySize={displaySize}
+              photoScale={device.photoScale}
+              pedestalScale={scale}
+              aspectHint={devicePhotoAspect(device.id)}
               selected={selected}
+              onPlaneSize={onPlaneSize}
             />
           </group>
-          {/* Subtle contact shadow under the billboard */}
           <mesh
             position={[0, 0.003, 0]}
             rotation={[-Math.PI / 2, 0, 0]}
           >
-            <circleGeometry args={[targetSize * 0.3, 32]} />
+            <circleGeometry args={[footprint * 0.3, 32]} />
             <meshBasicMaterial
               color="#000"
               transparent
@@ -115,14 +128,10 @@ export function DevicePedestal({
           <DeviceModel device={device} highlighted={selected} />
         </group>
       )}
-      {selected && <SelectionSpot footprint={targetSize} />}
+      {selected && <SelectionSpot footprint={footprint} />}
       {showLabel && (
         <Html
-          position={[
-            0,
-            (imageUrl ? targetSize : device.size[1]) + 0.35,
-            0,
-          ]}
+          position={[0, (imageUrl ? planeH : device.size[1]) + 0.35, 0]}
           center
           distanceFactor={6}
           zIndexRange={[1, 0]}
@@ -166,7 +175,6 @@ function SelectionSpot({ footprint }: { footprint: number }) {
 
   useFrame(({ clock }) => {
     if (prefersReducedMotion) {
-      // Freeze the pulse at its midpoint — spotlight remains, but doesn't breathe.
       uniforms.uTime.value = 0
       uniforms.uPulse.value = 0
     } else {
@@ -179,11 +187,8 @@ function SelectionSpot({ footprint }: { footprint: number }) {
 
   return (
     <group>
-      {/* Empty target placed at the pedestal so the cone points straight down. */}
       <primitive object={target} />
 
-      {/* drei's <SpotLight> renders a soft visible cone as well as casting
-          real three.js spotlight illumination on the floor. */}
       <SpotLight
         position={[0, 3.4, 0]}
         target={target}
@@ -198,8 +203,6 @@ function SelectionSpot({ footprint }: { footprint: number }) {
         radiusBottom={0.9}
       />
 
-      {/* Floor pool — radial gradient that always reads on any background,
-          even when the volumetric cone is at a shallow camera angle. */}
       <mesh position={[0, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={3}>
         <circleGeometry args={[poolRadius, 96]} />
         <shaderMaterial
@@ -232,7 +235,6 @@ const poolFrag = /* glsl */ `
   void main() {
     vec2 c = vUv - 0.5;
     float d = length(c) * 2.0;
-    // Soft falloff: bright near center, transparent at the rim.
     float core = 1.0 - smoothstep(0.0, 0.45, d);
     float halo = 1.0 - smoothstep(0.0, 1.0, d);
     float pulse = mix(1.0, 0.92 + 0.08 * sin(uTime * 1.8), uPulse);

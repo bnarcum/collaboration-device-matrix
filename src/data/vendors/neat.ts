@@ -84,6 +84,7 @@ export const NEAT_DEVICES: Device[] = [
     surface: LIGHT,
     shape: 'board',
     size: [1.15, 0.72, 0.06],
+    photoScale: 1.08,
   },
   {
     id: 'neat-board-65',
@@ -112,6 +113,7 @@ export const NEAT_DEVICES: Device[] = [
     surface: LIGHT,
     shape: 'board',
     size: [1.45, 0.88, 0.07],
+    photoScale: 1.08,
   },
   {
     id: 'neat-board-pro-75',
@@ -140,6 +142,7 @@ export const NEAT_DEVICES: Device[] = [
     surface: LIGHT,
     shape: 'board',
     size: [1.7, 1.05, 0.08],
+    photoScale: 1.08,
   },
   {
     id: 'neat-pad',

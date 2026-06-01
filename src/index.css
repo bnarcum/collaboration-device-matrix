@@ -1343,6 +1343,12 @@ a:hover {
   transition: filter 160ms ease;
 }
 
+/* Scale board / desk photos by catalog display height for cross-vendor parity. */
+.aisle-tile[data-shape='board'] .aisle-tile-img,
+.aisle-tile[data-shape='desk-display'] .aisle-tile-img {
+  max-height: calc(var(--aisle-img-height-ratio, 1) * 100%);
+}
+
 .aisle-tile:hover .aisle-tile-img {
   filter:
     drop-shadow(0 14px 20px rgba(0, 0, 0, 0.78))
