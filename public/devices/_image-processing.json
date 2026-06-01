@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "description": "Per-asset image pipeline flags for scripts/remove-backgrounds.py. Update when adding hero shots that need special handling.",
+  "holePunch": {
+    "img-5ada38fb4a": {
+      "devices": ["headset-520"],
+      "min_area_pct": 0.04,
+      "note": "Cisco brochure: enclosed black studio head prop under headband arch"
+    },
+    "img-bf6dfa019e": {
+      "devices": ["headset-560"],
+      "min_area_pct": 0.04,
+      "note": "Cisco brochure: enclosed black studio head prop under headband arch"
+    },
+    "img-8cb7938ed5": {
+      "devices": ["headset-730"],
+      "min_area_pct": 0.04,
+      "note": "Cisco brochure: enclosed black studio head prop under headband arch"
+    },
+    "img-da6d23e902": {
+      "devices": ["poly-voyager-4300"],
+      "min_area_pct": 0.04,
+      "note": "Poly HP DAM hero: enclosed black head prop inside headband"
+    },
+    "img-e0546342cc": {
+      "devices": ["poly-voyager-focus-2"],
+      "min_area_pct": 0.04,
+      "note": "Poly HP DAM hero: enclosed black head prop inside headband"
+    }
+  }
+}

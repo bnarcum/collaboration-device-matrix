@@ -17,7 +17,13 @@ npm run dev
 
 ```bash
 npm run build
+npm run verify:images
+npm run verify:product-urls
 ```
+
+CI (`.github/workflows/ci.yml`) runs build + image + URL checks on every push/PR.
+
+Product photo processing flags (e.g. headset hole-punch) live in `public/devices/_image-processing.json`.
 
 GitHub Pages workflow is included (`.github/workflows/deploy.yml`). Set Pages source to **GitHub Actions**.
 

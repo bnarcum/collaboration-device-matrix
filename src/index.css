@@ -172,6 +172,20 @@ a:hover {
   gap: 0.35rem;
   flex-wrap: wrap;
   flex: 0 0 auto;
+  align-items: center;
+}
+
+.vendor-switch-reset {
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+
+.scene-loading {
+  display: grid;
+  place-items: center;
+  min-height: 320px;
+  color: var(--fg-3);
+  font-size: 0.9rem;
 }
 
 .mode-switch {

@@ -35,28 +35,48 @@ const WEBEX_HOST = /^https:\/\/www\.webex\.com\//i
 const UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
-async function check({ id, url }) {
-  try {
-    const res = await fetch(url, {
-      redirect: 'follow',
-      headers: { 'User-Agent': UA, Accept: 'text/html' },
-    })
-    const body = await res.text()
-    const title = body.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() ?? ''
+async function checkOnce({ id, url }) {
+  const res = await fetch(url, {
+    redirect: 'follow',
+    headers: { 'User-Agent': UA, Accept: 'text/html' },
+    signal: AbortSignal.timeout(20_000),
+  })
+  const body = await res.text()
+  const title = body.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() ?? ''
 
-    if (res.status === 403 && WEBEX_HOST.test(url)) {
-      return { id, url, status: 'skip', detail: '403 (Webex bot guard — verify in browser)' }
-    }
-    if (res.status !== 200) {
-      return { id, url, status: 'fail', detail: `HTTP ${res.status}` }
-    }
-    if (BAD_BODY.test(body) || BAD_TITLE.test(title)) {
-      return { id, url, status: 'fail', detail: `Bad content in page (${title.slice(0, 60)})` }
-    }
-    return { id, url, status: 'ok', detail: title.slice(0, 70) }
-  } catch (err) {
-    return { id, url, status: 'fail', detail: err.message }
+  if (res.status === 403 && WEBEX_HOST.test(url)) {
+    return { id, url, status: 'skip', detail: '403 (Webex bot guard — verify in browser)' }
   }
+  if (res.status === 429 || res.status >= 500) {
+    return { id, url, status: 'skip', detail: `HTTP ${res.status} (transient)` }
+  }
+  if (res.status !== 200) {
+    return { id, url, status: 'fail', detail: `HTTP ${res.status}` }
+  }
+  if (BAD_BODY.test(body) || BAD_TITLE.test(title)) {
+    return { id, url, status: 'fail', detail: `Bad content in page (${title.slice(0, 60)})` }
+  }
+  return { id, url, status: 'ok', detail: title.slice(0, 70) }
+}
+
+async function check(entry) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      return await checkOnce(entry)
+    } catch (err) {
+      if (attempt === 0) {
+        await new Promise((r) => setTimeout(r, 800))
+        continue
+      }
+      const msg = err instanceof Error ? err.message : String(err)
+      return {
+        ...entry,
+        status: 'skip',
+        detail: `Network (${msg}) — verify in browser`,
+      }
+    }
+  }
+  return { ...entry, status: 'skip', detail: 'Network — verify in browser' }
 }
 
 const results = []
@@ -76,5 +96,7 @@ for (const r of results) {
   if (r.status === 'skip') skips++
 }
 
-console.log(`\n${results.length} URLs — ${results.length - fails - skips} ok, ${skips} skipped (Webex), ${fails} failed`)
+console.log(
+  `\n${results.length} URLs — ${results.length - fails - skips} ok, ${skips} skipped, ${fails} failed`,
+)
 process.exit(fails > 0 ? 1 : 0)

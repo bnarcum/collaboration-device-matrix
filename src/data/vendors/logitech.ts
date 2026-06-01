@@ -154,6 +154,7 @@ export const LOGITECH_DEVICES: Device[] = [
     roomSizes: ['medium'],
     camera: 'AI companion · tabletop · pairs with Rally Bar',
     connectivity: ['USB (via Rally Bar)'],
+    software: ['Logitech Sync', 'Microsoft Teams Rooms', 'Zoom Rooms'],
     colors: ['carbon'],
     surface: SURFACE,
     shape: 'camera-puck',

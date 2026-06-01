@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo } from 'react'
 import type { CSSProperties } from 'react'
-import { Canvas } from '@react-three/fiber'
 import {
   DEVICES,
   devicesForVendors,
   normalizeVendorSelection,
 } from './data/catalog'
+import { ModeViewport } from './components/ModeViewport'
 import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
@@ -15,13 +15,14 @@ import {
 } from './data/types'
 import type { Category, Device, RoomSize, VendorId } from './data/types'
 import { VENDORS } from './data/vendors'
-import { ShowroomScene } from './scenes/ShowroomScene'
-import { AisleScene } from './scenes/AisleScene'
-import { FinderScene } from './scenes/FinderScene'
 import { DeviceDrawer } from './ui/DeviceDrawer'
 import { CompareTray } from './ui/CompareTray'
 import { CompareModal } from './ui/CompareModal'
-import { FinderOverlay, type FinderState } from './ui/FinderOverlay'
+import type { FinderState } from './ui/FinderOverlay'
+
+const FinderOverlay = lazy(() =>
+  import('./ui/FinderOverlay').then((m) => ({ default: m.FinderOverlay })),
+)
 import { SearchBar } from './ui/SearchBar'
 import {
   enumCodec,
@@ -110,8 +111,16 @@ export default function App() {
     })
   }, [setSelectedVendors])
 
-  const selectAllVendors = useCallback(() => {
-    setSelectedVendors([...VENDOR_ORDER])
+  const toggleAllVendors = useCallback(() => {
+    setSelectedVendors((prev) => {
+      const norm = normalizeVendorSelection(prev, VENDOR_ORDER)
+      if (norm.length === VENDOR_ORDER.length) return [...DEFAULT_VENDORS]
+      return [...VENDOR_ORDER]
+    })
+  }, [setSelectedVendors])
+
+  const resetVendors = useCallback(() => {
+    setSelectedVendors([...DEFAULT_VENDORS])
   }, [setSelectedVendors])
 
   useEffect(() => {
@@ -140,6 +149,14 @@ export default function App() {
       setSelectedId(null)
     }
   }, [catalog, selectedId, setSelectedId])
+
+  useEffect(() => {
+    const catalogIds = new Set(catalog.map((d) => d.id))
+    setCompareIds((prev) => {
+      const next = prev.filter((id) => catalogIds.has(id))
+      return next.length === prev.length ? prev : next
+    })
+  }, [catalog, setCompareIds])
 
   const selected: Device | null = useMemo(
     () => (selectedId ? DEVICES_BY_ID.get(selectedId) ?? null : null),
@@ -323,9 +340,22 @@ export default function App() {
             className="vendor-switch-all"
             data-active={allVendorsSelected ? 'true' : 'false'}
             aria-pressed={allVendorsSelected}
-            onClick={selectAllVendors}
+            title={
+              allVendorsSelected
+                ? 'Show Cisco only'
+                : 'Select all manufacturers'
+            }
+            onClick={toggleAllVendors}
           >
             All
+          </button>
+          <button
+            type="button"
+            className="vendor-switch-reset"
+            title="Reset to Cisco only"
+            onClick={resetVendors}
+          >
+            Reset
           </button>
         </nav>
         <nav className="mode-switch" aria-label="View mode">
@@ -426,47 +456,28 @@ export default function App() {
       </header>
 
       <div className="canvas-wrap">
-        {mode === 'showcase' ? (
-          <AisleScene
-            devices={visibleDevices}
-            selected={selected}
-            onSelect={(d) => selectDevice(d)}
-            filter={filter}
-          />
-        ) : (
-          <Canvas
-            camera={{ position: cameraFor(mode), fov: 45 }}
-            dpr={[1, 2]}
-            gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
-          >
-            {mode === 'showroom' && (
-              <ShowroomScene
-                devices={visibleDevices}
-                selected={selected}
-                onSelect={(d) => selectDevice(d)}
-              />
-            )}
-            {mode === 'finder' && (
-              <FinderScene
-                devices={catalog}
-                selected={selected}
-                step={finderState.step}
-                filter={{
-                  roomSize: finderState.roomSize,
-                  category: finderState.category,
-                }}
-                onSelect={(d) => selectDevice(d)}
-              />
-            )}
-          </Canvas>
-        )}
+        <ModeViewport
+          mode={mode}
+          visibleDevices={visibleDevices}
+          catalog={catalog}
+          selected={selected}
+          onSelect={(d) => selectDevice(d)}
+          filter={filter}
+          finderStep={finderState.step}
+          finderFilter={{
+            roomSize: finderState.roomSize,
+            category: finderState.category,
+          }}
+        />
 
         <div className="overlay">
           {(mode === 'showroom' || mode === 'showcase') && (
             <Filters value={filter} onChange={setFilter} />
           )}
           {mode === 'finder' && (
-            <FinderOverlay state={finderState} setState={setFinderState} />
+            <Suspense fallback={null}>
+              <FinderOverlay state={finderState} setState={setFinderState} />
+            </Suspense>
           )}
           <CompareTray
             items={compare}
@@ -492,17 +503,6 @@ export default function App() {
       </div>
     </div>
   )
-}
-
-function cameraFor(mode: Mode): [number, number, number] {
-  switch (mode) {
-    case 'showroom':
-      return [9, 6, 9]
-    case 'showcase':
-      return [0, 5, 14]
-    case 'finder':
-      return [0, 4.5, 9]
-  }
 }
 
 function Filters({

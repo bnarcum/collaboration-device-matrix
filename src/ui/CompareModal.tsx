@@ -1,5 +1,17 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import {
+  compareAudio,
+  compareCamera,
+  compareConnectivity,
+  compareDisplay,
+  compareSoftware,
+} from '../data/compareSpecs'
+import {
+  MEETING_PLATFORM_LABELS,
+  MEETING_PLATFORM_ORDER,
+  meetingPlatformSupport,
+} from '../data/platforms'
 import type { Device } from '../data/types'
 import { CATEGORY_LABELS, ROOM_SIZE_LABELS, VENDOR_LABELS } from '../data/types'
 
@@ -20,19 +32,16 @@ const ROWS: { key: string; label: string; get: (d: Device) => string }[] = [
     label: 'Rooms',
     get: (d) => d.roomSizes.map((r) => ROOM_SIZE_LABELS[r]).join(', '),
   },
-  { key: 'display', label: 'Display', get: (d) => d.display ?? '—' },
-  { key: 'camera', label: 'Camera', get: (d) => d.camera ?? '—' },
-  { key: 'audio', label: 'Audio', get: (d) => d.audio ?? '—' },
-  {
-    key: 'conn',
-    label: 'Connectivity',
-    get: (d) => d.connectivity?.join(', ') ?? '—',
-  },
-  {
-    key: 'sw',
-    label: 'Software',
-    get: (d) => d.software?.join(', ') ?? '—',
-  },
+  { key: 'display', label: 'Display', get: compareDisplay },
+  { key: 'camera', label: 'Camera', get: compareCamera },
+  { key: 'audio', label: 'Audio', get: compareAudio },
+  { key: 'conn', label: 'Connectivity', get: compareConnectivity },
+  { key: 'sw', label: 'Software / OS', get: compareSoftware },
+  ...MEETING_PLATFORM_ORDER.map((platformId) => ({
+    key: `platform-${platformId}`,
+    label: MEETING_PLATFORM_LABELS[platformId],
+    get: (d: Device) => meetingPlatformSupport(d)[platformId],
+  })),
   {
     key: 'colors',
     label: 'Colors',

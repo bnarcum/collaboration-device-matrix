@@ -35,6 +35,7 @@ in place.
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -96,24 +97,23 @@ ALPHA_HIGH = 180
 ALPHA_BLUR_RADIUS = 0.6
 
 # Per-image opt-in for "hole-punch enclosed dark silhouette" pass.
-# The brochure's multi-ear-cup headset shots include a black "hidden
-# head" prop inside the headband arch. The prop is fully enclosed by
-# the headset silhouette, so the white-key flood fill (which can only
-# remove near-white that connects to the image edge) leaves it
-# untouched. This per-image opt-in punches the prop out by area-
-# gating connected components of opaque-near-black pixels.
-#
-# Note: img-976ab4d643 (Headset 900 / B&O) is photographed differently
-# — it shows the earbuds in a charging case with no head prop — so it
-# is intentionally not listed here.
-HOLE_PUNCH: dict[str, dict[str, float]] = {
-    # stem (no extension)  → params dict
-    "img-5ada38fb4a": {"min_area_pct": 0.04},  # Headset 520
-    "img-bf6dfa019e": {"min_area_pct": 0.04},  # Headset 560
-    "img-8cb7938ed5": {"min_area_pct": 0.04},  # Headset 730 (twin)
-    "img-da6d23e902": {"min_area_pct": 0.04},  # Voyager 4300
-    "img-e0546342cc": {"min_area_pct": 0.04},  # Voyager Focus 2
-}
+# Registry: public/devices/_image-processing.json (devices + notes).
+HOLE_PUNCH: dict[str, dict[str, float]] = {}
+
+
+def _load_hole_punch_registry() -> dict[str, dict[str, float]]:
+    path = Path(__file__).resolve().parent.parent / "public" / "devices" / "_image-processing.json"
+    if not path.is_file():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    out: dict[str, dict[str, float]] = {}
+    for stem, entry in (data.get("holePunch") or {}).items():
+        pct = float(entry.get("min_area_pct", 0.04))
+        out[stem] = {"min_area_pct": pct}
+    return out
+
+
+HOLE_PUNCH.update(_load_hole_punch_registry())
 HOLE_PUNCH_BLACK_TOL = 30  # RGB.min() < this counts as "deep black"
 HOLE_PUNCH_OPAQUE_TOL = 200  # alpha >= this is "fully opaque foreground"
 
