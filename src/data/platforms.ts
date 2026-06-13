@@ -17,10 +17,10 @@ export const MEETING_PLATFORM_LABELS: Record<MeetingPlatformId, string> = {
 
 /** Shorter labels for the topbar platform switch. */
 export const MEETING_PLATFORM_SHORT_LABELS: Record<MeetingPlatformId, string> = {
-  webex: 'Webex',
-  teams: 'Teams Rooms',
+  webex: 'Cisco RoomOS',
+  teams: 'MTR',
   zoom: 'Zoom',
-  google: 'Google Meet',
+  google: 'Google',
 }
 
 export const MEETING_PLATFORM_ORDER: MeetingPlatformId[] = [
@@ -170,8 +170,7 @@ export function formatMeetingPlatforms(d: Device): string {
   return MEETING_PLATFORM_ORDER.map((id) => {
     const label = platformSupportLabel(d, id)
     if (label === '—') return null
-    const short =
-      id === 'google' ? 'Meet' : MEETING_PLATFORM_SHORT_LABELS[id]
+    const short = MEETING_PLATFORM_SHORT_LABELS[id]
     return `${short}: ${label}`
   })
     .filter(Boolean)

@@ -3,6 +3,7 @@ import {
   MEETING_PLATFORM_SHORT_LABELS,
   type MeetingPlatformId,
 } from '../data/platforms'
+import { PlatformIcon } from './PlatformIcon'
 
 interface Props {
   selected: MeetingPlatformId[]
@@ -29,15 +30,21 @@ export function PlatformSwitch({
       <nav className="platform-switch" role="group" aria-label="Meeting platforms">
         {MEETING_PLATFORM_ORDER.map((p) => {
           const on = selected.includes(p)
+          const label = MEETING_PLATFORM_SHORT_LABELS[p]
           return (
             <button
               key={p}
               type="button"
+              className="platform-switch-btn"
+              data-platform={p}
               data-active={on ? 'true' : 'false'}
               aria-pressed={on}
+              aria-label={label}
+              title={label}
               onClick={() => onToggle(p)}
             >
-              {MEETING_PLATFORM_SHORT_LABELS[p]}
+              <PlatformIcon platform={p} />
+              <span>{label}</span>
             </button>
           )
         })}

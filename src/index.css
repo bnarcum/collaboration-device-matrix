@@ -157,6 +157,20 @@ a:hover {
   flex: 1 1 auto;
 }
 
+.platform-switch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.42rem 0.85rem 0.42rem 0.65rem;
+}
+
+.platform-switch-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: block;
+}
+
 .platform-switch-all {
   font-size: 0.78rem;
   opacity: 0.85;
