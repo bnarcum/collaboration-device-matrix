@@ -24,8 +24,15 @@ const FinderOverlay = lazy(() =>
   import('./ui/FinderOverlay').then((m) => ({ default: m.FinderOverlay })),
 )
 import { SearchBar } from './ui/SearchBar'
+import { PlatformSwitch } from './ui/PlatformSwitch'
+import {
+  filterDevicesByPlatform,
+  MEETING_PLATFORM_ORDER,
+  type MeetingPlatformId,
+} from './data/platforms'
 import {
   enumCodec,
+  enumArrayCodec,
   idArrayCodec,
   idCodec,
   useUrlState,
@@ -87,6 +94,17 @@ export default function App() {
       serialize: (v) => (v ? '1' : null),
     },
   )
+  const [selectedPlatforms, setSelectedPlatforms] = useUrlState<
+    MeetingPlatformId[]
+  >('platform', [], enumArrayCodec(MEETING_PLATFORM_ORDER))
+  const [platformInterop, setPlatformInterop] = useUrlState<boolean>(
+    'platformInterop',
+    false,
+    {
+      parse: (raw) => raw === '1',
+      serialize: (v) => (v ? '1' : null),
+    },
+  )
 
   const catalog = useMemo(
     () => devicesForVendors(selectedVendors),
@@ -122,6 +140,21 @@ export default function App() {
   const resetVendors = useCallback(() => {
     setSelectedVendors([...DEFAULT_VENDORS])
   }, [setSelectedVendors])
+
+  const ciscoInSelection = selectedVendors.includes('cisco')
+
+  const togglePlatform = useCallback((p: MeetingPlatformId) => {
+    setSelectedPlatforms((prev) => {
+      if (prev.includes(p)) return prev.filter((id) => id !== p)
+      return [...prev, p]
+    })
+  }, [setSelectedPlatforms])
+
+  const toggleAllPlatforms = useCallback(() => {
+    setSelectedPlatforms((prev) =>
+      prev.length === MEETING_PLATFORM_ORDER.length ? [] : [...MEETING_PLATFORM_ORDER],
+    )
+  }, [setSelectedPlatforms])
 
   useEffect(() => {
     if (selectedId !== null && !DEVICES_BY_ID.has(selectedId)) {
@@ -198,13 +231,26 @@ export default function App() {
     [setRoomSize, setFinderForRaw],
   )
 
-  const visibleDevices = useMemo(
-    () =>
+  const visibleDevices = useMemo(() => {
+    const byCategory =
       filter === 'all'
         ? catalog
-        : catalog.filter((d) => d.category === filter),
-    [catalog, filter],
-  )
+        : catalog.filter((d) => d.category === filter)
+    if (!ciscoInSelection || selectedPlatforms.length === 0) {
+      return byCategory
+    }
+    return filterDevicesByPlatform(
+      byCategory,
+      selectedPlatforms,
+      platformInterop,
+    )
+  }, [
+    catalog,
+    filter,
+    ciscoInSelection,
+    selectedPlatforms,
+    platformInterop,
+  ])
 
   const selectDevice = useCallback(
     (d: Device | null) => {
@@ -453,6 +499,15 @@ export default function App() {
             )
           })}
         </div>
+        {ciscoInSelection && (
+          <PlatformSwitch
+            selected={selectedPlatforms}
+            includeInterop={platformInterop}
+            onToggle={togglePlatform}
+            onToggleAll={toggleAllPlatforms}
+            onIncludeInteropChange={setPlatformInterop}
+          />
+        )}
       </header>
 
       <div className="canvas-wrap">

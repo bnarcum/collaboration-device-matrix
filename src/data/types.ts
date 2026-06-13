@@ -2,6 +2,24 @@
 
 export type VendorId = 'cisco' | 'logitech' | 'poly' | 'neat'
 
+export type MeetingPlatformId = 'webex' | 'teams' | 'zoom' | 'google'
+
+/** How a device supports a meeting platform (filter + compare source of truth). */
+export type PlatformSupportLevel =
+  | 'native'
+  | 'mtr'
+  | 'teams-panel'
+  | 'teams-console'
+  | 'vimt'
+  | 'zoom-native'
+  | 'zoom-sip'
+  | 'guest'
+  | 'app'
+
+export type DevicePlatforms = Partial<
+  Record<MeetingPlatformId, PlatformSupportLevel>
+>
+
 export type Category =
   | 'room'
   | 'desk'
@@ -57,6 +75,8 @@ export interface Device {
   audio?: string
   connectivity?: string[]
   software?: string[]
+  /** Structured meeting-platform support; Cisco entries use official allowlists. */
+  platforms?: DevicePlatforms
   colors: DeviceColor[]
   surface: string
   shape: Shape

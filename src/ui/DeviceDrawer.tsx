@@ -4,6 +4,11 @@ import { CATEGORY_LABELS, ROOM_SIZE_LABELS, VENDOR_LABELS } from '../data/types'
 import { vendorConfig } from '../data/vendors'
 import { deviceImage } from '../data/deviceImages'
 import { deviceProductUrl } from '../data/deviceProductUrls'
+import {
+  MEETING_PLATFORM_LABELS,
+  MEETING_PLATFORM_ORDER,
+  platformSupportLabel,
+} from '../data/platforms'
 
 const COLOR_LABELS: Record<Device['colors'][number], string> = {
   carbon: 'Carbon Black',
@@ -126,8 +131,27 @@ export function DeviceDrawer({
             )}
             {device.software && device.software.length > 0 && (
               <>
-                <h4>Platforms &amp; software</h4>
+                <h4>Software &amp; OS</h4>
                 <p className="spec">{device.software.join(' · ')}</p>
+              </>
+            )}
+
+            {MEETING_PLATFORM_ORDER.some(
+              (id) => platformSupportLabel(device, id) !== '—',
+            ) && (
+              <>
+                <h4>Meeting platforms</h4>
+                <ul className="platform-list">
+                  {MEETING_PLATFORM_ORDER.map((id) => {
+                    const label = platformSupportLabel(device, id)
+                    if (label === '—') return null
+                    return (
+                      <li key={id}>
+                        <strong>{MEETING_PLATFORM_LABELS[id]}:</strong> {label}
+                      </li>
+                    )
+                  })}
+                </ul>
               </>
             )}
 

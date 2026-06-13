@@ -76,6 +76,7 @@ button:hover {
 /* Selected / toggled-on pills — scoped so highlight states elsewhere
    (e.g. search keyboard focus) don't inherit solid-fill + dark text. */
 .vendor-switch button[data-active='true'],
+.platform-switch button[data-active='true'],
 .mode-switch button[data-active='true'],
 .filters button[data-active='true'],
 .compare-tray button[data-active='true'],
@@ -127,6 +128,53 @@ a:hover {
   background: rgba(5, 8, 15, 0.55);
   backdrop-filter: blur(14px);
   z-index: 5;
+}
+
+.platform-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  flex: 1 1 100%;
+  padding-top: 0.35rem;
+  margin-top: 0.15rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.platform-bar-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  flex: 0 0 auto;
+}
+
+.platform-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  flex: 1 1 auto;
+}
+
+.platform-switch-all {
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+
+.platform-interop-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--fg-2);
+  cursor: pointer;
+  flex: 0 0 auto;
+  user-select: none;
+}
+
+.platform-interop-toggle input {
+  accent-color: var(--brand-primary);
 }
 
 .brand {

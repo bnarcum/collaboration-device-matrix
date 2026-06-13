@@ -291,7 +291,7 @@ export const CISCO_DEVICES: Device[] = [
     camera: 'Dual 4K · 48 MP tele + 105° wide · 2x optical + 5x digital',
     audio: '8-mic array · directional · AI noise removal',
     connectivity: ['HDMI in/out (4Kp60)', 'USB-C DisplayPort (4Kp60)', 'USB-A x2', '2x RJ-45'],
-    software: ['RoomOS 26+', 'Webex', 'Zoom for Cisco Rooms', 'Teams (VIMT/CVI)', 'Teams Rooms on Android (coming)'],
+    software: ['RoomOS 26+', 'Webex', 'Zoom for Cisco Rooms', 'Microsoft Teams Rooms on Android', 'Teams (VIMT/CVI)', 'Google Meet (guest)'],
     colors: ['carbon', 'first-light'],
     surface: C.carbon,
     shape: 'desk-display',
