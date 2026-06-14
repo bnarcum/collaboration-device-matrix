@@ -53,7 +53,7 @@ const PRIMARY_FILTER_LEVELS: Record<
   google: ['guest'],
 }
 
-/** Additional levels when “Include interop & apps” is on. */
+/** Additional levels when “Include interop & client apps” is on. */
 const INTEROP_FILTER_LEVELS: Record<
   MeetingPlatformId,
   readonly PlatformSupportLevel[]

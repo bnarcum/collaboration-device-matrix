@@ -59,13 +59,16 @@ export function PlatformSwitch({
           All
         </button>
       </nav>
-      <label className="platform-interop-toggle">
+      <label
+        className="platform-interop-toggle"
+        title="Also show devices that support this platform via Teams VIMT/CVI, Zoom SIP, Google guest/app join, or client apps (phones, headsets, USB) — not just native room systems."
+      >
         <input
           type="checkbox"
           checked={includeInterop}
           onChange={(e) => onIncludeInteropChange(e.target.checked)}
         />
-        <span>Include interop &amp; apps</span>
+        <span>Include interop &amp; client apps</span>
       </label>
     </div>
   )
