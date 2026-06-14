@@ -37,8 +37,8 @@ export function ShowroomScene({
         enablePan
         enableDamping
         dampingFactor={0.08}
-        minDistance={2.5}
-        maxDistance={20}
+        minDistance={filter === 'all' ? 2.5 : 1.4}
+        maxDistance={filter === 'all' ? 20 : 8}
         maxPolarAngle={Math.PI * 0.42}
       />
 
@@ -74,29 +74,50 @@ interface Placement {
   rotationY: number
 }
 
-/** Minimum radians between neighbors on a compact (single-filter) arc. */
-const MIN_ANGLE_RAD = 0.52
 /** Horizontal angle (XZ) that faces the default showroom camera ([9, 6, 9]). */
 const ARC_CENTER = Math.PI / 4
+
+/** Target spacing along the arc for compact (filtered) layouts. */
+const COMPACT_MIN_CHORD = 0.78
+const COMPACT_MIN_ANGLE = 0.38
+const COMPACT_MAX_ARC = Math.PI * 0.5
 
 function fullRingAngles(count: number): number[] {
   return Array.from({ length: count }, (_, i) => (i / count) * Math.PI * 2)
 }
 
-function compactArcAngles(count: number): number[] {
-  if (count <= 0) return []
-  if (count === 1) return [ARC_CENTER]
+function compactLayout(count: number): { radius: number; angles: number[] } {
+  if (count <= 0) return { radius: 0.9, angles: [] }
+  if (count === 1) return { radius: 0.85, angles: [ARC_CENTER] }
 
-  const arcSpan = Math.min(
-    Math.PI * 2,
-    Math.max(Math.PI * 0.65, (count - 1) * MIN_ANGLE_RAD),
-  )
-  const start = ARC_CENTER - arcSpan / 2
-  return Array.from({ length: count }, (_, i) => start + (i / (count - 1)) * arcSpan)
-}
+  // Small sets: front-facing arc; larger sets wrap a full circle at a tight radius.
+  const useFullRing = count > 10
+  const arcSpan = useFullRing
+    ? Math.PI * 2
+    : Math.min(
+        COMPACT_MAX_ARC,
+        Math.max(Math.PI * 0.35, (count - 1) * COMPACT_MIN_ANGLE),
+      )
 
-function compactRingRadius(count: number, baseRadius: number): number {
-  return Math.max(1.3, Math.min(baseRadius, 0.9 + count * 0.26))
+  const step = count > 1 ? arcSpan / (count - 1) : COMPACT_MIN_ANGLE
+  const angleGap = Math.max(step, COMPACT_MIN_ANGLE)
+  const fromChord = COMPACT_MIN_CHORD / (2 * Math.sin(angleGap / 2))
+
+  let radius: number
+  if (useFullRing) {
+    radius = Math.max(0.9, (count * COMPACT_MIN_CHORD) / (Math.PI * 2))
+  } else {
+    radius = Math.max(0.75, Math.min(fromChord, 0.65 + count * 0.14))
+  }
+
+  const angles = useFullRing
+    ? fullRingAngles(count)
+    : Array.from({ length: count }, (_, i) => {
+        const start = ARC_CENTER - arcSpan / 2
+        return start + (i / (count - 1)) * arcSpan
+      })
+
+  return { radius, angles }
 }
 
 function layoutByCategory(devices: Device[], filter: Category | 'all') {
@@ -111,14 +132,15 @@ function layoutByCategory(devices: Device[], filter: Category | 'all') {
   for (const cat of CATEGORY_ORDER) {
     const inCat = devices.filter((d) => d.category === cat)
     if (inCat.length === 0) continue
-    const radius = useCompactArc
-      ? compactRingRadius(inCat.length, baseRadius)
-      : baseRadius
+
+    const compact = useCompactArc ? compactLayout(inCat.length) : null
+    const radius = compact ? compact.radius : baseRadius
     const labelAngle = useCompactArc ? ARC_CENTER : 0
+    const angles =
+      compact?.angles ??
+      fullRingAngles(inCat.length)
+
     rings.push({ category: cat, radius, labelAngle })
-    const angles = useCompactArc
-      ? compactArcAngles(inCat.length)
-      : fullRingAngles(inCat.length)
     inCat.forEach((d, i) => {
       const angle = angles[i] ?? 0
       const x = Math.cos(angle) * radius
@@ -129,7 +151,7 @@ function layoutByCategory(devices: Device[], filter: Category | 'all') {
         rotationY: -angle + Math.PI / 2,
       })
     })
-    baseRadius += 2.0
+    if (!useCompactArc) baseRadius += 2.0
   }
   return { rings, placements }
 }
