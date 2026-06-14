@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Html, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
-import type { Device } from '../data/types'
+import type { Category, Device } from '../data/types'
 import { CATEGORY_ORDER, CATEGORY_LABELS } from '../data/types'
 import { DevicePedestal } from '../three/DevicePedestal'
 import { SceneEnv } from '../three/SceneEnv'
@@ -9,6 +9,7 @@ import { ShowroomFloor } from '../three/ShowroomFloor'
 
 interface Props {
   devices: Device[]
+  filter?: Category | 'all'
   selected?: Device | null
   onSelect: (d: Device) => void
 }
@@ -17,8 +18,16 @@ interface Props {
  * Walkable virtual showroom: devices are arranged in concentric "rings" by
  * category. Drag to orbit; scroll to dolly. Click a device to inspect.
  */
-export function ShowroomScene({ devices, selected, onSelect }: Props) {
-  const layout = useMemo(() => layoutByCategory(devices), [devices])
+export function ShowroomScene({
+  devices,
+  filter = 'all',
+  selected,
+  onSelect,
+}: Props) {
+  const layout = useMemo(
+    () => layoutByCategory(devices, filter),
+    [devices, filter],
+  )
 
   return (
     <>
@@ -40,6 +49,7 @@ export function ShowroomScene({ devices, selected, onSelect }: Props) {
           key={ring.category}
           radius={ring.radius}
           label={CATEGORY_LABELS[ring.category]}
+          labelAngle={ring.labelAngle}
         />
       ))}
 
@@ -64,20 +74,18 @@ interface Placement {
   rotationY: number
 }
 
-/** Use a full 360° ring when a category has at least this many devices. */
-const FULL_RING_COUNT = 10
-/** Minimum radians between neighbors on a compact (partial) arc. */
+/** Minimum radians between neighbors on a compact (single-filter) arc. */
 const MIN_ANGLE_RAD = 0.52
 /** Horizontal angle (XZ) that faces the default showroom camera ([9, 6, 9]). */
 const ARC_CENTER = Math.PI / 4
 
-function placementAngles(count: number): number[] {
+function fullRingAngles(count: number): number[] {
+  return Array.from({ length: count }, (_, i) => (i / count) * Math.PI * 2)
+}
+
+function compactArcAngles(count: number): number[] {
   if (count <= 0) return []
   if (count === 1) return [ARC_CENTER]
-
-  if (count >= FULL_RING_COUNT) {
-    return Array.from({ length: count }, (_, i) => (i / count) * Math.PI * 2)
-  }
 
   const arcSpan = Math.min(
     Math.PI * 2,
@@ -87,21 +95,30 @@ function placementAngles(count: number): number[] {
   return Array.from({ length: count }, (_, i) => start + (i / (count - 1)) * arcSpan)
 }
 
-function ringRadiusForCount(count: number, baseRadius: number): number {
-  if (count >= FULL_RING_COUNT) return baseRadius
+function compactRingRadius(count: number, baseRadius: number): number {
   return Math.max(1.3, Math.min(baseRadius, 0.9 + count * 0.26))
 }
 
-function layoutByCategory(devices: Device[]) {
-  const rings: { category: Device['category']; radius: number }[] = []
+function layoutByCategory(devices: Device[], filter: Category | 'all') {
+  const useCompactArc = filter !== 'all'
+  const rings: {
+    category: Device['category']
+    radius: number
+    labelAngle: number
+  }[] = []
   const placements: Placement[] = []
   let baseRadius = 2.4
   for (const cat of CATEGORY_ORDER) {
     const inCat = devices.filter((d) => d.category === cat)
     if (inCat.length === 0) continue
-    const radius = ringRadiusForCount(inCat.length, baseRadius)
-    rings.push({ category: cat, radius })
-    const angles = placementAngles(inCat.length)
+    const radius = useCompactArc
+      ? compactRingRadius(inCat.length, baseRadius)
+      : baseRadius
+    const labelAngle = useCompactArc ? ARC_CENTER : 0
+    rings.push({ category: cat, radius, labelAngle })
+    const angles = useCompactArc
+      ? compactArcAngles(inCat.length)
+      : fullRingAngles(inCat.length)
     inCat.forEach((d, i) => {
       const angle = angles[i] ?? 0
       const x = Math.cos(angle) * radius
@@ -123,7 +140,15 @@ function layoutByCategory(devices: Device[]) {
  * geometry is a thin band and the shader keeps both core + bloom alphas very
  * low so the line reads like chalk on a stage, not a neon track.
  */
-function CategoryRing({ radius, label }: { radius: number; label: string }) {
+function CategoryRing({
+  radius,
+  label,
+  labelAngle,
+}: {
+  radius: number
+  label: string
+  labelAngle: number
+}) {
   const uniforms = useMemo(
     () => ({
       uRadius: { value: radius },
@@ -148,7 +173,7 @@ function CategoryRing({ radius, label }: { radius: number; label: string }) {
           side={THREE.DoubleSide}
         />
       </mesh>
-      <RingLabel label={label} radius={radius} />
+      <RingLabel label={label} radius={radius} labelAngle={labelAngle} />
     </group>
   )
 }
@@ -183,10 +208,23 @@ const ringFrag = /* glsl */ `
  * HTML pill label anchored at the outer edge of each ring. Reuses the Cisco
  * blue border so the label visually belongs to the ring it sits on.
  */
-function RingLabel({ radius, label }: { radius: number; label: string }) {
+function RingLabel({
+  radius,
+  label,
+  labelAngle,
+}: {
+  radius: number
+  label: string
+  labelAngle: number
+}) {
+  const labelR = radius + 0.55
   return (
     <Html
-      position={[radius + 0.55, 0.03, 0]}
+      position={[
+        Math.cos(labelAngle) * labelR,
+        0.03,
+        Math.sin(labelAngle) * labelR,
+      ]}
       center
       distanceFactor={9}
       style={{ pointerEvents: 'none' }}

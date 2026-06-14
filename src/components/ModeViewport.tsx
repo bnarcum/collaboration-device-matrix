@@ -56,6 +56,7 @@ export function ModeViewport({
       <Suspense fallback={null}>
         <ShowroomScene
           devices={visibleDevices}
+          filter={filter}
           selected={selected}
           onSelect={onSelect}
         />
