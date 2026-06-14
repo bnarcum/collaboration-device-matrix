@@ -12,7 +12,7 @@ interface FloorProps {
 }
 
 /**
- * Polished floor used by both the Showroom and Finder scenes.
+ * Polished floor used by the Showroom scene.
  *
  * Base layer is a wide MeshReflectorMaterial disc that gives a whisper-
  * faint reflection so pedestals feel anchored to the ground instead of

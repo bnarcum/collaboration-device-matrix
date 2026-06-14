@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { CATEGORY_LABELS, type Category, type RoomSize } from '../data/types'
-import { FINDER_QUESTIONS } from '../scenes/FinderScene'
+import { FINDER_QUESTIONS } from '../data/finder'
 
 export interface FinderState {
   step: 0 | 1 | 2

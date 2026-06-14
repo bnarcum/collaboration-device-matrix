@@ -687,6 +687,49 @@ a:hover {
   backdrop-filter: blur(10px);
 }
 
+.filters--inline {
+  position: static;
+  max-width: none;
+  padding: 0;
+  border: none;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.aisle-toolbar {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  max-width: calc(100% - 2rem);
+  padding: 0.6rem 0.7rem;
+  border-radius: 18px;
+  background: rgba(5, 8, 15, 0.55);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+}
+
+.find-devices-btn {
+  font-weight: 600;
+  padding: 0.42rem 0.85rem;
+}
+
+.find-devices-clear {
+  font-size: 0.78rem;
+  opacity: 0.85;
+  padding: 0.42rem 0.65rem;
+}
+
+.aisle-toolbar-divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 0.15rem 0.2rem;
+  background: var(--line-strong);
+}
+
 .compare-tray {
   position: absolute;
   bottom: 1rem;

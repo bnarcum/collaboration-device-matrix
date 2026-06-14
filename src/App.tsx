@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import type { CSSProperties } from 'react'
 import {
   DEVICES,
@@ -18,11 +18,8 @@ import { VENDORS } from './data/vendors'
 import { DeviceDrawer } from './ui/DeviceDrawer'
 import { CompareTray } from './ui/CompareTray'
 import { CompareModal } from './ui/CompareModal'
+import { filterDevicesByFinder } from './data/finder'
 import type { FinderState } from './ui/FinderOverlay'
-
-const FinderOverlay = lazy(() =>
-  import('./ui/FinderOverlay').then((m) => ({ default: m.FinderOverlay })),
-)
 import { SearchBar } from './ui/SearchBar'
 import { PlatformSwitch } from './ui/PlatformSwitch'
 import {
@@ -37,10 +34,24 @@ import {
   idCodec,
   useUrlState,
   vendorSelectionCodec,
+  type UrlCodec,
 } from './hooks/useUrlState'
 
-type Mode = 'showroom' | 'showcase' | 'finder'
-const MODES: readonly Mode[] = ['showroom', 'showcase', 'finder']
+const FinderOverlay = lazy(() =>
+  import('./ui/FinderOverlay').then((m) => ({ default: m.FinderOverlay })),
+)
+
+type Mode = 'showroom' | 'showcase'
+const MODES: readonly Mode[] = ['showroom', 'showcase']
+
+const modeCodec: UrlCodec<Mode> = {
+  parse: (raw) => {
+    if (raw === 'finder') return 'showcase'
+    if (raw && (MODES as readonly string[]).includes(raw)) return raw as Mode
+    return 'showroom'
+  },
+  serialize: (v) => (v === 'showroom' ? null : v),
+}
 
 const DEFAULT_VENDORS: VendorId[] = ['cisco']
 
@@ -59,8 +70,9 @@ export default function App() {
   const [mode, setMode] = useUrlState<Mode>(
     'view',
     'showroom',
-    enumCodec(MODES, 'showroom'),
+    modeCodec,
   )
+  const [finderPanelOpen, setFinderPanelOpen] = useState(false)
   const [selectedId, setSelectedId] = useUrlState<string | null>(
     'device',
     null,
@@ -220,16 +232,38 @@ export default function App() {
       if (s.step === 0) {
         setRoomSize(null)
         setFinderForRaw(null)
+        setFinderPanelOpen(true)
       } else if (s.step === 1) {
         setRoomSize(s.roomSize ?? null)
         setFinderForRaw(null)
+        setFinderPanelOpen(true)
       } else {
         setRoomSize(s.roomSize ?? null)
         setFinderForRaw(s.category ?? 'any')
+        setFinderPanelOpen(false)
       }
     },
     [setRoomSize, setFinderForRaw],
   )
+
+  const openFinder = useCallback(() => {
+    setMode('showcase')
+    setFinderState({ step: 0 })
+  }, [setMode, setFinderState])
+
+  const clearFinder = useCallback(() => {
+    setRoomSize(null)
+    setFinderForRaw(null)
+    setFinderPanelOpen(false)
+  }, [setRoomSize, setFinderForRaw])
+
+  const finderComplete = finderState.step >= 2
+
+  useEffect(() => {
+    if (roomSize && finderForRaw === null) {
+      setFinderPanelOpen(true)
+    }
+  }, [roomSize, finderForRaw])
 
   const visibleDevices = useMemo(() => {
     const byCategory =
@@ -251,6 +285,15 @@ export default function App() {
     selectedPlatforms,
     platformInterop,
   ])
+
+  const aisleDevices = useMemo(() => {
+    if (!finderComplete || !finderState.roomSize) return visibleDevices
+    return filterDevicesByFinder(
+      visibleDevices,
+      finderState.roomSize,
+      finderState.category,
+    )
+  }, [visibleDevices, finderComplete, finderState.roomSize, finderState.category])
 
   const selectDevice = useCallback(
     (d: Device | null) => {
@@ -313,6 +356,11 @@ export default function App() {
         tag === 'select' ||
         target?.isContentEditable === true
       if (e.key === 'Escape') {
+        if (finderPanelOpen && finderState.step < 2) {
+          clearFinder()
+          e.preventDefault()
+          return
+        }
         if (compareOpen) {
           setCompareOpen(false)
           e.preventDefault()
@@ -339,7 +387,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [selected, selectDevice, compareOpen, setCompareOpen, catalog])
+  }, [selected, selectDevice, compareOpen, setCompareOpen, catalog, finderPanelOpen, finderState.step, clearFinder])
 
   return (
     <div
@@ -416,12 +464,6 @@ export default function App() {
             onClick={() => setMode('showcase')}
           >
             Aisle
-          </button>
-          <button
-            data-active={mode === 'finder' ? 'true' : 'false'}
-            onClick={() => setMode('finder')}
-          >
-            Finder
           </button>
         </nav>
         <SearchBar devices={catalog} onSelect={(d) => selectDevice(d)} />
@@ -513,27 +555,30 @@ export default function App() {
       <div className="canvas-wrap">
         <ModeViewport
           mode={mode}
-          visibleDevices={visibleDevices}
-          catalog={catalog}
+          visibleDevices={mode === 'showcase' ? aisleDevices : visibleDevices}
           selected={selected}
           onSelect={(d) => selectDevice(d)}
           filter={filter}
-          finderStep={finderState.step}
-          finderFilter={{
-            roomSize: finderState.roomSize,
-            category: finderState.category,
-          }}
         />
 
         <div className="overlay">
-          {(mode === 'showroom' || mode === 'showcase') && (
+          {mode === 'showroom' && (
             <Filters value={filter} onChange={setFilter} />
           )}
-          {mode === 'finder' && (
+          {mode === 'showcase' && (
+            <AisleToolbar
+              filter={filter}
+              onFilterChange={setFilter}
+              onFindDevices={openFinder}
+              finderActive={finderComplete}
+              onClearFinder={clearFinder}
+            />
+          )}
+          {(finderPanelOpen && finderState.step < 2) || finderComplete ? (
             <Suspense fallback={null}>
               <FinderOverlay state={finderState} setState={setFinderState} />
             </Suspense>
-          )}
+          ) : null}
           <CompareTray
             items={compare}
             onRemove={(d) => toggleCompare(d)}
@@ -560,15 +605,55 @@ export default function App() {
   )
 }
 
+function AisleToolbar({
+  filter,
+  onFilterChange,
+  onFindDevices,
+  finderActive,
+  onClearFinder,
+}: {
+  filter: Category | 'all'
+  onFilterChange: (c: Category | 'all') => void
+  onFindDevices: () => void
+  finderActive: boolean
+  onClearFinder: () => void
+}) {
+  return (
+    <div className="aisle-toolbar" role="toolbar" aria-label="Aisle filters">
+      <button type="button" className="find-devices-btn" onClick={onFindDevices}>
+        Find devices
+      </button>
+      {finderActive && (
+        <button
+          type="button"
+          className="find-devices-clear"
+          onClick={onClearFinder}
+          title="Clear guided filter and show all devices"
+        >
+          Clear finder
+        </button>
+      )}
+      <span className="aisle-toolbar-divider" aria-hidden="true" />
+      <Filters value={filter} onChange={onFilterChange} inline />
+    </div>
+  )
+}
+
 function Filters({
   value,
   onChange,
+  inline = false,
 }: {
   value: Category | 'all'
   onChange: (c: Category | 'all') => void
+  inline?: boolean
 }) {
   return (
-    <div className="filters" role="toolbar" aria-label="Category filter">
+    <div
+      className={inline ? 'filters filters--inline' : 'filters'}
+      role={inline ? undefined : 'toolbar'}
+      aria-label={inline ? undefined : 'Category filter'}
+    >
       <button
         data-active={value === 'all' ? 'true' : 'false'}
         onClick={() => onChange('all')}
