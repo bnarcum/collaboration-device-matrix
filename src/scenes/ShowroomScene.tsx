@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import type { Category, Device } from '../data/types'
 import { CATEGORY_ORDER, CATEGORY_LABELS } from '../data/types'
 import { DevicePedestal } from '../three/DevicePedestal'
+import { estimateBillboardPlane } from '../three/billboardSizing'
 import { SceneEnv } from '../three/SceneEnv'
 import { ShowroomFloor } from '../three/ShowroomFloor'
 
@@ -28,6 +29,10 @@ export function ShowroomScene({
     () => layoutByCategory(devices, filter),
     [devices, filter],
   )
+  const maxRingRadius = useMemo(
+    () => layout.rings.reduce((max, r) => Math.max(max, r.radius), 0),
+    [layout.rings],
+  )
 
   return (
     <>
@@ -37,8 +42,8 @@ export function ShowroomScene({
         enablePan
         enableDamping
         dampingFactor={0.08}
-        minDistance={filter === 'all' ? 2.5 : 1.4}
-        maxDistance={filter === 'all' ? 20 : 8}
+        minDistance={filter === 'all' ? 2.5 : 1.6}
+        maxDistance={filter === 'all' ? 20 : Math.max(7, maxRingRadius * 2.6)}
         maxPolarAngle={Math.PI * 0.42}
       />
 
@@ -74,50 +79,33 @@ interface Placement {
   rotationY: number
 }
 
-/** Horizontal angle (XZ) that faces the default showroom camera ([9, 6, 9]). */
-const ARC_CENTER = Math.PI / 4
-
-/** Target spacing along the arc for compact (filtered) layouts. */
-const COMPACT_MIN_CHORD = 0.78
-const COMPACT_MIN_ANGLE = 0.38
-const COMPACT_MAX_ARC = Math.PI * 0.5
+/** Gap between billboard footprints along a filtered ring (meters). */
+const COMPACT_GAP = 0.35
 
 function fullRingAngles(count: number): number[] {
   return Array.from({ length: count }, (_, i) => (i / count) * Math.PI * 2)
 }
 
-function compactLayout(count: number): { radius: number; angles: number[] } {
-  if (count <= 0) return { radius: 0.9, angles: [] }
-  if (count === 1) return { radius: 0.85, angles: [ARC_CENTER] }
+/**
+ * Filtered view: one ring, devices evenly spaced 360°, radius sized from the
+ * largest billboard footprint so neighbors do not overlap.
+ */
+function compactLayout(devices: Device[]): { radius: number; angles: number[] } {
+  const count = devices.length
+  if (count === 0) return { radius: 0.9, angles: [] }
+  if (count === 1) return { radius: 0.95, angles: [0] }
 
-  // Small sets: front-facing arc; larger sets wrap a full circle at a tight radius.
-  const useFullRing = count > 10
-  const arcSpan = useFullRing
-    ? Math.PI * 2
-    : Math.min(
-        COMPACT_MAX_ARC,
-        Math.max(Math.PI * 0.35, (count - 1) * COMPACT_MIN_ANGLE),
-      )
+  const maxFootprint = Math.max(
+    ...devices.map((d) => estimateBillboardPlane(d).footprint),
+    0.55,
+  )
+  const spacing = maxFootprint + COMPACT_GAP
+  const angleStep = (Math.PI * 2) / count
+  const fromAngle = spacing / (2 * Math.sin(angleStep / 2))
+  const fromCirc = (count * spacing) / (Math.PI * 2)
+  const radius = Math.max(fromAngle, fromCirc, 0.95)
 
-  const step = count > 1 ? arcSpan / (count - 1) : COMPACT_MIN_ANGLE
-  const angleGap = Math.max(step, COMPACT_MIN_ANGLE)
-  const fromChord = COMPACT_MIN_CHORD / (2 * Math.sin(angleGap / 2))
-
-  let radius: number
-  if (useFullRing) {
-    radius = Math.max(0.9, (count * COMPACT_MIN_CHORD) / (Math.PI * 2))
-  } else {
-    radius = Math.max(0.75, Math.min(fromChord, 0.65 + count * 0.14))
-  }
-
-  const angles = useFullRing
-    ? fullRingAngles(count)
-    : Array.from({ length: count }, (_, i) => {
-        const start = ARC_CENTER - arcSpan / 2
-        return start + (i / (count - 1)) * arcSpan
-      })
-
-  return { radius, angles }
+  return { radius, angles: fullRingAngles(count) }
 }
 
 function layoutByCategory(devices: Device[], filter: Category | 'all') {
@@ -133,9 +121,9 @@ function layoutByCategory(devices: Device[], filter: Category | 'all') {
     const inCat = devices.filter((d) => d.category === cat)
     if (inCat.length === 0) continue
 
-    const compact = useCompactArc ? compactLayout(inCat.length) : null
+    const compact = useCompactArc ? compactLayout(inCat) : null
     const radius = compact ? compact.radius : baseRadius
-    const labelAngle = useCompactArc ? ARC_CENTER : 0
+    const labelAngle = 0
     const angles =
       compact?.angles ??
       fullRingAngles(inCat.length)
