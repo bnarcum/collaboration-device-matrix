@@ -43,7 +43,7 @@ export function PlatformSwitch({
               title={label}
               onClick={() => onToggle(p)}
             >
-              <PlatformIcon platform={p} />
+              <PlatformIcon platform={p} active={on} />
               <span>{label}</span>
             </button>
           )
