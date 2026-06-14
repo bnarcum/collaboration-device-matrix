@@ -64,16 +64,46 @@ interface Placement {
   rotationY: number
 }
 
+/** Use a full 360° ring when a category has at least this many devices. */
+const FULL_RING_COUNT = 10
+/** Minimum radians between neighbors on a compact (partial) arc. */
+const MIN_ANGLE_RAD = 0.52
+/** Horizontal angle (XZ) that faces the default showroom camera ([9, 6, 9]). */
+const ARC_CENTER = Math.PI / 4
+
+function placementAngles(count: number): number[] {
+  if (count <= 0) return []
+  if (count === 1) return [ARC_CENTER]
+
+  if (count >= FULL_RING_COUNT) {
+    return Array.from({ length: count }, (_, i) => (i / count) * Math.PI * 2)
+  }
+
+  const arcSpan = Math.min(
+    Math.PI * 2,
+    Math.max(Math.PI * 0.65, (count - 1) * MIN_ANGLE_RAD),
+  )
+  const start = ARC_CENTER - arcSpan / 2
+  return Array.from({ length: count }, (_, i) => start + (i / (count - 1)) * arcSpan)
+}
+
+function ringRadiusForCount(count: number, baseRadius: number): number {
+  if (count >= FULL_RING_COUNT) return baseRadius
+  return Math.max(1.3, Math.min(baseRadius, 0.9 + count * 0.26))
+}
+
 function layoutByCategory(devices: Device[]) {
   const rings: { category: Device['category']; radius: number }[] = []
   const placements: Placement[] = []
-  let radius = 2.4
+  let baseRadius = 2.4
   for (const cat of CATEGORY_ORDER) {
     const inCat = devices.filter((d) => d.category === cat)
     if (inCat.length === 0) continue
+    const radius = ringRadiusForCount(inCat.length, baseRadius)
     rings.push({ category: cat, radius })
+    const angles = placementAngles(inCat.length)
     inCat.forEach((d, i) => {
-      const angle = (i / inCat.length) * Math.PI * 2
+      const angle = angles[i] ?? 0
       const x = Math.cos(angle) * radius
       const z = Math.sin(angle) * radius
       placements.push({
@@ -82,7 +112,7 @@ function layoutByCategory(devices: Device[]) {
         rotationY: -angle + Math.PI / 2,
       })
     })
-    radius += 2.0
+    baseRadius += 2.0
   }
   return { rings, placements }
 }
