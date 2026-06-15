@@ -63,7 +63,7 @@ function GridDisc() {
       uMinorWidth: { value: 0.8 },
       uMajorColor: { value: new THREE.Color('#34557a') },
       uMinorColor: { value: new THREE.Color('#1a283b') },
-      uAccent: { value: new THREE.Color('#049fd9') },
+      uAccent: { value: new THREE.Color('#02C8FF') },
       uFadeInner: { value: 8.5 },
       uFadeOuter: { value: 15.0 },
       uOverallAlpha: { value: 0.95 },

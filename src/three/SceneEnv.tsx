@@ -4,8 +4,8 @@ import { ContactShadows, Environment } from '@react-three/drei'
 export function SceneEnv() {
   return (
     <>
-      <color attach="background" args={['#05080f']} />
-      <fog attach="fog" args={['#05080f', 8, 28]} />
+      <color attach="background" args={['#07182D']} />
+      <fog attach="fog" args={['#07182D', 8, 28]} />
       <ambientLight intensity={0.35} />
       <directionalLight
         position={[6, 8, 4]}
@@ -15,7 +15,7 @@ export function SceneEnv() {
       <directionalLight
         position={[-6, 4, -3]}
         intensity={0.4}
-        color="#049FD9"
+        color="#02C8FF"
       />
       <Environment preset="city" />
       <ContactShadows

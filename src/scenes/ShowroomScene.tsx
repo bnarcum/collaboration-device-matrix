@@ -162,7 +162,7 @@ function CategoryRing({
   const uniforms = useMemo(
     () => ({
       uRadius: { value: radius },
-      uColor: { value: new THREE.Color('#049fd9') },
+      uColor: { value: new THREE.Color('#02C8FF') },
     }),
     [radius],
   )
@@ -245,7 +245,7 @@ function RingLabel({
           padding: '5px 11px',
           borderRadius: 999,
           background: 'rgba(5, 8, 15, 0.78)',
-          border: '1px solid rgba(4, 159, 217, 0.65)',
+          border: '1px solid rgba(2, 200, 255, 0.65)',
           color: '#e6f0fa',
           fontSize: 11,
           letterSpacing: '0.08em',

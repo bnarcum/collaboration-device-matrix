@@ -1,19 +1,19 @@
 :root {
-  /* Cisco brand palette (publicly documented) — default chrome for the matrix */
-  --cisco-primary: #049fd9;
-  --cisco-indigo: #004baf;
-  --cisco-ocean: #097dbc;
+  /* Cisco brand palette */
+  --cisco-primary: #02c8ff;
+  --cisco-indigo: #0a60ff;
+  --cisco-ocean: #1abbe9;
   --brand-primary: var(--cisco-primary);
   --brand-secondary: var(--cisco-indigo);
 
   /* App tokens */
-  --bg-1: #05080f;
-  --bg-2: #0a1220;
-  --fg-1: #f7fafc;
-  --fg-2: rgba(247, 250, 252, 0.78);
-  --fg-3: rgba(247, 250, 252, 0.55);
-  --line: rgba(255, 255, 255, 0.08);
-  --line-strong: rgba(255, 255, 255, 0.16);
+  --bg-1: #07182d;
+  --bg-2: #0a2240;
+  --fg-1: #ffffff;
+  --fg-2: rgba(255, 255, 255, 0.78);
+  --fg-3: rgba(180, 185, 192, 0.85);
+  --line: rgba(214, 214, 214, 0.14);
+  --line-strong: rgba(214, 214, 214, 0.22);
   --accent: var(--brand-primary);
 
   color-scheme: dark;
@@ -40,12 +40,12 @@ body {
   background:
     radial-gradient(
       1200px 800px at 80% -10%,
-      rgba(0, 184, 252, 0.12),
+      rgba(2, 200, 255, 0.12),
       transparent 60%
     ),
     radial-gradient(
       900px 600px at -10% 90%,
-      rgba(97, 97, 255, 0.14),
+      rgba(48, 112, 229, 0.14),
       transparent 60%
     ),
     linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
@@ -69,7 +69,7 @@ button {
 }
 
 button:hover {
-  background: rgba(4, 159, 217, 0.18);
+  background: rgba(2, 200, 255, 0.18);
   border-color: var(--brand-primary);
 }
 
@@ -239,7 +239,7 @@ a:hover {
   color: white;
   font-weight: 800;
   font-size: 13px;
-  box-shadow: 0 8px 24px rgba(4, 159, 217, 0.35);
+  box-shadow: 0 8px 24px rgba(2, 200, 255, 0.35);
 }
 
 .brand-title {
@@ -299,11 +299,11 @@ a:hover {
   gap: 0.6rem;
   padding: 0.45rem 0.85rem 0.45rem 0.7rem;
   border-radius: 999px;
-  border: 1px solid rgba(4, 159, 217, 0.45);
+  border: 1px solid rgba(2, 200, 255, 0.45);
   background: linear-gradient(
     135deg,
     rgba(0, 75, 175, 0.22) 0%,
-    rgba(4, 159, 217, 0.22) 100%
+    rgba(2, 200, 255, 0.22) 100%
   );
   color: var(--fg-1);
   text-decoration: none;
@@ -321,10 +321,10 @@ a:hover {
   background: linear-gradient(
     135deg,
     rgba(0, 75, 175, 0.36) 0%,
-    rgba(4, 159, 217, 0.36) 100%
+    rgba(2, 200, 255, 0.36) 100%
   );
   border-color: var(--brand-primary);
-  box-shadow: 0 8px 22px rgba(4, 159, 217, 0.36);
+  box-shadow: 0 8px 22px rgba(2, 200, 255, 0.36);
   transform: translateY(-1px);
   text-decoration: none;
 }
@@ -435,7 +435,7 @@ a:hover {
 
 .search-input-wrap:focus-within {
   border-color: var(--brand-primary);
-  background: rgba(4, 159, 217, 0.08);
+  background: rgba(2, 200, 255, 0.08);
 }
 
 .search-input-icon {
@@ -504,7 +504,7 @@ a:hover {
 
 .search-result[data-highlighted='true'],
 .search-result:hover {
-  background: rgba(4, 159, 217, 0.18);
+  background: rgba(2, 200, 255, 0.18);
   color: var(--fg-1);
   border-color: transparent;
   font-weight: 500;
@@ -541,8 +541,8 @@ a:hover {
   text-transform: uppercase;
   padding: 3px 8px;
   border-radius: 999px;
-  background: rgba(4, 159, 217, 0.18);
-  border: 1px solid rgba(4, 159, 217, 0.4);
+  background: rgba(2, 200, 255, 0.18);
+  border: 1px solid rgba(2, 200, 255, 0.4);
   color: #cfe7f5;
   white-space: nowrap;
   flex-shrink: 0;
@@ -560,17 +560,17 @@ a:hover {
   gap: 0.6rem;
   padding: 0.45rem 0.85rem 0.45rem 0.7rem;
   border-radius: 999px;
-  border: 1px solid rgba(4, 159, 217, 0.45);
+  border: 1px solid rgba(2, 200, 255, 0.45);
   background: linear-gradient(
     135deg,
-    rgba(4, 159, 217, 0.18) 0%,
+    rgba(2, 200, 255, 0.18) 0%,
     rgba(0, 75, 175, 0.18) 100%
   );
   color: var(--fg-1);
   text-decoration: none;
   font-weight: 500;
   line-height: 1;
-  box-shadow: 0 6px 18px rgba(4, 159, 217, 0.18);
+  box-shadow: 0 6px 18px rgba(2, 200, 255, 0.18);
   transition:
     background-color 140ms ease,
     border-color 140ms ease,
@@ -581,11 +581,11 @@ a:hover {
 .source-link:hover {
   background: linear-gradient(
     135deg,
-    rgba(4, 159, 217, 0.32) 0%,
+    rgba(2, 200, 255, 0.32) 0%,
     rgba(0, 75, 175, 0.32) 100%
   );
   border-color: var(--brand-primary);
-  box-shadow: 0 8px 22px rgba(4, 159, 217, 0.32);
+  box-shadow: 0 8px 22px rgba(2, 200, 255, 0.32);
   transform: translateY(-1px);
   text-decoration: none;
 }
@@ -618,7 +618,7 @@ a:hover {
   width: 26px;
   height: 26px;
   border-radius: 999px;
-  background: rgba(4, 159, 217, 0.35);
+  background: rgba(2, 200, 255, 0.35);
   color: #fff;
   font-size: 0.95rem;
   font-weight: 700;
@@ -824,8 +824,8 @@ a:hover {
 }
 
 .drawer .vendor-tag[data-vendor='cisco'] {
-  background: #049fd9;
-  border-color: #049fd9;
+  background: #02C8FF;
+  border-color: #02C8FF;
   color: #001724;
 }
 
@@ -860,7 +860,7 @@ a:hover {
   margin: 0 0 1rem;
   background: radial-gradient(
     ellipse at center,
-    rgba(4, 159, 217, 0.12),
+    rgba(2, 200, 255, 0.12),
     transparent 65%
   );
   border-radius: 14px;
@@ -905,8 +905,8 @@ a:hover {
   padding: 0.3rem 0.65rem;
   font-size: 0.85rem;
   border-radius: 999px;
-  background: rgba(4, 159, 217, 0.15);
-  border: 1px solid rgba(4, 159, 217, 0.4);
+  background: rgba(2, 200, 255, 0.15);
+  border: 1px solid rgba(2, 200, 255, 0.4);
   color: var(--brand-primary);
   margin-top: 0.25rem;
 }
@@ -991,7 +991,7 @@ a:hover {
 
 .finder-choice:hover {
   border-color: var(--brand-primary);
-  background: rgba(4, 159, 217, 0.12);
+  background: rgba(2, 200, 255, 0.12);
   transform: translateY(-1px);
 }
 
@@ -1043,8 +1043,8 @@ a:hover {
 .chip {
   padding: 0.25rem 0.75rem;
   border-radius: 999px;
-  background: rgba(4, 159, 217, 0.15);
-  border: 1px solid rgba(4, 159, 217, 0.4);
+  background: rgba(2, 200, 255, 0.15);
+  border: 1px solid rgba(2, 200, 255, 0.4);
   color: var(--fg-1);
   font-size: 0.82rem;
   display: inline-flex;
@@ -1053,7 +1053,7 @@ a:hover {
 }
 
 .chip:hover {
-  background: rgba(4, 159, 217, 0.28);
+  background: rgba(2, 200, 255, 0.28);
   border-color: var(--brand-primary);
 }
 
@@ -1111,11 +1111,11 @@ a:hover {
   margin-top: 0.85rem;
   padding: 0.5rem 0.8rem;
   border-radius: 999px;
-  border: 1px solid rgba(4, 159, 217, 0.45);
+  border: 1px solid rgba(2, 200, 255, 0.45);
   background: linear-gradient(
     135deg,
     rgba(0, 75, 175, 0.18) 0%,
-    rgba(4, 159, 217, 0.18) 100%
+    rgba(2, 200, 255, 0.18) 100%
   );
   color: var(--fg-1);
   text-decoration: none;
@@ -1129,7 +1129,7 @@ a:hover {
   background: linear-gradient(
     135deg,
     rgba(0, 75, 175, 0.32) 0%,
-    rgba(4, 159, 217, 0.32) 100%
+    rgba(2, 200, 255, 0.32) 100%
   );
   text-decoration: none;
 }
@@ -1164,8 +1164,8 @@ a:hover {
   padding: 0.35rem 0.75rem;
   font-size: 0.78rem;
   border-radius: 999px;
-  border: 1px solid rgba(4, 159, 217, 0.45);
-  background: rgba(4, 159, 217, 0.14);
+  border: 1px solid rgba(2, 200, 255, 0.45);
+  background: rgba(2, 200, 255, 0.14);
   color: var(--fg-1);
   cursor: pointer;
   transition:
@@ -1175,12 +1175,12 @@ a:hover {
 }
 
 .compare-copy-link:hover {
-  background: rgba(4, 159, 217, 0.26);
+  background: rgba(2, 200, 255, 0.26);
   border-color: var(--brand-primary);
 }
 
 .compare-copy-link[data-copied='true'] {
-  background: rgba(4, 159, 217, 0.4);
+  background: rgba(2, 200, 255, 0.4);
   border-color: var(--brand-primary);
   color: #ffffff;
   font-weight: 600;
@@ -1206,7 +1206,7 @@ a:hover {
       180deg,
       #0a0e18 0%,
       #06090f 55%,
-      #05080f 100%
+      #07182D 100%
     );
   color: #e5eaf0;
   overflow: hidden;
@@ -1269,7 +1269,7 @@ a:hover {
   padding: 1rem 1.5rem;
   border-radius: 16px;
   background: rgba(8, 14, 26, 0.7);
-  border: 1px solid rgba(4, 159, 217, 0.45);
+  border: 1px solid rgba(2, 200, 255, 0.45);
   color: #e5eaf0;
   font-size: 0.95rem;
   backdrop-filter: blur(8px);
@@ -1290,7 +1290,7 @@ a:hover {
   padding: 6px 14px;
   border-radius: 999px;
   background: rgba(8, 14, 26, 0.7);
-  border: 1px solid rgba(4, 159, 217, 0.55);
+  border: 1px solid rgba(2, 200, 255, 0.55);
   color: #e5eaf0;
   font-size: 0.7rem;
   font-weight: 700;
@@ -1368,8 +1368,8 @@ a:hover {
   height: 3px;
   background: var(--brand-primary);
   box-shadow:
-    0 0 12px rgba(4, 159, 217, 0.65),
-    0 0 24px rgba(4, 159, 217, 0.25);
+    0 0 12px rgba(2, 200, 255, 0.65),
+    0 0 24px rgba(2, 200, 255, 0.25);
 }
 
 /* ── Boards (tall) variant ─────────────────────────────────────── */
@@ -1517,9 +1517,9 @@ a:hover {
   height: 18px;
   background: radial-gradient(
     50% 50% at 50% 50%,
-    rgba(4, 159, 217, 0.18) 0%,
-    rgba(4, 159, 217, 0.08) 45%,
-    rgba(4, 159, 217, 0) 75%
+    rgba(2, 200, 255, 0.18) 0%,
+    rgba(2, 200, 255, 0.08) 45%,
+    rgba(2, 200, 255, 0) 75%
   );
   filter: blur(6px);
   pointer-events: none;
@@ -1531,9 +1531,9 @@ a:hover {
   height: 22px;
   background: radial-gradient(
     50% 50% at 50% 50%,
-    rgba(4, 159, 217, 0.28) 0%,
-    rgba(4, 159, 217, 0.12) 45%,
-    rgba(4, 159, 217, 0) 75%
+    rgba(2, 200, 255, 0.28) 0%,
+    rgba(2, 200, 255, 0.12) 45%,
+    rgba(2, 200, 255, 0) 75%
   );
 }
 
@@ -1548,9 +1548,9 @@ a:hover {
   height: 80px;
   background: radial-gradient(
     50% 50% at 50% 65%,
-    rgba(4, 159, 217, 0.55) 0%,
-    rgba(4, 159, 217, 0.18) 35%,
-    rgba(4, 159, 217, 0) 70%
+    rgba(2, 200, 255, 0.55) 0%,
+    rgba(2, 200, 255, 0.18) 35%,
+    rgba(2, 200, 255, 0) 70%
   );
   opacity: 0;
   pointer-events: none;
@@ -1564,8 +1564,8 @@ a:hover {
 
 .aisle-tile[data-selected='true'] .aisle-tile-img {
   filter:
-    drop-shadow(0 14px 22px rgba(4, 159, 217, 0.55))
-    drop-shadow(0 4px 8px rgba(4, 159, 217, 0.35));
+    drop-shadow(0 14px 22px rgba(2, 200, 255, 0.55))
+    drop-shadow(0 4px 8px rgba(2, 200, 255, 0.35));
 }
 
 /* ── Caption ──────────────────────────────────────────────────── */
@@ -1680,7 +1680,7 @@ a:hover {
   display: grid;
   place-items: center;
   border-radius: 999px;
-  border: 1px solid rgba(4, 159, 217, 0.4);
+  border: 1px solid rgba(2, 200, 255, 0.4);
   background: rgba(8, 14, 26, 0.75);
   color: #e5eaf0;
   font-size: 1.5rem;
@@ -1699,7 +1699,7 @@ a:hover {
 
 .aisle-chevron:hover {
   background: rgba(8, 14, 26, 0.9);
-  border-color: rgba(4, 159, 217, 0.8);
+  border-color: rgba(2, 200, 255, 0.8);
   color: var(--brand-primary);
   transform: translateY(-50%) scale(1.04);
 }
@@ -1730,7 +1730,7 @@ a:hover {
   background: linear-gradient(
     180deg,
     transparent 0%,
-    rgba(4, 159, 217, 0.08) 50%,
+    rgba(2, 200, 255, 0.08) 50%,
     transparent 100%
   );
   border-top: 1px solid var(--line);

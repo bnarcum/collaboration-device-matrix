@@ -164,7 +164,7 @@ function SelectionSpot({ footprint }: { footprint: number }) {
 
   const uniforms = useMemo(
     () => ({
-      uColor: { value: new THREE.Color('#049fd9') },
+      uColor: { value: new THREE.Color('#02C8FF') },
       uTime: { value: 0 },
       uPulse: { value: 1 },
     }),
@@ -192,7 +192,7 @@ function SelectionSpot({ footprint }: { footprint: number }) {
       <SpotLight
         position={[0, 3.4, 0]}
         target={target}
-        color="#049fd9"
+        color="#02C8FF"
         intensity={9}
         distance={5.2}
         angle={0.42}

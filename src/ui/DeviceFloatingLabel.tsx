@@ -22,7 +22,7 @@ export function deviceLabelStyles(
       vendorId === 'neat' && !selected
         ? '0 2px 10px rgba(0, 0, 0, 0.45)'
         : selected
-          ? '0 0 12px rgba(4, 159, 217, 0.4)'
+          ? '0 0 12px rgba(2, 200, 255, 0.4)'
           : '0 2px 8px rgba(0, 0, 0, 0.35)',
   }
 }

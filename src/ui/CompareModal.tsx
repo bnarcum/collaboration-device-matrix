@@ -223,7 +223,7 @@ export function CompareModal({ items, open, onClose }: Props) {
                                   ? '2px solid var(--brand-primary)'
                                   : '2px solid transparent',
                                 background: differs
-                                  ? 'rgba(4, 159, 217, 0.08)'
+                                  ? 'rgba(2, 200, 255, 0.08)'
                                   : 'transparent',
                               }}
                             >
