@@ -62,7 +62,7 @@ export function PhotoFloorReflection({ url, planeW, planeH }: Props) {
   const uniforms = useMemo(
     () => ({
       uMap: { value: null as THREE.Texture | null },
-      uOpacity: { value: 0.68 },
+      uOpacity: { value: 0.82 },
     }),
     [],
   )
@@ -76,15 +76,18 @@ export function PhotoFloorReflection({ url, planeW, planeH }: Props) {
   return (
     <mesh
       rotation={[-Math.PI / 2, 0, 0]}
-      position={[0, 0.003, -planeH / 2]}
-      renderOrder={2}
+      position={[0, 0.012, -planeH / 2]}
+      renderOrder={3}
     >
       <planeGeometry args={[planeW, planeH]} />
       <shaderMaterial
         transparent
         depthWrite={false}
-        depthTest={true}
+        depthTest={false}
         toneMapped={false}
+        polygonOffset
+        polygonOffsetFactor={-2}
+        polygonOffsetUnits={-2}
         uniforms={uniforms}
         vertexShader={vert}
         fragmentShader={frag}
@@ -114,9 +117,9 @@ const frag = /* glsl */ `
     vec4 tex = texture2D(uMap, uv);
     if (tex.a < 0.08) discard;
     // Fade from the pedestal contact line (vUv.y = 1) toward the floor edge.
-    float fade = smoothstep(0.0, 0.62, vUv.y);
+    float fade = smoothstep(0.0, 0.78, vUv.y);
     float a = tex.a * uOpacity * fade;
     if (a < 0.02) discard;
-    gl_FragColor = vec4(tex.rgb * 0.9, a);
+    gl_FragColor = vec4(tex.rgb * 1.05, a);
   }
 `
