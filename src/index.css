@@ -243,6 +243,17 @@ a:hover {
   display: none;
 }
 
+/* Let users orbit the floor / use category filters without closing the panel. */
+.app[data-embed='cpn'] .drawer-backdrop {
+  pointer-events: none;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.app[data-embed='cpn'] .filters {
+  z-index: 12;
+}
+
 .topbar {
   display: flex;
   flex-wrap: wrap;
