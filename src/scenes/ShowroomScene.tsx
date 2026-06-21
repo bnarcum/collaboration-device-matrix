@@ -7,13 +7,17 @@ import { DevicePedestal } from '../three/DevicePedestal'
 import { estimateBillboardPlane } from '../three/billboardSizing'
 import { SceneEnv } from '../three/SceneEnv'
 import { ShowroomFloor } from '../three/ShowroomFloor'
-import { ShowroomCameraFocus } from '../three/ShowroomCameraFocus'
+import {
+  ShowroomCameraFocus,
+  type ShowroomFocusMode,
+} from '../three/ShowroomCameraFocus'
 
 interface Props {
   devices: Device[]
   filter?: Category | 'all'
   selected?: Device | null
   onSelect: (d: Device) => void
+  focusMode?: ShowroomFocusMode
 }
 
 /**
@@ -25,6 +29,7 @@ export function ShowroomScene({
   filter = 'all',
   selected,
   onSelect,
+  focusMode = 'ring',
 }: Props) {
   const layout = useMemo(
     () => layoutByCategory(devices, filter),
@@ -33,6 +38,14 @@ export function ShowroomScene({
   const maxRingRadius = useMemo(
     () => layout.rings.reduce((max, r) => Math.max(max, r.radius), 0),
     [layout.rings],
+  )
+  const placementRadius = useMemo(
+    () =>
+      layout.placements.reduce(
+        (max, p) => Math.max(max, Math.hypot(p.position[0], p.position[2])),
+        maxRingRadius,
+      ),
+    [layout.placements, maxRingRadius],
   )
 
   return (
@@ -75,6 +88,8 @@ export function ShowroomScene({
         selected={selected ?? null}
         placements={layout.placements}
         filter={filter}
+        focusMode={focusMode}
+        ringRadius={placementRadius}
       />
     </>
   )

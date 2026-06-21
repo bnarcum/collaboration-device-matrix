@@ -37,10 +37,28 @@ import {
   vendorSelectionCodec,
   type UrlCodec,
 } from './hooks/useUrlState'
+import type { ShowroomFocusMode } from './three/ShowroomCameraFocus'
 
 const FinderOverlay = lazy(() =>
   import('./ui/FinderOverlay').then((m) => ({ default: m.FinderOverlay })),
 )
+
+function embedDefaultShowroomFocus(): ShowroomFocusMode {
+  if (typeof window === 'undefined') return 'ring'
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('embed') !== 'cpn') return 'ring'
+  if (params.get('camera') === 'ring') return 'ring'
+  if (params.get('device')) return 'hero'
+  return 'ring'
+}
+
+const showroomFocusCodec: UrlCodec<ShowroomFocusMode> = {
+  parse: (raw) => {
+    if (raw === 'hero' || raw === 'ring') return raw
+    return embedDefaultShowroomFocus()
+  },
+  serialize: (v) => (v === 'hero' ? null : v),
+}
 
 type Mode = 'showroom' | 'showcase'
 const MODES: readonly Mode[] = ['showroom', 'showcase']
@@ -87,6 +105,11 @@ export default function App() {
     'filter',
     'all',
     enumCodec(FILTER_VALUES, 'all'),
+  )
+  const [showroomFocus, setShowroomFocus] = useUrlState<ShowroomFocusMode>(
+    'camera',
+    embedDefaultShowroomFocus(),
+    showroomFocusCodec,
   )
   const [roomSize, setRoomSize] = useUrlState<RoomSize | null>(
     'room',
@@ -206,6 +229,20 @@ export default function App() {
     const device = DEVICES_BY_ID.get(selectedId)
     if (device) setFilter(device.category)
   }, [selectedId, setFilter])
+
+  /** Portfolio overlay "Showroom" → full ring view while keeping selection. */
+  useEffect(() => {
+    if (!EMBED_MODE) return
+    const onMessage = (event: MessageEvent) => {
+      const data = event.data as { type?: string; mode?: string } | null
+      if (!data || data.type !== 'cpn-matrix-camera') return
+      if (data.mode === 'ring' || data.mode === 'hero') {
+        setShowroomFocus(data.mode)
+      }
+    }
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
+  }, [setShowroomFocus])
 
   useEffect(() => {
     const catalogIds = new Set(catalog.map((d) => d.id))
@@ -577,11 +614,21 @@ export default function App() {
           selected={selected}
           onSelect={(d) => selectDevice(d)}
           filter={filter}
+          showroomFocus={showroomFocus}
         />
 
         <div className="overlay">
           {mode === 'showroom' && (
             <Filters value={filter} onChange={setFilter} />
+          )}
+          {EMBED_MODE && mode === 'showroom' && showroomFocus === 'hero' && selected && (
+            <button
+              type="button"
+              className="embed-showroom-expand"
+              onClick={() => setShowroomFocus('ring')}
+            >
+              Explore full showroom
+            </button>
           )}
           {mode === 'showcase' && (
             <AisleToolbar

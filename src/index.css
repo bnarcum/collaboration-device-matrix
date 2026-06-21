@@ -254,6 +254,32 @@ a:hover {
   z-index: 12;
 }
 
+.embed-showroom-expand {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 12;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(2, 200, 255, 0.55);
+  background: rgba(5, 8, 15, 0.82);
+  color: #e6f0fa;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.embed-showroom-expand:hover {
+  border-color: #02c8ff;
+  background: rgba(2, 200, 255, 0.14);
+  color: #fff;
+}
+
 .topbar {
   display: flex;
   flex-wrap: wrap;

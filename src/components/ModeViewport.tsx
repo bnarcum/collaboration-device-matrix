@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import type { Category, Device } from '../data/types'
+import type { ShowroomFocusMode } from '../three/ShowroomCameraFocus'
 
 const ShowroomScene = lazy(() =>
   import('../scenes/ShowroomScene').then((m) => ({ default: m.ShowroomScene })),
@@ -25,6 +26,7 @@ interface Props {
   selected: Device | null
   onSelect: (d: Device) => void
   filter: Category | 'all'
+  showroomFocus?: ShowroomFocusMode
 }
 
 export function ModeViewport({
@@ -33,6 +35,7 @@ export function ModeViewport({
   selected,
   onSelect,
   filter,
+  showroomFocus = 'ring',
 }: Props) {
   if (mode === 'showcase') {
     return (
@@ -60,6 +63,7 @@ export function ModeViewport({
           filter={filter}
           selected={selected}
           onSelect={onSelect}
+          focusMode={showroomFocus}
         />
       </Suspense>
     </Canvas>

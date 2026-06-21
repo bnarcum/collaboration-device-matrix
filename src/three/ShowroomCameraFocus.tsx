@@ -59,11 +59,41 @@ function frameForDevice(
   return { position: positionOut, target }
 }
 
+/** Wide category ring — selected device stays spotlighted at the front of the arc. */
+function frameRingShowroom(
+  device: Device,
+  position: [number, number, number],
+  ringRadius: number,
+): CameraFrame {
+  const [x, , z] = position
+  const plane = estimateBillboardPlane(device)
+  const lookY = plane.planeH * 0.32 + 0.1
+  const target = new THREE.Vector3(x * 0.18, lookY * 0.55, z * 0.18)
+
+  const radial = new THREE.Vector3(x, 0, z)
+  const distFromCenter = radial.length()
+  if (distFromCenter > 0.08) radial.normalize()
+  else radial.set(0, 0, 1)
+
+  const dist = Math.max(ringRadius * 2.65, 7.8)
+  const positionOut = target
+    .clone()
+    .add(radial.clone().multiplyScalar(-dist * 0.72))
+    .add(new THREE.Vector3(0, dist * 0.58, 0))
+
+  return { position: positionOut, target }
+}
+
+export type ShowroomFocusMode = 'hero' | 'ring'
+
 interface Props {
   selected: Device | null
   placements: ShowroomPlacement[]
   /** Category filter driving layout — explicit dep so camera refocuses on filter change. */
   filter?: Category | 'all'
+  /** hero = tight product shot; ring = full category showroom arc. */
+  focusMode?: ShowroomFocusMode
+  ringRadius?: number
 }
 
 /** Stable key for layout changes (filter / device list / ring geometry). */
@@ -86,6 +116,8 @@ export function ShowroomCameraFocus({
   selected,
   placements,
   filter = 'all',
+  focusMode = 'ring',
+  ringRadius = 2.4,
 }: Props) {
   const camera = useThree((s) => s.camera)
   const controls = useThree((s) => s.controls) as OrbitControlsLike | null
@@ -105,7 +137,14 @@ export function ShowroomCameraFocus({
     if (selected) {
       const placement = placements.find((p) => p.device.id === selected.id)
       if (!placement) return
-      frame = frameForDevice(placement.device, placement.position)
+      frame =
+        focusMode === 'hero'
+          ? frameForDevice(placement.device, placement.position)
+          : frameRingShowroom(
+              placement.device,
+              placement.position,
+              ringRadius,
+            )
     } else {
       frame = {
         position: OVERVIEW.position.clone(),
@@ -124,7 +163,7 @@ export function ShowroomCameraFocus({
     } else {
       snapNext.current = true
     }
-  }, [selected, placements, controls, reducedMotion, camera])
+  }, [selected, placements, controls, reducedMotion, camera, focusMode, ringRadius])
 
   useLayoutEffect(() => {
     syncCameraGoal()
