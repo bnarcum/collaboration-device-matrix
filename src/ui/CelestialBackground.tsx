@@ -48,8 +48,8 @@ export function CelestialBackground() {
       nodes = Array.from({ length: NODE_COUNT }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
-        vx: (Math.random() - 0.5) * (reducedMotion ? 0 : 0.18),
-        vy: (Math.random() - 0.5) * (reducedMotion ? 0 : 0.18),
+        vx: (Math.random() - 0.5) * (reducedMotion ? 0 : 0.216),
+        vy: (Math.random() - 0.5) * (reducedMotion ? 0 : 0.216),
       }))
     }
 
