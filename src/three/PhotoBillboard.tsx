@@ -6,6 +6,31 @@ import {
   type BillboardPlane,
 } from './billboardSizing'
 
+const glowVert = /* glsl */ `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`
+
+const glowFrag = /* glsl */ `
+  precision highp float;
+  varying vec2 vUv;
+  uniform vec3 uColor;
+  uniform float uAspect;
+
+  void main() {
+    vec2 p = vUv - 0.5;
+    p.x *= uAspect;
+    float d = length(p) * 2.0;
+    float core = 1.0 - smoothstep(0.28, 0.88, d);
+    float halo = 1.0 - smoothstep(0.0, 1.0, d);
+    float a = core * 0.14 + halo * 0.06;
+    gl_FragColor = vec4(uColor, a);
+  }
+`
+
 /**
  * Renders a product photo as a 3D plane that always faces the camera.
  *
@@ -105,15 +130,7 @@ export function PhotoBillboard({
   return (
     <Billboard follow lockX={false} lockY={false} lockZ={false}>
       {selected && (
-        <mesh position={[0, 0, -0.01]}>
-          <planeGeometry args={[planeW * 1.08, planeH * 1.12]} />
-          <meshBasicMaterial
-            color="#049FD9"
-            transparent
-            opacity={0.18}
-            depthWrite={false}
-          />
-        </mesh>
+        <SelectionGlow planeW={planeW} planeH={planeH} />
       )}
       <mesh>
         <planeGeometry args={[planeW, planeH]} />
@@ -127,5 +144,38 @@ export function PhotoBillboard({
         />
       </mesh>
     </Billboard>
+  )
+}
+
+function SelectionGlow({
+  planeW,
+  planeH,
+}: {
+  planeW: number
+  planeH: number
+}) {
+  const pad = 1.18
+  const w = planeW * pad
+  const h = planeH * pad
+  const uniforms = useMemo(
+    () => ({
+      uColor: { value: new THREE.Color('#02C8FF') },
+      uAspect: { value: w / h },
+    }),
+    [w, h],
+  )
+
+  return (
+    <mesh position={[0, 0, -0.02]}>
+      <planeGeometry args={[w, h]} />
+      <shaderMaterial
+        transparent
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+        uniforms={uniforms}
+        vertexShader={glowVert}
+        fragmentShader={glowFrag}
+      />
+    </mesh>
   )
 }
