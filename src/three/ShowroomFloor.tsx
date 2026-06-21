@@ -11,9 +11,6 @@ interface FloorProps {
 
 /**
  * Dark polished floor for the Showroom scene.
- *
- * Uses a simple glossy material — device reflections come from
- * PhotoFloorReflection on each pedestal, not a global mirror/HDRI.
  */
 export function ShowroomFloor({ showGrid = false }: FloorProps = {}) {
   return (

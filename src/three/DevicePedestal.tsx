@@ -12,7 +12,6 @@ import {
   type BillboardPlane,
 } from './billboardSizing'
 import { PhotoBillboard } from './PhotoBillboard'
-import { PhotoFloorReflection } from './PhotoFloorReflection'
 
 interface Props {
   device: Device
@@ -72,7 +71,7 @@ export function DevicePedestal({
     }
   })
 
-  const { planeH, planeW, footprint } = billboard
+  const { planeH, footprint } = billboard
 
   return (
     <group
@@ -110,9 +109,6 @@ export function DevicePedestal({
               selected={selected}
               onPlaneSize={onPlaneSize}
             />
-          </group>
-          <group rotation={[0, Math.atan2(-position[0], -position[2]), 0]}>
-            <PhotoFloorReflection url={imageUrl} planeW={planeW} planeH={planeH} />
           </group>
         </>
       ) : (
