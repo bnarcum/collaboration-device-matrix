@@ -39,14 +39,6 @@ export function ShowroomScene({
     () => layout.rings.reduce((max, r) => Math.max(max, r.radius), 0),
     [layout.rings],
   )
-  const placementRadius = useMemo(
-    () =>
-      layout.placements.reduce(
-        (max, p) => Math.max(max, Math.hypot(p.position[0], p.position[2])),
-        maxRingRadius,
-      ),
-    [layout.placements, maxRingRadius],
-  )
 
   return (
     <>
@@ -54,6 +46,7 @@ export function ShowroomScene({
       <OrbitControls
         makeDefault
         enablePan
+        enableRotate
         enableDamping
         dampingFactor={0.08}
         minDistance={filter === 'all' ? 2.5 : 1.6}
@@ -89,7 +82,6 @@ export function ShowroomScene({
         placements={layout.placements}
         filter={filter}
         focusMode={focusMode}
-        ringRadius={placementRadius}
       />
     </>
   )

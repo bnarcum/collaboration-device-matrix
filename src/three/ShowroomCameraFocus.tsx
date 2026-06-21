@@ -19,6 +19,8 @@ interface CameraFrame {
 interface OrbitControlsLike {
   target: THREE.Vector3
   update: () => void
+  addEventListener?: (type: string, listener: () => void) => void
+  removeEventListener?: (type: string, listener: () => void) => void
 }
 
 const OVERVIEW: CameraFrame = {
@@ -59,29 +61,11 @@ function frameForDevice(
   return { position: positionOut, target }
 }
 
-/** Wide category ring — selected device stays spotlighted at the front of the arc. */
-function frameRingShowroom(
-  device: Device,
-  position: [number, number, number],
-  ringRadius: number,
-): CameraFrame {
-  const [x, , z] = position
-  const plane = estimateBillboardPlane(device)
-  const lookY = plane.planeH * 0.32 + 0.1
-  const target = new THREE.Vector3(x * 0.18, lookY * 0.55, z * 0.18)
-
-  const radial = new THREE.Vector3(x, 0, z)
-  const distFromCenter = radial.length()
-  if (distFromCenter > 0.08) radial.normalize()
-  else radial.set(0, 0, 1)
-
-  const dist = Math.max(ringRadius * 2.65, 7.8)
-  const positionOut = target
-    .clone()
-    .add(radial.clone().multiplyScalar(-dist * 0.72))
-    .add(new THREE.Vector3(0, dist * 0.58, 0))
-
-  return { position: positionOut, target }
+function overviewFrame(): CameraFrame {
+  return {
+    position: OVERVIEW.position.clone(),
+    target: OVERVIEW.target.clone(),
+  }
 }
 
 export type ShowroomFocusMode = 'hero' | 'ring'
@@ -91,7 +75,7 @@ interface Props {
   placements: ShowroomPlacement[]
   /** Category filter driving layout — explicit dep so camera refocuses on filter change. */
   filter?: Category | 'all'
-  /** hero = tight product shot; ring = full category showroom arc. */
+  /** hero = tight product shot; ring = full showroom floor (overview). */
   focusMode?: ShowroomFocusMode
   ringRadius?: number
 }
@@ -109,73 +93,90 @@ export function placementsLayoutKey(
 }
 
 /**
- * Smoothly frames OrbitControls on the selected showroom device (or overview
- * when deselected). Works for embed deep-links with ?device=… as well as clicks.
+ * Frames OrbitControls on the selected device (hero) or showroom overview (ring).
+ * Lerps only when focus inputs change — pauses while the user orbits.
  */
 export function ShowroomCameraFocus({
   selected,
   placements,
   filter = 'all',
   focusMode = 'ring',
-  ringRadius = 2.4,
 }: Props) {
   const camera = useThree((s) => s.camera)
   const controls = useThree((s) => s.controls) as OrbitControlsLike | null
   const reducedMotion = useReducedMotion()
-  const goal = useRef<CameraFrame>({
-    position: OVERVIEW.position.clone(),
-    target: OVERVIEW.target.clone(),
-  })
-  const snapNext = useRef(false)
+  const goal = useRef<CameraFrame>(overviewFrame())
+  const animating = useRef(false)
+  const userInteracting = useRef(false)
   const layoutKey = useMemo(
     () => placementsLayoutKey(placements, filter),
     [placements, filter],
   )
 
+  const applyGoalToCamera = useCallback(
+    (frame: CameraFrame, animate: boolean) => {
+      goal.current = frame
+      if (!controls) return
+
+      if (reducedMotion || !animate) {
+        camera.position.copy(frame.position)
+        controls.target.copy(frame.target)
+        controls.update()
+        animating.current = false
+      } else {
+        animating.current = true
+      }
+    },
+    [controls, reducedMotion, camera],
+  )
+
   const syncCameraGoal = useCallback(() => {
+    if (userInteracting.current) return
+
     let frame: CameraFrame
-    if (selected) {
+    if (selected && focusMode === 'hero') {
       const placement = placements.find((p) => p.device.id === selected.id)
       if (!placement) return
-      frame =
-        focusMode === 'hero'
-          ? frameForDevice(placement.device, placement.position)
-          : frameRingShowroom(
-              placement.device,
-              placement.position,
-              ringRadius,
-            )
+      frame = frameForDevice(placement.device, placement.position)
     } else {
-      frame = {
-        position: OVERVIEW.position.clone(),
-        target: OVERVIEW.target.clone(),
-      }
+      frame = overviewFrame()
     }
 
-    goal.current = frame
-    if (!controls) return
-
-    if (reducedMotion) {
-      camera.position.copy(frame.position)
-      controls.target.copy(frame.target)
-      controls.update()
-      snapNext.current = false
-    } else {
-      snapNext.current = true
-    }
-  }, [selected, placements, controls, reducedMotion, camera, focusMode, ringRadius])
+    applyGoalToCamera(frame, true)
+  }, [selected, placements, focusMode, applyGoalToCamera])
 
   useLayoutEffect(() => {
     syncCameraGoal()
-  }, [syncCameraGoal, layoutKey])
+  }, [syncCameraGoal, layoutKey, focusMode])
 
   // OrbitControls registers after first paint — re-apply when controls appear.
   useEffect(() => {
     syncCameraGoal()
   }, [syncCameraGoal, controls])
 
+  useEffect(() => {
+    if (!controls?.addEventListener) return
+
+    const onStart = () => {
+      userInteracting.current = true
+      animating.current = false
+    }
+    const onEnd = () => {
+      userInteracting.current = false
+    }
+
+    controls.addEventListener('start', onStart)
+    controls.addEventListener('end', onEnd)
+    return () => {
+      controls.removeEventListener?.('start', onStart)
+      controls.removeEventListener?.('end', onEnd)
+    }
+  }, [controls])
+
   useFrame((_, dt) => {
-    if (!controls || reducedMotion) return
+    if (!controls || reducedMotion || !animating.current || userInteracting.current) {
+      return
+    }
 
     const g = goal.current
     const t = 1 - Math.pow(0.0008, dt * 1000)
@@ -185,15 +186,13 @@ export function ShowroomCameraFocus({
     camera.position.lerp(g.position, step)
     controls.update()
 
-    if (snapNext.current) {
-      const targetDone = controls.target.distanceTo(g.target) < 0.02
-      const posDone = camera.position.distanceTo(g.position) < 0.02
-      if (targetDone && posDone) {
-        controls.target.copy(g.target)
-        camera.position.copy(g.position)
-        controls.update()
-        snapNext.current = false
-      }
+    const targetDone = controls.target.distanceTo(g.target) < 0.02
+    const posDone = camera.position.distanceTo(g.position) < 0.02
+    if (targetDone && posDone) {
+      controls.target.copy(g.target)
+      camera.position.copy(g.position)
+      controls.update()
+      animating.current = false
     }
   })
 

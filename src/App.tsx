@@ -223,12 +223,12 @@ export default function App() {
     }
   }, [catalog, selectedId, setSelectedId])
 
-  /** Embed deep-link: zoom category ring so ?device= opens on a tight arc. */
+  /** Embed deep-link: narrow to category only in hero (product) camera. */
   useEffect(() => {
-    if (!EMBED_MODE || !selectedId) return
+    if (!EMBED_MODE || !selectedId || showroomFocus !== 'hero') return
     const device = DEVICES_BY_ID.get(selectedId)
     if (device) setFilter(device.category)
-  }, [selectedId, setFilter])
+  }, [selectedId, setFilter, showroomFocus])
 
   /** Portfolio overlay "Showroom" → full ring view while keeping selection. */
   useEffect(() => {
@@ -238,6 +238,7 @@ export default function App() {
       if (!data || data.type !== 'cpn-matrix-camera') return
       if (data.mode === 'ring' || data.mode === 'hero') {
         setShowroomFocus(data.mode)
+        if (data.mode === 'ring') setFilter('all')
       }
     }
     window.addEventListener('message', onMessage)
@@ -625,7 +626,10 @@ export default function App() {
             <button
               type="button"
               className="embed-showroom-expand"
-              onClick={() => setShowroomFocus('ring')}
+              onClick={() => {
+                setShowroomFocus('ring')
+                setFilter('all')
+              }}
             >
               Explore full showroom
             </button>
