@@ -110,18 +110,7 @@ export function DevicePedestal({
               onPlaneSize={onPlaneSize}
             />
           </group>
-          <mesh
-            position={[0, 0.003, 0]}
-            rotation={[-Math.PI / 2, 0, 0]}
-          >
-            <circleGeometry args={[footprint * 0.3, 32]} />
-            <meshBasicMaterial
-              color="#000"
-              transparent
-              opacity={0.18}
-              depthWrite={false}
-            />
-          </mesh>
+          <FloorContactPool footprint={footprint} />
         </>
       ) : (
         <group scale={scale} position={[0, device.size[1] / 2 + 0.02, 0]}>
@@ -146,6 +135,54 @@ export function DevicePedestal({
     </group>
   )
 }
+
+/**
+ * Soft radial pool under every device — gives a grounded reflection anchor
+ * on the glossy floor (lighter than the selection spotlight).
+ */
+function FloorContactPool({ footprint }: { footprint: number }) {
+  const uniforms = useMemo(
+    () => ({
+      uColor: { value: new THREE.Color('#02C8FF') },
+    }),
+    [],
+  )
+  const poolRadius = Math.max(0.55, footprint * 0.42)
+
+  return (
+    <group>
+      <mesh position={[0, 0.004, 0]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={2}>
+        <circleGeometry args={[poolRadius, 64]} />
+        <shaderMaterial
+          transparent
+          depthWrite={false}
+          uniforms={uniforms}
+          vertexShader={poolVert}
+          fragmentShader={contactPoolFrag}
+        />
+      </mesh>
+      <mesh position={[0, 0.003, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[poolRadius * 0.35, 32]} />
+        <meshBasicMaterial color="#000" transparent opacity={0.22} depthWrite={false} />
+      </mesh>
+    </group>
+  )
+}
+
+const contactPoolFrag = /* glsl */ `
+  precision highp float;
+  varying vec2 vUv;
+  uniform vec3 uColor;
+
+  void main() {
+    vec2 c = vUv - 0.5;
+    float d = length(c) * 2.0;
+    float core = 1.0 - smoothstep(0.0, 0.55, d);
+    float halo = 1.0 - smoothstep(0.0, 1.0, d);
+    float a = clamp(core * 0.28 + halo * 0.12, 0.0, 1.0);
+    gl_FragColor = vec4(uColor, a);
+  }
+`
 
 /**
  * Soft volumetric spotlight + radial pool of light on the floor. We use this

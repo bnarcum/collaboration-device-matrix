@@ -23,7 +23,7 @@ interface FloorProps {
  * with fwidth() anti-aliasing, dual spacing, Cisco-blue cardinal axes,
  * and a radial fade so lines dissolve toward the horizon.
  */
-export function ShowroomFloor({ showGrid = false }: FloorProps = {}) {
+export function ShowroomFloor({ showGrid = true }: FloorProps = {}) {
   return (
     <group>
       <mesh
@@ -33,18 +33,18 @@ export function ShowroomFloor({ showGrid = false }: FloorProps = {}) {
       >
         <circleGeometry args={[16, 96]} />
         <MeshReflectorMaterial
-          color="#070c16"
-          roughness={0.85}
-          metalness={0.15}
-          blur={[400, 100]}
-          resolution={512}
-          mixBlur={1.2}
-          mixStrength={0.55}
-          mixContrast={1}
-          mirror={0.35}
-          depthScale={0.4}
-          minDepthThreshold={0.7}
-          maxDepthThreshold={1.4}
+          color="#050a14"
+          roughness={0.42}
+          metalness={0.38}
+          blur={[300, 80]}
+          resolution={1024}
+          mixBlur={0.9}
+          mixStrength={0.88}
+          mixContrast={1.15}
+          mirror={0.68}
+          depthScale={0.55}
+          minDepthThreshold={0.4}
+          maxDepthThreshold={1.25}
           side={THREE.DoubleSide}
         />
       </mesh>
@@ -64,9 +64,9 @@ function GridDisc() {
       uMajorColor: { value: new THREE.Color('#34557a') },
       uMinorColor: { value: new THREE.Color('#1a283b') },
       uAccent: { value: new THREE.Color('#02C8FF') },
-      uFadeInner: { value: 8.5 },
-      uFadeOuter: { value: 15.0 },
-      uOverallAlpha: { value: 0.95 },
+      uFadeInner: { value: 9.5 },
+      uFadeOuter: { value: 16.0 },
+      uOverallAlpha: { value: 0.72 },
     }),
     [],
   )

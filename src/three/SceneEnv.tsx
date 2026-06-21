@@ -1,29 +1,32 @@
 import { ContactShadows, Environment } from '@react-three/drei'
+import { ShowroomBackdrop } from './ShowroomBackdrop'
 
 /** Shared lighting + ground used across the 3D scenes. */
 export function SceneEnv() {
   return (
     <>
-      <color attach="background" args={['#07182D']} />
-      <fog attach="fog" args={['#07182D', 8, 28]} />
-      <ambientLight intensity={0.35} />
+      <color attach="background" args={['#051222']} />
+      <fog attach="fog" args={['#051222', 10, 32]} />
+      <ShowroomBackdrop />
+      <ambientLight intensity={0.42} />
       <directionalLight
-        position={[6, 8, 4]}
-        intensity={1.1}
+        position={[6, 10, 5]}
+        intensity={1.35}
         castShadow={false}
       />
       <directionalLight
-        position={[-6, 4, -3]}
-        intensity={0.4}
+        position={[-5, 6, -4]}
+        intensity={0.55}
         color="#02C8FF"
       />
+      <pointLight position={[0, 4, 0]} intensity={0.35} color="#0A60FF" distance={18} />
       <Environment preset="city" />
       <ContactShadows
         position={[0, -0.001, 0]}
-        opacity={0.4}
-        scale={30}
-        blur={2}
-        far={4}
+        opacity={0.55}
+        scale={32}
+        blur={2.5}
+        far={5}
       />
     </>
   )

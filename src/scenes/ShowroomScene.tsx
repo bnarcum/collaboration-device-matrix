@@ -173,7 +173,7 @@ function CategoryRing({
           their billboards always paint on top of it, even where the photo
           alpha is too soft to write depth on its own. */}
       <mesh renderOrder={-1}>
-        <ringGeometry args={[radius - 0.04, radius + 0.04, 192]} />
+        <ringGeometry args={[radius - 0.06, radius + 0.06, 192]} />
         <shaderMaterial
           transparent
           depthWrite={false}
@@ -181,6 +181,18 @@ function CategoryRing({
           vertexShader={ringVert}
           fragmentShader={ringFrag}
           side={THREE.DoubleSide}
+        />
+      </mesh>
+      <mesh renderOrder={-2}>
+        <ringGeometry args={[radius - 0.14, radius + 0.14, 192]} />
+        <shaderMaterial
+          transparent
+          depthWrite={false}
+          uniforms={uniforms}
+          vertexShader={ringVert}
+          fragmentShader={ringBloomFrag}
+          side={THREE.DoubleSide}
+          blending={THREE.AdditiveBlending}
         />
       </mesh>
       <RingLabel label={label} radius={radius} labelAngle={labelAngle} />
@@ -196,8 +208,7 @@ const ringVert = /* glsl */ `
   }
 `
 
-// Soft hairline with a wider, even softer bloom so the rim of the band fades
-// gracefully into the floor instead of cutting a hard edge.
+// Bright core line with a wider bloom halo — reads on stage / big screens.
 const ringFrag = /* glsl */ `
   precision highp float;
   varying vec2 vLocal;
@@ -206,10 +217,25 @@ const ringFrag = /* glsl */ `
 
   void main() {
     float r = length(vLocal);
-    float d = abs(r - uRadius) / 0.04;
-    float core  = 1.0 - smoothstep(0.0, 0.35, d);
-    float bloom = 1.0 - smoothstep(0.0, 1.4,  d);
-    float alpha = clamp(core * 0.55 + bloom * 0.18, 0.0, 1.0);
+    float d = abs(r - uRadius) / 0.06;
+    float core  = 1.0 - smoothstep(0.0, 0.32, d);
+    float bloom = 1.0 - smoothstep(0.0, 1.2,  d);
+    float alpha = clamp(core * 0.92 + bloom * 0.38, 0.0, 1.0);
+    gl_FragColor = vec4(uColor, alpha);
+  }
+`
+
+const ringBloomFrag = /* glsl */ `
+  precision highp float;
+  varying vec2 vLocal;
+  uniform float uRadius;
+  uniform vec3 uColor;
+
+  void main() {
+    float r = length(vLocal);
+    float d = abs(r - uRadius) / 0.14;
+    float halo = 1.0 - smoothstep(0.0, 1.0, d);
+    float alpha = halo * 0.22;
     gl_FragColor = vec4(uColor, alpha);
   }
 `
