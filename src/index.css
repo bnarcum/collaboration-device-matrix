@@ -169,6 +169,59 @@ body {
   }
 }
 
+/* ── Tron: Legacy showroom (toggle via src/theme/tronShowroom.ts or ?tron=0) ── */
+.celestial-bg--tron {
+  background: #000000;
+}
+
+.celestial-bg--tron .celestial-bg__grid {
+  opacity: 0.42;
+  background-image:
+    linear-gradient(rgba(0, 255, 240, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 240, 0.14) 1px, transparent 1px),
+    linear-gradient(rgba(0, 255, 240, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 240, 0.04) 1px, transparent 1px);
+  background-size: 96px 96px, 96px 96px, 24px 24px, 24px 24px;
+  animation: tron-grid-drift 42s linear infinite;
+}
+
+.celestial-bg__scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 240, 0.35) 2px,
+    rgba(0, 255, 240, 0.35) 3px
+  );
+}
+
+body.tron-showroom {
+  background: #000000;
+}
+
+body.tron-showroom .app {
+  background: transparent;
+}
+
+@keyframes tron-grid-drift {
+  0% {
+    background-position: 0 0, 0 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: 96px 96px, 96px 96px, 24px 24px, 24px 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .celestial-bg--tron .celestial-bg__grid {
+    animation: none;
+  }
+}
+
 button {
   font: inherit;
   color: inherit;

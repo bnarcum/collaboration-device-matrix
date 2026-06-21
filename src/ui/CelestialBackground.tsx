@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useReducedMotion } from '../hooks/useReducedMotion'
+import { resolveTronShowroom } from '../theme/tronShowroom'
 
 interface Node {
   x: number
@@ -20,8 +21,10 @@ export function CelestialBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const hostRef = useRef<HTMLDivElement>(null)
   const reducedMotion = useReducedMotion()
+  const tron = resolveTronShowroom()
 
   useEffect(() => {
+    if (tron) return
     const canvas = canvasRef.current
     const host = hostRef.current
     if (!canvas || !host) return
@@ -155,15 +158,24 @@ export function CelestialBackground() {
       ro.disconnect()
       window.removeEventListener('resize', onResize)
     }
-  }, [reducedMotion])
+  }, [reducedMotion, tron])
 
   return (
-    <div ref={hostRef} className="celestial-bg" aria-hidden="true">
-      <div className="celestial-bg__vignette" />
-      <div className="celestial-bg__beams" />
-      <div className="celestial-bg__glow" />
-      <canvas ref={canvasRef} className="celestial-bg__mesh" />
+    <div
+      ref={hostRef}
+      className={tron ? 'celestial-bg celestial-bg--tron' : 'celestial-bg'}
+      aria-hidden="true"
+    >
+      {!tron && (
+        <>
+          <div className="celestial-bg__vignette" />
+          <div className="celestial-bg__beams" />
+          <div className="celestial-bg__glow" />
+          <canvas ref={canvasRef} className="celestial-bg__mesh" />
+        </>
+      )}
       <div className="celestial-bg__grid" />
+      {tron && <div className="celestial-bg__scanlines" aria-hidden="true" />}
     </div>
   )
 }

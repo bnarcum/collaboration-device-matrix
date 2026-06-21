@@ -1,19 +1,22 @@
 import * as THREE from 'three'
+import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 
 /**
  * Wireframe dome + horizon rings behind the showroom — visible stage depth
  * without competing with devices on the reflective floor.
  */
 export function ShowroomBackdrop() {
+  const tron = resolveTronShowroom()
+
   return (
     <group position={[0, -0.05, 0]}>
       <mesh>
         <icosahedronGeometry args={[22, 3]} />
         <meshBasicMaterial
-          color="#2a7ab8"
+          color={tron ? TRON.cyanDim : '#2a7ab8'}
           wireframe
           transparent
-          opacity={0.16}
+          opacity={tron ? 0.32 : 0.16}
           depthWrite={false}
           side={THREE.BackSide}
         />
@@ -21,21 +24,35 @@ export function ShowroomBackdrop() {
       <mesh scale={0.92}>
         <icosahedronGeometry args={[22, 2]} />
         <meshBasicMaterial
-          color="#02C8FF"
+          color={tron ? TRON.cyan : '#02C8FF'}
           wireframe
           transparent
-          opacity={0.09}
+          opacity={tron ? 0.2 : 0.09}
           depthWrite={false}
           side={THREE.BackSide}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
+      {tron && (
+        <mesh scale={0.78}>
+          <icosahedronGeometry args={[22, 1]} />
+          <meshBasicMaterial
+            color={TRON.orange}
+            wireframe
+            transparent
+            opacity={0.08}
+            depthWrite={false}
+            side={THREE.BackSide}
+            blending={THREE.AdditiveBlending}
+          />
+        </mesh>
+      )}
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[14.5, 15.2, 128]} />
         <meshBasicMaterial
-          color="#02C8FF"
+          color={tron ? TRON.cyan : '#02C8FF'}
           transparent
-          opacity={0.05}
+          opacity={tron ? 0.14 : 0.05}
           depthWrite={false}
           side={THREE.DoubleSide}
           blending={THREE.AdditiveBlending}
@@ -44,9 +61,9 @@ export function ShowroomBackdrop() {
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[10.5, 10.85, 96]} />
         <meshBasicMaterial
-          color="#0A60FF"
+          color={tron ? TRON.orange : '#0A60FF'}
           transparent
-          opacity={0.03}
+          opacity={tron ? 0.1 : 0.03}
           depthWrite={false}
           side={THREE.DoubleSide}
           blending={THREE.AdditiveBlending}

@@ -38,6 +38,7 @@ import {
   type UrlCodec,
 } from './hooks/useUrlState'
 import type { ShowroomFocusMode } from './three/ShowroomCameraFocus'
+import { resolveTronShowroom } from './theme/tronShowroom'
 
 const FinderOverlay = lazy(() =>
   import('./ui/FinderOverlay').then((m) => ({ default: m.FinderOverlay })),
@@ -273,6 +274,12 @@ export default function App() {
     window.addEventListener('message', onMessage)
     return () => window.removeEventListener('message', onMessage)
   }, [enterEmbedRing, enterEmbedHero])
+
+  useEffect(() => {
+    const on = resolveTronShowroom() && mode === 'showroom'
+    document.body.classList.toggle('tron-showroom', on)
+    return () => document.body.classList.remove('tron-showroom')
+  }, [mode])
 
   useEffect(() => {
     const catalogIds = new Set(catalog.map((d) => d.id))

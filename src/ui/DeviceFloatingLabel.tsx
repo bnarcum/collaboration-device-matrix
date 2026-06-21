@@ -1,12 +1,36 @@
 import type { CSSProperties } from 'react'
 import type { VendorId } from '../data/types'
 import { vendorLabelTheme } from '../data/vendors'
+import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 
 /** Inline styles for 3D Html pills — same fill as active topbar vendor/mode pills. */
 export function deviceLabelStyles(
   vendorId: VendorId,
   selected = false,
 ): CSSProperties {
+  if (resolveTronShowroom()) {
+    return {
+      padding: '3px 10px',
+      borderRadius: 2,
+      background: 'rgba(0, 0, 0, 0.78)',
+      border: `1px solid ${selected ? TRON.orange : TRON.cyan}`,
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: '0.06em',
+      textTransform: 'uppercase',
+      fontFamily:
+        'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+      color: selected ? TRON.orange : TRON.cyan,
+      whiteSpace: 'nowrap',
+      boxShadow: selected
+        ? `0 0 16px rgba(255, 102, 0, 0.55), inset 0 0 6px rgba(255, 102, 0, 0.15)`
+        : `0 0 12px rgba(0, 255, 240, 0.4), inset 0 0 6px rgba(0, 255, 240, 0.1)`,
+      textShadow: selected
+        ? '0 0 8px rgba(255, 102, 0, 0.9)'
+        : '0 0 6px rgba(0, 255, 240, 0.75)',
+    }
+  }
+
   const theme = vendorLabelTheme(vendorId, selected)
 
   return {

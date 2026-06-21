@@ -5,6 +5,7 @@ import {
   computeBillboardPlane,
   type BillboardPlane,
 } from './billboardSizing'
+import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 
 const glowVert = /* glsl */ `
   varying vec2 vUv;
@@ -19,6 +20,7 @@ const glowFrag = /* glsl */ `
   varying vec2 vUv;
   uniform vec3 uColor;
   uniform float uAspect;
+  uniform float uTron;
 
   void main() {
     vec2 p = vUv - 0.5;
@@ -26,7 +28,9 @@ const glowFrag = /* glsl */ `
     float d = length(p) * 2.0;
     float core = 1.0 - smoothstep(0.28, 0.88, d);
     float halo = 1.0 - smoothstep(0.0, 1.0, d);
-    float a = core * 0.14 + halo * 0.06;
+    float coreA = uTron > 0.5 ? 0.28 : 0.14;
+    float haloA = uTron > 0.5 ? 0.14 : 0.06;
+    float a = core * coreA + halo * haloA;
     gl_FragColor = vec4(uColor, a);
   }
 `
@@ -154,15 +158,17 @@ function SelectionGlow({
   planeW: number
   planeH: number
 }) {
-  const pad = 1.18
+  const tron = resolveTronShowroom()
+  const pad = tron ? 1.22 : 1.18
   const w = planeW * pad
   const h = planeH * pad
   const uniforms = useMemo(
     () => ({
-      uColor: { value: new THREE.Color('#02C8FF') },
+      uColor: { value: new THREE.Color(tron ? TRON.cyan : '#02C8FF') },
       uAspect: { value: w / h },
+      uTron: { value: tron ? 1 : 0 },
     }),
-    [w, h],
+    [w, h, tron],
   )
 
   return (

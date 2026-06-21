@@ -11,7 +11,9 @@ import {
   estimateBillboardPlane,
   type BillboardPlane,
 } from './billboardSizing'
+import { TronPlatform } from './TronPlatform'
 import { PhotoBillboard } from './PhotoBillboard'
+import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 
 interface Props {
   device: Device
@@ -95,6 +97,7 @@ export function DevicePedestal({
     >
       {imageUrl ? (
         <>
+          <TronPlatform footprint={footprint} selected={selected} />
           <mesh position={[0, planeH / 2, 0]} visible={false}>
             <boxGeometry args={[footprint, planeH, 0.3]} />
             <meshBasicMaterial />
@@ -112,9 +115,15 @@ export function DevicePedestal({
           </group>
         </>
       ) : (
-        <group scale={scale} position={[0, device.size[1] / 2 + 0.02, 0]}>
+        <>
+          <TronPlatform
+            footprint={Math.max(device.size[0], device.size[2]) * scale * 0.5}
+            selected={selected}
+          />
+          <group scale={scale} position={[0, device.size[1] / 2 + 0.02, 0]}>
           <DeviceModel device={device} highlighted={selected} />
         </group>
+        </>
       )}
       {selected && <SelectionSpot footprint={footprint} />}
       {showLabel && (
@@ -144,6 +153,7 @@ export function DevicePedestal({
  * it flies to in the Finder grid.
  */
 function SelectionSpot({ footprint }: { footprint: number }) {
+  const tron = resolveTronShowroom()
   const target = useMemo(() => {
     const obj = new THREE.Object3D()
     obj.position.set(0, 0, 0)
@@ -152,11 +162,11 @@ function SelectionSpot({ footprint }: { footprint: number }) {
 
   const uniforms = useMemo(
     () => ({
-      uColor: { value: new THREE.Color('#02C8FF') },
+      uColor: { value: new THREE.Color(tron ? TRON.orange : '#02C8FF') },
       uTime: { value: 0 },
       uPulse: { value: 1 },
     }),
-    [],
+    [tron],
   )
 
   const prefersReducedMotion = useReducedMotion()
@@ -180,8 +190,8 @@ function SelectionSpot({ footprint }: { footprint: number }) {
       <SpotLight
         position={[0, 3.4, 0]}
         target={target}
-        color="#02C8FF"
-        intensity={9}
+        color={tron ? TRON.orange : '#02C8FF'}
+        intensity={tron ? 12 : 9}
         distance={5.2}
         angle={0.42}
         penumbra={0.85}
