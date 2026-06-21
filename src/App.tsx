@@ -61,6 +61,10 @@ const DEVICES_BY_ID = new Map(DEVICES.map((d) => [d.id, d]))
 
 const FILTER_VALUES: readonly (Category | 'all')[] = ['all', ...CATEGORY_ORDER]
 
+const EMBED_MODE =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('embed') === 'cpn'
+
 export default function App() {
   const [selectedVendors, setSelectedVendors] = useUrlState<VendorId[]>(
     'vendor',
@@ -393,6 +397,7 @@ export default function App() {
     <div
       className="app"
       data-vendors={selectedVendors.join(',')}
+      data-embed={EMBED_MODE ? 'cpn' : undefined}
       style={
         activeVendorTheme
           ? ({

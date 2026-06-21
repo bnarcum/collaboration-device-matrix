@@ -118,6 +118,14 @@ a:hover {
   grid-template-rows: auto 1fr;
 }
 
+.app[data-embed='cpn'] {
+  grid-template-rows: 1fr;
+}
+
+.app[data-embed='cpn'] .topbar {
+  display: none;
+}
+
 .topbar {
   display: flex;
   flex-wrap: wrap;
