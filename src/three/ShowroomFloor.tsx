@@ -23,7 +23,7 @@ interface FloorProps {
  * with fwidth() anti-aliasing, dual spacing, Cisco-blue cardinal axes,
  * and a radial fade so lines dissolve toward the horizon.
  */
-export function ShowroomFloor({ showGrid = true }: FloorProps = {}) {
+export function ShowroomFloor({ showGrid = false }: FloorProps = {}) {
   return (
     <group>
       <mesh
@@ -39,9 +39,9 @@ export function ShowroomFloor({ showGrid = true }: FloorProps = {}) {
           blur={[180, 45]}
           resolution={1024}
           mixBlur={0.65}
-          mixStrength={0.98}
-          mixContrast={1.28}
-          mirror={0.84}
+          mixStrength={0.72}
+          mixContrast={1.15}
+          mirror={0.55}
           depthScale={0.72}
           minDepthThreshold={0.25}
           maxDepthThreshold={1.1}
