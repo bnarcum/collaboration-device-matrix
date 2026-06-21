@@ -50,7 +50,11 @@ export function ShowroomScene({
         enableDamping
         dampingFactor={0.08}
         minDistance={filter === 'all' ? 2.5 : 1.6}
-        maxDistance={filter === 'all' ? 20 : Math.max(7, maxRingRadius * 2.6)}
+        maxDistance={
+          focusMode === 'ring' || filter === 'all'
+            ? 20
+            : Math.max(15, maxRingRadius * 3.5)
+        }
         maxPolarAngle={Math.PI * 0.42}
       />
 

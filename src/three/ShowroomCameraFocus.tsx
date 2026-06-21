@@ -130,23 +130,27 @@ export function ShowroomCameraFocus({
     [controls, reducedMotion, camera],
   )
 
-  const syncCameraGoal = useCallback(() => {
-    if (userInteracting.current) return
+  const syncCameraGoal = useCallback(
+    (force = false) => {
+      if (userInteracting.current && !force) return
 
-    let frame: CameraFrame
-    if (selected && focusMode === 'hero') {
-      const placement = placements.find((p) => p.device.id === selected.id)
-      if (!placement) return
-      frame = frameForDevice(placement.device, placement.position)
-    } else {
-      frame = overviewFrame()
-    }
+      let frame: CameraFrame
+      if (selected && focusMode === 'hero') {
+        const placement = placements.find((p) => p.device.id === selected.id)
+        if (!placement) return
+        frame = frameForDevice(placement.device, placement.position)
+      } else {
+        frame = overviewFrame()
+      }
 
-    applyGoalToCamera(frame, true)
-  }, [selected, placements, focusMode, applyGoalToCamera])
+      applyGoalToCamera(frame, true)
+    },
+    [selected, placements, focusMode, applyGoalToCamera],
+  )
 
   useLayoutEffect(() => {
-    syncCameraGoal()
+    // Programmatic hero ↔ ring transitions must win over in-progress orbit drags.
+    syncCameraGoal(true)
   }, [syncCameraGoal, layoutKey, focusMode])
 
   // OrbitControls registers after first paint — re-apply when controls appear.

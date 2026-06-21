@@ -223,6 +223,18 @@ export default function App() {
     }
   }, [catalog, selectedId, setSelectedId])
 
+  const enterEmbedRing = useCallback(() => {
+    setShowroomFocus('ring')
+    setFilter('all')
+  }, [setShowroomFocus, setFilter])
+
+  const enterEmbedHero = useCallback(() => {
+    setShowroomFocus('hero')
+    if (!selectedId) return
+    const device = DEVICES_BY_ID.get(selectedId)
+    if (device) setFilter(device.category)
+  }, [setShowroomFocus, setFilter, selectedId])
+
   /** Embed deep-link: narrow to category only in hero (product) camera. */
   useEffect(() => {
     if (!EMBED_MODE || !selectedId || showroomFocus !== 'hero') return
@@ -236,14 +248,31 @@ export default function App() {
     const onMessage = (event: MessageEvent) => {
       const data = event.data as { type?: string; mode?: string } | null
       if (!data || data.type !== 'cpn-matrix-camera') return
-      if (data.mode === 'ring' || data.mode === 'hero') {
-        setShowroomFocus(data.mode)
-        if (data.mode === 'ring') setFilter('all')
+      if (data.mode === 'ring') {
+        enterEmbedRing()
+        try {
+          window.parent.postMessage(
+            { type: 'cpn-matrix-camera-ack', mode: 'ring' },
+            '*',
+          )
+        } catch {
+          /* cross-origin parent may block; Portfolio falls back via timeout */
+        }
+      } else if (data.mode === 'hero') {
+        enterEmbedHero()
+        try {
+          window.parent.postMessage(
+            { type: 'cpn-matrix-camera-ack', mode: 'hero' },
+            '*',
+          )
+        } catch {
+          /* ignore */
+        }
       }
     }
     window.addEventListener('message', onMessage)
     return () => window.removeEventListener('message', onMessage)
-  }, [setShowroomFocus])
+  }, [enterEmbedRing, enterEmbedHero])
 
   useEffect(() => {
     const catalogIds = new Set(catalog.map((d) => d.id))
@@ -347,9 +376,13 @@ export default function App() {
 
   const selectDevice = useCallback(
     (d: Device | null) => {
+      if (EMBED_MODE && d?.id && d.id !== selectedId && showroomFocus === 'ring') {
+        setShowroomFocus('hero')
+        setFilter(d.category)
+      }
       setSelectedId(d?.id ?? null)
     },
-    [setSelectedId],
+    [setSelectedId, selectedId, setShowroomFocus, setFilter, showroomFocus],
   )
 
   const toggleCompare = useCallback(
@@ -626,10 +659,7 @@ export default function App() {
             <button
               type="button"
               className="embed-showroom-expand"
-              onClick={() => {
-                setShowroomFocus('ring')
-                setFilter('all')
-              }}
+              onClick={enterEmbedRing}
             >
               Explore full showroom
             </button>
