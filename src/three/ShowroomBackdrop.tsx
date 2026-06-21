@@ -35,7 +35,7 @@ export function ShowroomBackdrop() {
         <meshBasicMaterial
           color="#02C8FF"
           transparent
-          opacity={0.1}
+          opacity={0.05}
           depthWrite={false}
           side={THREE.DoubleSide}
           blending={THREE.AdditiveBlending}
@@ -46,7 +46,7 @@ export function ShowroomBackdrop() {
         <meshBasicMaterial
           color="#0A60FF"
           transparent
-          opacity={0.06}
+          opacity={0.03}
           depthWrite={false}
           side={THREE.DoubleSide}
           blending={THREE.AdditiveBlending}
