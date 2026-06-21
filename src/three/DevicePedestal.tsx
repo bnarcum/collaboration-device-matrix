@@ -110,6 +110,8 @@ export function DevicePedestal({
               selected={selected}
               onPlaneSize={onPlaneSize}
             />
+          </group>
+          <group rotation={[0, Math.atan2(-position[0], -position[2]), 0]}>
             <PhotoFloorReflection url={imageUrl} planeW={planeW} planeH={planeH} />
           </group>
         </>

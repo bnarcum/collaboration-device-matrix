@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Billboard } from '@react-three/drei'
+import { useEffect, useState } from 'react'
 import * as THREE from 'three'
 
 const loader = new THREE.TextureLoader()
@@ -34,11 +33,8 @@ interface Props {
 }
 
 /**
- * Camera-facing mirror of the product photo, anchored at floor level.
- *
- * A horizontal floor plane reads edge-on from the default orbit camera, so
- * we use a vertical billboard sitting on the floor (same trick as Apple-style
- * product pages) with a vertical flip + fade toward the floor edge.
+ * World-horizontal floor mirror — parent group rotates toward ring center.
+ * Extends from the pedestal contact line (local z = 0) inward (local −z).
  */
 export function PhotoFloorReflection({ url, planeW, planeH }: Props) {
   const [texture, setTexture] = useState<THREE.Texture | null>(
@@ -63,61 +59,48 @@ export function PhotoFloorReflection({ url, planeW, planeH }: Props) {
     }
   }, [url])
 
-  const uniforms = useMemo(
-    () => ({
-      uMap: { value: null as THREE.Texture | null },
-      uOpacity: { value: 0.55 },
-    }),
-    [],
-  )
+  const mirrorMap = useMirrorTexture(texture)
 
-  useEffect(() => {
-    uniforms.uMap.value = texture
-  }, [texture, uniforms])
-
-  if (!texture) return null
+  if (!mirrorMap || planeH <= 0 || planeW <= 0) return null
 
   return (
-    <Billboard follow lockX={false} lockY={false} lockZ={false}>
-      <mesh position={[0, -planeH / 2, -0.02]} renderOrder={2}>
-        <planeGeometry args={[planeW, planeH]} />
-        <shaderMaterial
-          transparent
-          depthWrite={false}
-          toneMapped={false}
-          uniforms={uniforms}
-          vertexShader={vert}
-          fragmentShader={frag}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-    </Billboard>
+    <mesh
+      rotation={[-Math.PI / 2, 0, 0]}
+      position={[0, 0.012, -planeH / 2]}
+      renderOrder={10}
+      frustumCulled={false}
+    >
+      <planeGeometry args={[planeW, planeH]} />
+      <meshBasicMaterial
+        map={mirrorMap}
+        transparent
+        opacity={0.58}
+        alphaTest={0.28}
+        depthWrite={false}
+        depthTest={false}
+        toneMapped={false}
+        fog={false}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
   )
 }
 
-const vert = /* glsl */ `
-  varying vec2 vUv;
-  void main() {
-    vUv = uv;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`
+function useMirrorTexture(source: THREE.Texture | null) {
+  const [mirrored, setMirrored] = useState<THREE.Texture | null>(null)
 
-const frag = /* glsl */ `
-  precision highp float;
-  uniform sampler2D uMap;
-  uniform float uOpacity;
-  varying vec2 vUv;
+  useEffect(() => {
+    if (!source) {
+      setMirrored(null)
+      return
+    }
+    const clone = source.clone()
+    clone.repeat.y = -1
+    clone.offset.y = 1
+    clone.needsUpdate = true
+    setMirrored(clone)
+    return () => clone.dispose()
+  }, [source])
 
-  void main() {
-    // Flip vertically — mirror of the hero above.
-    vec2 uv = vec2(vUv.x, 1.0 - vUv.y);
-    vec4 tex = texture2D(uMap, uv);
-    if (tex.a < 0.04) discard;
-    // vUv.y = 1 at the pedestal contact line; fade toward the floor edge.
-    float fade = smoothstep(0.0, 0.92, vUv.y);
-    float a = tex.a * uOpacity * fade;
-    if (a < 0.02) discard;
-    gl_FragColor = vec4(tex.rgb * 0.82, a);
-  }
-`
+  return mirrored
+}
