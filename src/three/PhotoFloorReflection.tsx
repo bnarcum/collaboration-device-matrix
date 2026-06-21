@@ -62,7 +62,7 @@ export function PhotoFloorReflection({ url, planeW, planeH }: Props) {
   const uniforms = useMemo(
     () => ({
       uMap: { value: null as THREE.Texture | null },
-      uOpacity: { value: 0.82 },
+      uOpacity: { value: 0.75 },
     }),
     [],
   )

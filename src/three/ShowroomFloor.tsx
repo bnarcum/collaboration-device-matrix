@@ -1,27 +1,19 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
-import { MeshReflectorMaterial } from '@react-three/drei'
 
 interface FloorProps {
   /**
    * When true, overlays a procedural anti-aliased grid (the original
-   * showroom look). Default is `false`; the floor itself reads cleanly
-   * thanks to the reflection alone.
+   * showroom look). Default is `false`.
    */
   showGrid?: boolean
 }
 
 /**
- * Polished floor used by the Showroom scene.
+ * Dark polished floor for the Showroom scene.
  *
- * Base layer is a wide MeshReflectorMaterial disc that gives a whisper-
- * faint reflection so pedestals feel anchored to the ground instead of
- * floating. Material is rendered DoubleSide so a stray under-floor camera
- * angle never sees through the world.
- *
- * Optional grid overlay (off by default) renders a procedural shader grid
- * with fwidth() anti-aliasing, dual spacing, Cisco-blue cardinal axes,
- * and a radial fade so lines dissolve toward the horizon.
+ * Uses a simple glossy material — device reflections come from
+ * PhotoFloorReflection on each pedestal, not a global mirror/HDRI.
  */
 export function ShowroomFloor({ showGrid = false }: FloorProps = {}) {
   return (
@@ -32,19 +24,10 @@ export function ShowroomFloor({ showGrid = false }: FloorProps = {}) {
         receiveShadow
       >
         <circleGeometry args={[16, 96]} />
-        <MeshReflectorMaterial
-          color="#030810"
-          roughness={0.12}
-          metalness={0.72}
-          blur={[140, 32]}
-          resolution={1024}
-          mixBlur={0.45}
-          mixStrength={1.05}
-          mixContrast={1.35}
-          mirror={0.82}
-          depthScale={0.85}
-          minDepthThreshold={0.15}
-          maxDepthThreshold={1.2}
+        <meshStandardMaterial
+          color="#050c18"
+          roughness={0.38}
+          metalness={0.12}
           side={THREE.DoubleSide}
         />
       </mesh>
