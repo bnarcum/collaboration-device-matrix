@@ -33,18 +33,18 @@ export function ShowroomFloor({ showGrid = true }: FloorProps = {}) {
       >
         <circleGeometry args={[16, 96]} />
         <MeshReflectorMaterial
-          color="#050a14"
-          roughness={0.42}
-          metalness={0.38}
-          blur={[300, 80]}
+          color="#030810"
+          roughness={0.22}
+          metalness={0.52}
+          blur={[180, 45]}
           resolution={1024}
-          mixBlur={0.9}
-          mixStrength={0.88}
-          mixContrast={1.15}
-          mirror={0.68}
-          depthScale={0.55}
-          minDepthThreshold={0.4}
-          maxDepthThreshold={1.25}
+          mixBlur={0.65}
+          mixStrength={0.98}
+          mixContrast={1.28}
+          mirror={0.84}
+          depthScale={0.72}
+          minDepthThreshold={0.25}
+          maxDepthThreshold={1.1}
           side={THREE.DoubleSide}
         />
       </mesh>
@@ -64,9 +64,9 @@ function GridDisc() {
       uMajorColor: { value: new THREE.Color('#34557a') },
       uMinorColor: { value: new THREE.Color('#1a283b') },
       uAccent: { value: new THREE.Color('#02C8FF') },
-      uFadeInner: { value: 9.5 },
-      uFadeOuter: { value: 16.0 },
-      uOverallAlpha: { value: 0.72 },
+      uFadeInner: { value: 10.5 },
+      uFadeOuter: { value: 16.5 },
+      uOverallAlpha: { value: 0.92 },
     }),
     [],
   )

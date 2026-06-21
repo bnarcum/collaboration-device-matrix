@@ -19,7 +19,8 @@ export function SceneEnv() {
         intensity={0.55}
         color="#02C8FF"
       />
-      <pointLight position={[0, 4, 0]} intensity={0.35} color="#0A60FF" distance={18} />
+      <pointLight position={[0, 5, 0]} intensity={0.55} color="#02C8FF" distance={20} />
+      <pointLight position={[0, 2, 8]} intensity={0.28} color="#0A60FF" distance={14} />
       <Environment preset="city" />
       <ContactShadows
         position={[0, -0.001, 0]}

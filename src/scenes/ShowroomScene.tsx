@@ -220,7 +220,7 @@ const ringFrag = /* glsl */ `
     float d = abs(r - uRadius) / 0.06;
     float core  = 1.0 - smoothstep(0.0, 0.32, d);
     float bloom = 1.0 - smoothstep(0.0, 1.2,  d);
-    float alpha = clamp(core * 0.92 + bloom * 0.38, 0.0, 1.0);
+    float alpha = clamp(core * 1.0 + bloom * 0.52, 0.0, 1.0);
     gl_FragColor = vec4(uColor, alpha);
   }
 `
@@ -235,7 +235,7 @@ const ringBloomFrag = /* glsl */ `
     float r = length(vLocal);
     float d = abs(r - uRadius) / 0.14;
     float halo = 1.0 - smoothstep(0.0, 1.0, d);
-    float alpha = halo * 0.22;
+    float alpha = halo * 0.38;
     gl_FragColor = vec4(uColor, alpha);
   }
 `

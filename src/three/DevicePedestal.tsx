@@ -179,7 +179,7 @@ const contactPoolFrag = /* glsl */ `
     float d = length(c) * 2.0;
     float core = 1.0 - smoothstep(0.0, 0.55, d);
     float halo = 1.0 - smoothstep(0.0, 1.0, d);
-    float a = clamp(core * 0.28 + halo * 0.12, 0.0, 1.0);
+    float a = clamp(core * 0.42 + halo * 0.22, 0.0, 1.0);
     gl_FragColor = vec4(uColor, a);
   }
 `
@@ -275,7 +275,7 @@ const poolFrag = /* glsl */ `
     float core = 1.0 - smoothstep(0.0, 0.45, d);
     float halo = 1.0 - smoothstep(0.0, 1.0, d);
     float pulse = mix(1.0, 0.92 + 0.08 * sin(uTime * 1.8), uPulse);
-    float a = clamp(core * 0.55 + halo * 0.22, 0.0, 1.0) * pulse;
+    float a = clamp(core * 0.68 + halo * 0.32, 0.0, 1.0) * pulse;
     gl_FragColor = vec4(uColor, a);
   }
 `
