@@ -33,8 +33,8 @@ interface Props {
 }
 
 /**
- * Mirror image of a product photo on the showroom floor — flipped across y=0
- * with a vertical fade so it reads as a real reflection, not a glow disc.
+ * Mirror image of a product photo on the showroom floor — laid flat on the
+ * polished surface with a vertical UV flip and fade from the pedestal edge.
  */
 export function PhotoFloorReflection({ url, planeW, planeH }: Props) {
   const [texture, setTexture] = useState<THREE.Texture | null>(
@@ -62,7 +62,7 @@ export function PhotoFloorReflection({ url, planeW, planeH }: Props) {
   const uniforms = useMemo(
     () => ({
       uMap: { value: null as THREE.Texture | null },
-      uOpacity: { value: 0.52 },
+      uOpacity: { value: 0.68 },
     }),
     [],
   )
@@ -75,14 +75,15 @@ export function PhotoFloorReflection({ url, planeW, planeH }: Props) {
 
   return (
     <mesh
-      position={[0, -planeH / 2, 0]}
-      scale={[1, -1, 1]}
-      renderOrder={-1}
+      rotation={[-Math.PI / 2, 0, 0]}
+      position={[0, 0.003, -planeH / 2]}
+      renderOrder={2}
     >
       <planeGeometry args={[planeW, planeH]} />
       <shaderMaterial
         transparent
         depthWrite={false}
+        depthTest={true}
         toneMapped={false}
         uniforms={uniforms}
         vertexShader={vert}
@@ -108,12 +109,14 @@ const frag = /* glsl */ `
   varying vec2 vUv;
 
   void main() {
-    vec4 tex = texture2D(uMap, vUv);
+    // Mirror vertically so the image reads as a floor reflection.
+    vec2 uv = vec2(vUv.x, 1.0 - vUv.y);
+    vec4 tex = texture2D(uMap, uv);
     if (tex.a < 0.08) discard;
-    // Fade toward the floor line (top of reflection plane in UV space).
-    float fade = smoothstep(0.0, 0.55, vUv.y);
+    // Fade from the pedestal contact line (vUv.y = 1) toward the floor edge.
+    float fade = smoothstep(0.0, 0.62, vUv.y);
     float a = tex.a * uOpacity * fade;
     if (a < 0.02) discard;
-    gl_FragColor = vec4(tex.rgb * 0.85, a);
+    gl_FragColor = vec4(tex.rgb * 0.9, a);
   }
 `

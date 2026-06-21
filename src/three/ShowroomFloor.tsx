@@ -33,18 +33,18 @@ export function ShowroomFloor({ showGrid = false }: FloorProps = {}) {
       >
         <circleGeometry args={[16, 96]} />
         <MeshReflectorMaterial
-          color="#030810"
-          roughness={0.22}
-          metalness={0.52}
-          blur={[180, 45]}
+          color="#040a14"
+          roughness={0.18}
+          metalness={0.58}
+          blur={[160, 40]}
           resolution={1024}
-          mixBlur={0.65}
-          mixStrength={0.72}
-          mixContrast={1.15}
-          mirror={0.55}
-          depthScale={0.72}
-          minDepthThreshold={0.25}
-          maxDepthThreshold={1.1}
+          mixBlur={0.55}
+          mixStrength={0.88}
+          mixContrast={1.2}
+          mirror={0.68}
+          depthScale={0.8}
+          minDepthThreshold={0.2}
+          maxDepthThreshold={1.15}
           side={THREE.DoubleSide}
         />
       </mesh>
