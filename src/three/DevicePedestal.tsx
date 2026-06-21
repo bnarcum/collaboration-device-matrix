@@ -110,8 +110,8 @@ export function DevicePedestal({
               selected={selected}
               onPlaneSize={onPlaneSize}
             />
+            <PhotoFloorReflection url={imageUrl} planeW={planeW} planeH={planeH} />
           </group>
-          <PhotoFloorReflection url={imageUrl} planeW={planeW} planeH={planeH} />
         </>
       ) : (
         <group scale={scale} position={[0, device.size[1] / 2 + 0.02, 0]}>

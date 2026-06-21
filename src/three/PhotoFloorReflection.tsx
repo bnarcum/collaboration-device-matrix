@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Billboard } from '@react-three/drei'
 import * as THREE from 'three'
 
 const loader = new THREE.TextureLoader()
@@ -33,8 +34,11 @@ interface Props {
 }
 
 /**
- * Mirror image of a product photo on the showroom floor — laid flat on the
- * polished surface with a vertical UV flip and fade from the pedestal edge.
+ * Camera-facing mirror of the product photo, anchored at floor level.
+ *
+ * A horizontal floor plane reads edge-on from the default orbit camera, so
+ * we use a vertical billboard sitting on the floor (same trick as Apple-style
+ * product pages) with a vertical flip + fade toward the floor edge.
  */
 export function PhotoFloorReflection({ url, planeW, planeH }: Props) {
   const [texture, setTexture] = useState<THREE.Texture | null>(
@@ -62,7 +66,7 @@ export function PhotoFloorReflection({ url, planeW, planeH }: Props) {
   const uniforms = useMemo(
     () => ({
       uMap: { value: null as THREE.Texture | null },
-      uOpacity: { value: 0.75 },
+      uOpacity: { value: 0.55 },
     }),
     [],
   )
@@ -74,26 +78,20 @@ export function PhotoFloorReflection({ url, planeW, planeH }: Props) {
   if (!texture) return null
 
   return (
-    <mesh
-      rotation={[-Math.PI / 2, 0, 0]}
-      position={[0, 0.012, -planeH / 2]}
-      renderOrder={3}
-    >
-      <planeGeometry args={[planeW, planeH]} />
-      <shaderMaterial
-        transparent
-        depthWrite={false}
-        depthTest={false}
-        toneMapped={false}
-        polygonOffset
-        polygonOffsetFactor={-2}
-        polygonOffsetUnits={-2}
-        uniforms={uniforms}
-        vertexShader={vert}
-        fragmentShader={frag}
-        side={THREE.DoubleSide}
-      />
-    </mesh>
+    <Billboard follow lockX={false} lockY={false} lockZ={false}>
+      <mesh position={[0, -planeH / 2, -0.02]} renderOrder={2}>
+        <planeGeometry args={[planeW, planeH]} />
+        <shaderMaterial
+          transparent
+          depthWrite={false}
+          toneMapped={false}
+          uniforms={uniforms}
+          vertexShader={vert}
+          fragmentShader={frag}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+    </Billboard>
   )
 }
 
@@ -112,14 +110,14 @@ const frag = /* glsl */ `
   varying vec2 vUv;
 
   void main() {
-    // Mirror vertically so the image reads as a floor reflection.
+    // Flip vertically — mirror of the hero above.
     vec2 uv = vec2(vUv.x, 1.0 - vUv.y);
     vec4 tex = texture2D(uMap, uv);
-    if (tex.a < 0.08) discard;
-    // Fade from the pedestal contact line (vUv.y = 1) toward the floor edge.
-    float fade = smoothstep(0.0, 0.78, vUv.y);
+    if (tex.a < 0.04) discard;
+    // vUv.y = 1 at the pedestal contact line; fade toward the floor edge.
+    float fade = smoothstep(0.0, 0.92, vUv.y);
     float a = tex.a * uOpacity * fade;
     if (a < 0.02) discard;
-    gl_FragColor = vec4(tex.rgb * 1.05, a);
+    gl_FragColor = vec4(tex.rgb * 0.82, a);
   }
 `
