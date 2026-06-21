@@ -7,6 +7,7 @@ import { DevicePedestal } from '../three/DevicePedestal'
 import { estimateBillboardPlane } from '../three/billboardSizing'
 import { SceneEnv } from '../three/SceneEnv'
 import { ShowroomFloor } from '../three/ShowroomFloor'
+import { ShowroomCameraFocus } from '../three/ShowroomCameraFocus'
 
 interface Props {
   devices: Device[]
@@ -69,6 +70,8 @@ export function ShowroomScene({
           onClick={onSelect}
         />
       ))}
+
+      <ShowroomCameraFocus selected={selected ?? null} placements={layout.placements} />
     </>
   )
 }

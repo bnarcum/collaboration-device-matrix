@@ -200,6 +200,14 @@ export default function App() {
     }
   }, [catalog, selectedId, setSelectedId])
 
+  /** Embed deep-link: zoom category ring so ?device= opens on a tight arc. */
+  useEffect(() => {
+    if (!EMBED_MODE || !selectedId) return
+    const device = DEVICES_BY_ID.get(selectedId)
+    if (device) setFilter(device.category)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   useEffect(() => {
     const catalogIds = new Set(catalog.map((d) => d.id))
     setCompareIds((prev) => {
