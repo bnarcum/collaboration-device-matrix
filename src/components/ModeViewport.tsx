@@ -51,7 +51,8 @@ export function ModeViewport({
     <Canvas
       camera={{ position: [9, 6, 9], fov: 45 }}
       dpr={[1, 2]}
-      gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
+      gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+      style={{ background: 'transparent' }}
     >
       <Suspense fallback={null}>
         <ShowroomScene

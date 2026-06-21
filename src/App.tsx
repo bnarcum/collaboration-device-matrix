@@ -21,6 +21,7 @@ import { CompareModal } from './ui/CompareModal'
 import { filterDevicesByFinder } from './data/finder'
 import type { FinderState } from './ui/FinderOverlay'
 import { SearchBar } from './ui/SearchBar'
+import { CelestialBackground } from './ui/CelestialBackground'
 import { PlatformSwitch } from './ui/PlatformSwitch'
 import {
   filterDevicesByPlatform,
@@ -394,19 +395,21 @@ export default function App() {
   }, [selected, selectDevice, compareOpen, setCompareOpen, catalog, finderPanelOpen, finderState.step, clearFinder])
 
   return (
-    <div
-      className="app"
-      data-vendors={selectedVendors.join(',')}
-      data-embed={EMBED_MODE ? 'cpn' : undefined}
-      style={
-        activeVendorTheme
-          ? ({
-              '--brand-primary': activeVendorTheme.primary,
-              '--brand-secondary': activeVendorTheme.secondary,
-            } as CSSProperties)
-          : undefined
-      }
-    >
+    <>
+      <CelestialBackground />
+      <div
+        className="app"
+        data-vendors={selectedVendors.join(',')}
+        data-embed={EMBED_MODE ? 'cpn' : undefined}
+        style={
+          activeVendorTheme
+            ? ({
+                '--brand-primary': activeVendorTheme.primary,
+                '--brand-secondary': activeVendorTheme.secondary,
+              } as CSSProperties)
+            : undefined
+        }
+      >
       <header className="topbar">
         <div className="brand">
           <div className="brand-logo" aria-hidden>
@@ -607,6 +610,7 @@ export default function App() {
         />
       </div>
     </div>
+    </>
   )
 }
 

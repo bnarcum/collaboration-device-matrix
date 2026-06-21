@@ -4,7 +4,6 @@ import { ShowroomBackdrop } from './ShowroomBackdrop'
 export function SceneEnv() {
   return (
     <>
-      <color attach="background" args={['#051222']} />
       <fog attach="fog" args={['#051222', 10, 32]} />
       <ShowroomBackdrop />
       <ambientLight intensity={0.42} />

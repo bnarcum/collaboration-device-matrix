@@ -37,20 +37,136 @@ body,
 }
 
 body {
-  background:
-    radial-gradient(
-      1200px 800px at 80% -10%,
-      rgba(2, 200, 255, 0.12),
-      transparent 60%
-    ),
-    radial-gradient(
-      900px 600px at -10% 90%,
-      rgba(48, 112, 229, 0.14),
-      transparent 60%
-    ),
-    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+  background: #04101f;
   color: var(--fg-1);
   overflow: hidden;
+}
+
+/* Celestial ambient — Portfolio Navigator parity */
+.celestial-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: linear-gradient(165deg, #04101f 0%, #07182d 42%, #0b2a4a 100%);
+}
+
+.celestial-bg__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 85% 75% at 50% 48%,
+    transparent 35%,
+    rgba(0, 0, 0, 0.45) 100%
+  );
+}
+
+.celestial-bg__glow {
+  position: absolute;
+  inset: -25%;
+  opacity: 1;
+  background:
+    radial-gradient(
+      ellipse 58% 48% at 22% 32%,
+      rgba(10, 96, 255, 0.28) 0%,
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse 52% 44% at 78% 68%,
+      rgba(2, 200, 255, 0.22) 0%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 46% 38% at 50% 88%,
+      rgba(255, 144, 0, 0.12) 0%,
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 40% 35% at 50% 42%,
+      rgba(2, 200, 255, 0.1) 0%,
+      transparent 70%
+    );
+  animation: celestial-glow-drift 24s ease-in-out infinite alternate;
+}
+
+.celestial-bg__beams {
+  position: absolute;
+  inset: -50%;
+  opacity: 0.14;
+  background: conic-gradient(
+    from 210deg at 50% 50%,
+    transparent 0deg,
+    rgba(2, 200, 255, 0.55) 32deg,
+    transparent 64deg,
+    rgba(10, 96, 255, 0.45) 128deg,
+    transparent 168deg,
+    rgba(2, 200, 255, 0.35) 248deg,
+    transparent 300deg
+  );
+  animation: celestial-beams-spin 120s linear infinite;
+}
+
+.celestial-bg__grid {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+  background-image:
+    linear-gradient(rgba(2, 200, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(2, 200, 255, 0.06) 1px, transparent 1px),
+    radial-gradient(circle, rgba(2, 200, 255, 0.22) 1px, transparent 1px);
+  background-size: 72px 72px, 72px 72px, 36px 36px;
+  background-position: 0 0, 0 0, 18px 18px;
+  animation: celestial-grid-pan 70s linear infinite;
+}
+
+.celestial-bg__mesh {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@keyframes celestial-glow-drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.92;
+  }
+  50% {
+    transform: translate(2.5%, -2%) scale(1.04);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-2%, 2.5%) scale(1.02);
+    opacity: 0.95;
+  }
+}
+
+@keyframes celestial-beams-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes celestial-grid-pan {
+  0% {
+    background-position: 0 0, 0 0, 18px 18px;
+  }
+  100% {
+    background-position: 72px 72px, 72px 72px, 54px 54px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .celestial-bg__glow,
+  .celestial-bg__beams,
+  .celestial-bg__grid {
+    animation: none;
+  }
 }
 
 button {
@@ -114,6 +230,7 @@ a:hover {
 .app {
   position: fixed;
   inset: 0;
+  z-index: 1;
   display: grid;
   grid-template-rows: auto 1fr;
 }
@@ -667,6 +784,7 @@ a:hover {
   width: 100%;
   height: 100%;
   outline: none;
+  background: transparent;
 }
 
 .overlay {
