@@ -6,6 +6,7 @@ interface Node {
   y: number
   vx: number
   vy: number
+  phase: number
 }
 
 const NODE_COUNT = 28
@@ -32,6 +33,7 @@ export function CelestialBackground() {
     let h = 0
     let nodes: Node[] = []
     let rafId: number | null = null
+    let lastTs = 0
 
     const resize = () => {
       w = host.clientWidth || window.innerWidth
@@ -48,22 +50,37 @@ export function CelestialBackground() {
       nodes = Array.from({ length: NODE_COUNT }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
-        vx: (Math.random() - 0.5) * (reducedMotion ? 0 : 0.216),
-        vy: (Math.random() - 0.5) * (reducedMotion ? 0 : 0.216),
+        vx: (Math.random() - 0.5) * (reducedMotion ? 0 : 0.11),
+        vy: (Math.random() - 0.5) * (reducedMotion ? 0 : 0.11),
+        phase: Math.random() * Math.PI * 2,
       }))
     }
 
-    const drawMesh = () => {
+    const drawMesh = (now: number) => {
+      const t = now * 0.001
+      const dt = lastTs ? Math.min(0.032, (now - lastTs) / 1000) : 1 / 60
+      lastTs = now
       ctx.clearRect(0, 0, w, h)
 
       if (!reducedMotion) {
+        const edge = 24
         for (const n of nodes) {
-          n.x += n.vx
-          n.y += n.vy
-          if (n.x < 0 || n.x > w) n.vx *= -1
-          if (n.y < 0 || n.y > h) n.vy *= -1
-          n.x = Math.max(0, Math.min(w, n.x))
-          n.y = Math.max(0, Math.min(h, n.y))
+          n.x += n.vx * dt * 60
+          n.y += n.vy * dt * 60
+          if (n.x < edge) {
+            n.x = edge
+            n.vx = Math.abs(n.vx) * 0.96
+          } else if (n.x > w - edge) {
+            n.x = w - edge
+            n.vx = -Math.abs(n.vx) * 0.96
+          }
+          if (n.y < edge) {
+            n.y = edge
+            n.vy = Math.abs(n.vy) * 0.96
+          } else if (n.y > h - edge) {
+            n.y = h - edge
+            n.vy = -Math.abs(n.vy) * 0.96
+          }
         }
       }
 
@@ -87,20 +104,24 @@ export function CelestialBackground() {
       }
 
       for (const n of nodes) {
-        ctx.fillStyle = 'rgba(2,200,255,0.38)'
+        const pulse = 0.5 + 0.5 * Math.sin(t * 0.85 + n.phase)
+        const alpha = 0.26 + pulse * 0.14
+        const radius = 1.45 + pulse * 0.35
+        ctx.fillStyle = `rgba(2,200,255,${alpha})`
         ctx.beginPath()
-        ctx.arc(n.x, n.y, 1.8, 0, Math.PI * 2)
+        ctx.arc(n.x, n.y, radius, 0, Math.PI * 2)
         ctx.fill()
       }
     }
 
-    const tick = () => {
-      drawMesh()
+    const tick = (now: number) => {
+      drawMesh(now)
       if (!reducedMotion) rafId = requestAnimationFrame(tick)
     }
 
     const start = () => {
-      drawMesh()
+      lastTs = 0
+      tick(performance.now())
       if (!reducedMotion && rafId == null) rafId = requestAnimationFrame(tick)
     }
 
