@@ -71,7 +71,11 @@ export function ShowroomScene({
         />
       ))}
 
-      <ShowroomCameraFocus selected={selected ?? null} placements={layout.placements} />
+      <ShowroomCameraFocus
+        selected={selected ?? null}
+        placements={layout.placements}
+        filter={filter}
+      />
     </>
   )
 }

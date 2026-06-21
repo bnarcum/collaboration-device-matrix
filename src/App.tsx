@@ -205,8 +205,7 @@ export default function App() {
     if (!EMBED_MODE || !selectedId) return
     const device = DEVICES_BY_ID.get(selectedId)
     if (device) setFilter(device.category)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [selectedId, setFilter])
 
   useEffect(() => {
     const catalogIds = new Set(catalog.map((d) => d.id))
@@ -471,7 +470,10 @@ export default function App() {
         <nav className="mode-switch" aria-label="View mode">
           <button
             data-active={mode === 'showroom' ? 'true' : 'false'}
-            onClick={() => setMode('showroom')}
+            onClick={() => {
+              if (selected) setFilter(selected.category)
+              setMode('showroom')
+            }}
           >
             Showroom
           </button>

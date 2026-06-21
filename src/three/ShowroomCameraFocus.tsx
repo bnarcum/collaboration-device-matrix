@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
-import type { Device } from '../data/types'
+import type { Category, Device } from '../data/types'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { estimateBillboardPlane } from './billboardSizing'
 
@@ -62,13 +62,31 @@ function frameForDevice(
 interface Props {
   selected: Device | null
   placements: ShowroomPlacement[]
+  /** Category filter driving layout — explicit dep so camera refocuses on filter change. */
+  filter?: Category | 'all'
+}
+
+/** Stable key for layout changes (filter / device list / ring geometry). */
+export function placementsLayoutKey(
+  placements: ShowroomPlacement[],
+  filter: Category | 'all' = 'all',
+): string {
+  const parts = placements.map(
+    (p) => `${p.device.id}@${p.position.map((n) => n.toFixed(2)).join(',')}`,
+  )
+  parts.sort()
+  return `${filter}|${parts.join(';')}`
 }
 
 /**
  * Smoothly frames OrbitControls on the selected showroom device (or overview
  * when deselected). Works for embed deep-links with ?device=… as well as clicks.
  */
-export function ShowroomCameraFocus({ selected, placements }: Props) {
+export function ShowroomCameraFocus({
+  selected,
+  placements,
+  filter = 'all',
+}: Props) {
   const camera = useThree((s) => s.camera)
   const controls = useThree((s) => s.controls) as OrbitControlsLike | null
   const reducedMotion = useReducedMotion()
@@ -77,30 +95,45 @@ export function ShowroomCameraFocus({ selected, placements }: Props) {
     target: OVERVIEW.target.clone(),
   })
   const snapNext = useRef(false)
+  const layoutKey = useMemo(
+    () => placementsLayoutKey(placements, filter),
+    [placements, filter],
+  )
 
-  useEffect(() => {
-    if (!controls) return
-
+  const syncCameraGoal = useCallback(() => {
+    let frame: CameraFrame
     if (selected) {
       const placement = placements.find((p) => p.device.id === selected.id)
       if (!placement) return
-      goal.current = frameForDevice(placement.device, placement.position)
+      frame = frameForDevice(placement.device, placement.position)
     } else {
-      goal.current = {
+      frame = {
         position: OVERVIEW.position.clone(),
         target: OVERVIEW.target.clone(),
       }
     }
 
+    goal.current = frame
+    if (!controls) return
+
     if (reducedMotion) {
-      camera.position.copy(goal.current.position)
-      controls.target.copy(goal.current.target)
+      camera.position.copy(frame.position)
+      controls.target.copy(frame.target)
       controls.update()
       snapNext.current = false
     } else {
       snapNext.current = true
     }
-  }, [selected?.id, placements, controls, reducedMotion, camera, selected])
+  }, [selected, placements, controls, reducedMotion, camera])
+
+  useLayoutEffect(() => {
+    syncCameraGoal()
+  }, [syncCameraGoal, layoutKey])
+
+  // OrbitControls registers after first paint — re-apply when controls appear.
+  useEffect(() => {
+    syncCameraGoal()
+  }, [syncCameraGoal, controls])
 
   useFrame((_, dt) => {
     if (!controls || reducedMotion) return
