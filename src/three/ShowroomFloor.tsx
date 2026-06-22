@@ -46,8 +46,8 @@ function GridDisc({ tron }: { tron: boolean }) {
     () => ({
       uMajor: { value: tron ? 1.0 : 1.0 },
       uMinor: { value: tron ? 0.5 : 0.5 },
-      uMajorWidth: { value: tron ? 1.8 : 1.4 },
-      uMinorWidth: { value: tron ? 1.0 : 0.8 },
+      uMajorWidth: { value: tron ? 1.5 : 1.4 },
+      uMinorWidth: { value: tron ? 0.85 : 0.8 },
       uMajorColor: { value: new THREE.Color(tron ? TRON.gridMajor : '#34557a') },
       uMinorColor: { value: new THREE.Color(tron ? TRON.gridMinor : '#1a283b') },
       uAccent: { value: new THREE.Color(tron ? TRON.cyan : '#02C8FF') },
@@ -131,18 +131,23 @@ const frag = /* glsl */ `
     float major = gridLine(vWorldXZ, uMajor, uMajorWidth);
     float ax = max(axisLine(vWorldXZ.x, 2.4), axisLine(vWorldXZ.y, 2.4));
 
+    float centerFade = uTron > 0.5 ? smoothstep(0.0, 3.2, r) : 1.0;
+    ax *= centerFade;
+    minor *= mix(1.0, centerFade, 0.55);
+    major *= mix(1.0, centerFade, 0.35);
+
     float pulse = 1.0;
     if (uTron > 0.5) {
       float wave = sin(uTime * 1.6 - r * 0.85) * 0.5 + 0.5;
-      pulse = 0.72 + 0.28 * wave;
+      pulse = 0.82 + 0.18 * wave;
     }
 
-    vec3 col = uMinorColor * minor * (uTron > 0.5 ? 0.85 : 0.6)
-             + uMajorColor * major * (uTron > 0.5 ? 1.35 : 1.0)
-             + uAccent     * ax    * (uTron > 0.5 ? 1.1 : 0.55);
+    vec3 col = uMinorColor * minor * (uTron > 0.5 ? 0.55 : 0.6)
+             + uMajorColor * major * (uTron > 0.5 ? 0.95 : 1.0)
+             + uAccent     * ax    * (uTron > 0.5 ? 0.65 : 0.55);
 
     float alpha = clamp(
-      max(max(minor * (uTron > 0.5 ? 0.65 : 0.45), major * (uTron > 0.5 ? 1.0 : 0.85)), ax * (uTron > 0.5 ? 0.95 : 0.55)),
+      max(max(minor * (uTron > 0.5 ? 0.45 : 0.45), major * (uTron > 0.5 ? 0.72 : 0.85)), ax * (uTron > 0.5 ? 0.55 : 0.55)),
       0.0, 1.0
     ) * fade * uOverallAlpha * pulse;
 

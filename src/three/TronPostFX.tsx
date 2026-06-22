@@ -7,9 +7,9 @@ export function TronPostFX() {
   return (
     <EffectComposer multisampling={0}>
       <Bloom
-        luminanceThreshold={0.12}
-        luminanceSmoothing={0.85}
-        intensity={1.35}
+        luminanceThreshold={0.28}
+        luminanceSmoothing={0.82}
+        intensity={0.82}
         mipmapBlur
       />
     </EffectComposer>

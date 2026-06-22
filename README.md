@@ -41,6 +41,16 @@ python3 scripts/import-product-images.py   # partner heroes
 python3 scripts/remove-backgrounds.py      # cutouts
 ```
 
+## Showroom Tron theme (easter egg)
+
+Default showroom uses the **celestial stage** look. **Tron: Legacy** grid mode is hidden:
+
+- **Triple-click** the title “Collaboration Device Matrix” to toggle (toast confirms)
+- URL: `?tron=1` (on) or `?tron=0` (off) — shareable bookmark
+- Preference persists for the browser session
+
+To disable the easter egg in code: remove `TronShowroomProvider` / triple-click handler, or never ship `TRON_SHOWROOM_DEFAULT = true`.
+
 ## Unaffiliated
 
 This project is not affiliated with Cisco, Logitech, Poly (HP), or Neat. Specifications are summarized from public product documentation.

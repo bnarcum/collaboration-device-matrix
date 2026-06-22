@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import { useReducedMotion } from '../hooks/useReducedMotion'
-import { resolveTronShowroom } from '../theme/tronShowroom'
 
 interface Node {
   x: number
@@ -17,11 +16,10 @@ const LINK_DIST = 190
  * Animated constellation mesh + CSS layers — matches Portfolio Navigator
  * `#bg-ambient` (grid, glow, beams, drifting nodes).
  */
-export function CelestialBackground() {
+export function CelestialBackground({ tron = false }: { tron?: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const hostRef = useRef<HTMLDivElement>(null)
   const reducedMotion = useReducedMotion()
-  const tron = resolveTronShowroom()
 
   useEffect(() => {
     if (tron) return

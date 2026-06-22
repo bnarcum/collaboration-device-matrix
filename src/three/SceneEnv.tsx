@@ -12,32 +12,33 @@ export function SceneEnv() {
         args={[tron ? TRON.void : '#051222', tron ? 6 : 10, tron ? 26 : 32]}
       />
       <ShowroomBackdrop />
-      <ambientLight intensity={tron ? 0.14 : 0.42} />
+      <ambientLight intensity={tron ? 0.22 : 0.42} color={tron ? '#eef6ff' : '#ffffff'} />
       <directionalLight
         position={[6, 10, 5]}
-        intensity={tron ? 0.55 : 1.35}
+        intensity={tron ? 0.75 : 1.35}
         castShadow={false}
       />
+      {tron && (
+        <directionalLight
+          position={[10, 14, 12]}
+          intensity={0.95}
+          color="#ffffff"
+        />
+      )}
       <directionalLight
         position={[-5, 6, -4]}
-        intensity={tron ? 0.35 : 0.55}
+        intensity={tron ? 0.22 : 0.55}
         color={TRON.cyanDim}
       />
       <pointLight
         position={[0, 5, 0]}
-        intensity={tron ? 0.85 : 0.55}
+        intensity={tron ? 0.35 : 0.55}
         color={TRON.cyan}
         distance={20}
       />
       <pointLight
-        position={[0, 0.4, 0]}
-        intensity={tron ? 1.1 : 0.28}
-        color={TRON.cyan}
-        distance={tron ? 18 : 14}
-      />
-      <pointLight
         position={[0, 2, 8]}
-        intensity={tron ? 0.4 : 0.28}
+        intensity={tron ? 0.28 : 0.28}
         color={tron ? TRON.orange : '#0A60FF'}
         distance={14}
       />

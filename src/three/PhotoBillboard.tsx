@@ -28,8 +28,8 @@ const glowFrag = /* glsl */ `
     float d = length(p) * 2.0;
     float core = 1.0 - smoothstep(0.28, 0.88, d);
     float halo = 1.0 - smoothstep(0.0, 1.0, d);
-    float coreA = uTron > 0.5 ? 0.28 : 0.14;
-    float haloA = uTron > 0.5 ? 0.14 : 0.06;
+    float coreA = uTron > 0.5 ? 0.2 : 0.14;
+    float haloA = uTron > 0.5 ? 0.1 : 0.06;
     float a = core * coreA + halo * haloA;
     gl_FragColor = vec4(uColor, a);
   }
@@ -136,7 +136,7 @@ export function PhotoBillboard({
       {selected && (
         <SelectionGlow planeW={planeW} planeH={planeH} />
       )}
-      <mesh>
+      <mesh renderOrder={10}>
         <planeGeometry args={[planeW, planeH]} />
         <meshBasicMaterial
           map={texture}

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import {
   DEVICES,
@@ -38,7 +38,7 @@ import {
   type UrlCodec,
 } from './hooks/useUrlState'
 import type { ShowroomFocusMode } from './three/ShowroomCameraFocus'
-import { resolveTronShowroom } from './theme/tronShowroom'
+import { useTronShowroom } from './theme/TronShowroomContext'
 
 const FinderOverlay = lazy(() =>
   import('./ui/FinderOverlay').then((m) => ({ default: m.FinderOverlay })),
@@ -86,6 +86,24 @@ const EMBED_MODE =
   new URLSearchParams(window.location.search).get('embed') === 'cpn'
 
 export default function App() {
+  const { enabled: tronEnabled, toggle: toggleTron } = useTronShowroom()
+  const [tronToast, setTronToast] = useState<string | null>(null)
+  const titleClickRef = useRef({ count: 0, timer: 0 as ReturnType<typeof setTimeout> | 0 })
+
+  const onTitleClick = useCallback(() => {
+    const ref = titleClickRef.current
+    ref.count += 1
+    if (ref.timer) clearTimeout(ref.timer)
+    ref.timer = setTimeout(() => {
+      ref.count = 0
+    }, 650)
+    if (ref.count >= 3) {
+      ref.count = 0
+      setTronToast(tronEnabled ? 'Grid mode off' : 'Grid mode on')
+      toggleTron()
+      window.setTimeout(() => setTronToast(null), 2200)
+    }
+  }, [toggleTron, tronEnabled])
   const [selectedVendors, setSelectedVendors] = useUrlState<VendorId[]>(
     'vendor',
     DEFAULT_VENDORS,
@@ -276,10 +294,10 @@ export default function App() {
   }, [enterEmbedRing, enterEmbedHero])
 
   useEffect(() => {
-    const on = resolveTronShowroom() && mode === 'showroom'
+    const on = tronEnabled && mode === 'showroom'
     document.body.classList.toggle('tron-showroom', on)
     return () => document.body.classList.remove('tron-showroom')
-  }, [mode])
+  }, [mode, tronEnabled])
 
   useEffect(() => {
     const catalogIds = new Set(catalog.map((d) => d.id))
@@ -481,7 +499,7 @@ export default function App() {
 
   return (
     <>
-      <CelestialBackground />
+      <CelestialBackground tron={tronEnabled} />
       <div
         className="app"
         data-vendors={selectedVendors.join(',')}
@@ -501,7 +519,18 @@ export default function App() {
             ⩕
           </div>
           <div>
-            <div className="brand-title">Collaboration Device Matrix</div>
+            <div
+              className="brand-title brand-title--easter"
+              role="button"
+              tabIndex={0}
+              title="Collaboration Device Matrix"
+              onClick={onTitleClick}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') onTitleClick()
+              }}
+            >
+              Collaboration Device Matrix
+            </div>
             <div className="brand-sub">
               Cisco · compare Logitech, Poly &amp; Neat
             </div>
@@ -650,6 +679,7 @@ export default function App() {
 
       <div className="canvas-wrap">
         <ModeViewport
+          key={tronEnabled ? 'showroom-tron' : 'showroom-celestial'}
           mode={mode}
           visibleDevices={mode === 'showcase' ? aisleDevices : visibleDevices}
           selected={selected}
@@ -708,6 +738,11 @@ export default function App() {
         />
       </div>
     </div>
+    {tronToast && (
+      <div className="tron-toast" role="status" aria-live="polite">
+        {tronToast}
+      </div>
+    )}
     </>
   )
 }

@@ -9,7 +9,7 @@ interface Props {
   selected?: boolean
 }
 
-/** Hex wireframe pad under each device — Tron grid disc. */
+/** Hex wireframe pad + dark base under each device — Tron grid disc. */
 export function TronPlatform({ footprint, selected = false }: Props) {
   const reduced = useReducedMotion()
   const uniforms = useMemo(
@@ -33,8 +33,18 @@ export function TronPlatform({ footprint, selected = false }: Props) {
 
   return (
     <group position={[0, 0.006, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh renderOrder={0}>
+        <circleGeometry args={[r * 1.08, 32]} />
+        <meshBasicMaterial
+          color="#000000"
+          transparent
+          opacity={0.78}
+          depthWrite={false}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
       <mesh renderOrder={2}>
-        <ringGeometry args={[r * 0.72, r * 0.98, 6]} />
+        <ringGeometry args={[r * 0.78, r * 0.96, 6]} />
         <shaderMaterial
           transparent
           depthWrite={false}
@@ -46,11 +56,11 @@ export function TronPlatform({ footprint, selected = false }: Props) {
         />
       </mesh>
       <mesh renderOrder={1}>
-        <ringGeometry args={[r * 0.98, r * 1.05, 6]} />
+        <ringGeometry args={[r * 0.96, r * 1.02, 6]} />
         <meshBasicMaterial
           color={TRON.cyanDim}
           transparent
-          opacity={selected ? 0.55 : 0.28}
+          opacity={selected ? 0.38 : 0.18}
           depthWrite={false}
           side={THREE.DoubleSide}
           blending={THREE.AdditiveBlending}
@@ -80,9 +90,9 @@ const padFrag = /* glsl */ `
     vec2 c = vUv - 0.5;
     float d = length(c) * 2.0;
     float edge = 1.0 - smoothstep(0.82, 1.0, d);
-    float pulse = 0.88 + 0.12 * sin(uTime * 2.4 + d * 8.0);
-    vec3 col = mix(uColor, uAccent, uSelected * 0.35);
-    float a = edge * pulse * (0.35 + uSelected * 0.45);
+    float pulse = 0.92 + 0.08 * sin(uTime * 2.0 + d * 6.0);
+    vec3 col = mix(uColor, uAccent, uSelected * 0.4);
+    float a = edge * pulse * (0.22 + uSelected * 0.28);
     gl_FragColor = vec4(col, a);
   }
 `
