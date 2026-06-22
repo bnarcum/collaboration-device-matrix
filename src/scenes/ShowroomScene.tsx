@@ -48,7 +48,7 @@ export function ShowroomScene({
 
   return (
     <>
-      <color attach="background" args={[tron ? TRON.void : '#051222']} />
+      {tron && <color attach="background" args={[TRON.void]} />}
       <SceneEnv />
       <OrbitControls
         makeDefault

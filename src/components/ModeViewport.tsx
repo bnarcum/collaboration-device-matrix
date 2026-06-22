@@ -52,14 +52,17 @@ export function ModeViewport({
   }
 
   const tron = resolveTronShowroom()
-  const voidColor = tron ? TRON.void : '#051222'
 
   return (
     <Canvas
       camera={{ position: [9, 6, 9], fov: 45 }}
       dpr={[1, 2]}
-      gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
-      style={{ background: voidColor }}
+      gl={{
+        antialias: true,
+        alpha: !tron,
+        powerPreference: 'high-performance',
+      }}
+      style={{ background: tron ? TRON.void : 'transparent' }}
     >
       <Suspense fallback={null}>
         <ShowroomScene
