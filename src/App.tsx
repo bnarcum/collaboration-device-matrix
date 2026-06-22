@@ -49,8 +49,8 @@ function embedDefaultShowroomFocus(): ShowroomFocusMode {
   if (typeof window === 'undefined') return 'ring'
   const params = new URLSearchParams(window.location.search)
   if (params.get('embed') !== 'cpn') return 'ring'
-  if (params.get('camera') === 'ring') return 'ring'
-  if (params.get('device')) return 'hero'
+  // Portfolio embed uses the full showroom floor by default; hero carousel is opt-in only.
+  if (params.get('camera') === 'hero') return 'hero'
   return 'ring'
 }
 
@@ -410,13 +410,9 @@ export default function App() {
 
   const selectDevice = useCallback(
     (d: Device | null) => {
-      if (EMBED_MODE && d?.id && d.id !== selectedId && showroomFocus === 'ring') {
-        setShowroomFocus('hero')
-        setFilter(d.category)
-      }
       setSelectedId(d?.id ?? null)
     },
-    [setSelectedId, selectedId, setShowroomFocus, setFilter, showroomFocus],
+    [setSelectedId],
   )
 
   const toggleCompare = useCallback(
