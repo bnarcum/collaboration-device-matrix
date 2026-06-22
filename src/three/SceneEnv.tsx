@@ -30,19 +30,11 @@ export function SceneEnv() {
         intensity={tron ? 0.22 : 0.55}
         color={TRON.cyanDim}
       />
-      {!tron && (
-        <pointLight
-          position={[0, 5, 0]}
-          intensity={0.55}
-          color={TRON.cyan}
-          distance={20}
-        />
-      )}
       <pointLight
-        position={[0, 2, 8]}
-        intensity={tron ? 0.28 : 0.28}
+        position={[4, 4, 6]}
+        intensity={tron ? 0.28 : 0.22}
         color={tron ? TRON.orange : '#0A60FF'}
-        distance={14}
+        distance={16}
       />
     </>
   )

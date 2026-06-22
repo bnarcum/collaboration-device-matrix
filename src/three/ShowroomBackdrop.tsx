@@ -52,7 +52,7 @@ export function ShowroomBackdrop() {
         <meshBasicMaterial
           color={tron ? TRON.cyan : '#02C8FF'}
           transparent
-          opacity={tron ? 0.14 : 0.05}
+          opacity={tron ? 0.14 : 0.025}
           depthWrite={false}
           side={THREE.DoubleSide}
           blending={THREE.AdditiveBlending}
@@ -63,7 +63,7 @@ export function ShowroomBackdrop() {
         <meshBasicMaterial
           color={tron ? TRON.orange : '#0A60FF'}
           transparent
-          opacity={tron ? 0.1 : 0.03}
+          opacity={tron ? 0.1 : 0.015}
           depthWrite={false}
           side={THREE.DoubleSide}
           blending={THREE.AdditiveBlending}

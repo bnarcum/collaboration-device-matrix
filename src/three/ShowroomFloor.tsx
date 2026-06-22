@@ -35,7 +35,7 @@ export function ShowroomFloor({ showGrid }: FloorProps = {}) {
         />
       </mesh>
 
-      {tron && <CenterDimDisc />}
+      <CenterDimDisc strength={tron ? 0.72 : 0.58} />
 
       {gridOn && <GridDisc tron={tron} />}
     </group>
@@ -158,13 +158,14 @@ const frag = /* glsl */ `
   }
 `
 
-function CenterDimDisc() {
+function CenterDimDisc({ strength = 0.65 }: { strength?: number }) {
   const uniforms = useMemo(
     () => ({
       uInner: { value: 0.8 },
       uOuter: { value: 5.2 },
+      uStrength: { value: strength },
     }),
-    [],
+    [strength],
   )
 
   return (
@@ -199,12 +200,13 @@ const dimFrag = /* glsl */ `
   varying vec2 vUv;
   uniform float uInner;
   uniform float uOuter;
+  uniform float uStrength;
 
   void main() {
     vec2 c = vUv - 0.5;
     float r = length(c) * 13.0;
     float dim = 1.0 - smoothstep(uInner, uOuter, r);
     if (dim <= 0.001) discard;
-    gl_FragColor = vec4(0.0, 0.0, 0.0, dim * 0.72);
+    gl_FragColor = vec4(0.0, 0.0, 0.0, dim * uStrength);
   }
 `
