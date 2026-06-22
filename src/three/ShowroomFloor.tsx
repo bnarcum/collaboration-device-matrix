@@ -29,11 +29,13 @@ export function ShowroomFloor({ showGrid }: FloorProps = {}) {
         <circleGeometry args={[16, 96]} />
         <meshStandardMaterial
           color={tron ? TRON.floor : '#050c18'}
-          roughness={tron ? 0.12 : 0.38}
-          metalness={tron ? 0.88 : 0.12}
+          roughness={tron ? 0.32 : 0.38}
+          metalness={tron ? 0.38 : 0.12}
           side={THREE.DoubleSide}
         />
       </mesh>
+
+      {tron && <CenterDimDisc />}
 
       {gridOn && <GridDisc tron={tron} />}
     </group>
@@ -131,10 +133,10 @@ const frag = /* glsl */ `
     float major = gridLine(vWorldXZ, uMajor, uMajorWidth);
     float ax = max(axisLine(vWorldXZ.x, 2.4), axisLine(vWorldXZ.y, 2.4));
 
-    float centerFade = uTron > 0.5 ? smoothstep(0.0, 3.2, r) : 1.0;
+    float centerFade = uTron > 0.5 ? smoothstep(0.0, 4.8, r) : 1.0;
     ax *= centerFade;
-    minor *= mix(1.0, centerFade, 0.55);
-    major *= mix(1.0, centerFade, 0.35);
+    minor *= mix(1.0, centerFade, 0.75);
+    major *= mix(1.0, centerFade, 0.55);
 
     float pulse = 1.0;
     if (uTron > 0.5) {
@@ -153,5 +155,56 @@ const frag = /* glsl */ `
 
     if (alpha < 0.01) discard;
     gl_FragColor = vec4(col, alpha);
+  }
+`
+
+function CenterDimDisc() {
+  const uniforms = useMemo(
+    () => ({
+      uInner: { value: 0.8 },
+      uOuter: { value: 5.2 },
+    }),
+    [],
+  )
+
+  return (
+    <mesh
+      rotation={[-Math.PI / 2, 0, 0]}
+      position={[0, 0.001, 0]}
+      renderOrder={0}
+    >
+      <circleGeometry args={[6.5, 64]} />
+      <shaderMaterial
+        transparent
+        depthWrite={false}
+        uniforms={uniforms}
+        vertexShader={dimVert}
+        fragmentShader={dimFrag}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  )
+}
+
+const dimVert = /* glsl */ `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`
+
+const dimFrag = /* glsl */ `
+  precision highp float;
+  varying vec2 vUv;
+  uniform float uInner;
+  uniform float uOuter;
+
+  void main() {
+    vec2 c = vUv - 0.5;
+    float r = length(c) * 13.0;
+    float dim = 1.0 - smoothstep(uInner, uOuter, r);
+    if (dim <= 0.001) discard;
+    gl_FragColor = vec4(0.0, 0.0, 0.0, dim * 0.72);
   }
 `

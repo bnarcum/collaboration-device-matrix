@@ -279,7 +279,7 @@ const ringBloomFrag = /* glsl */ `
     float pulse = uTron > 0.5
       ? 0.85 + 0.15 * sin(uTime * 1.6 + uRadius * 0.28)
       : 1.0;
-    float alpha = halo * (uTron > 0.5 ? 0.42 : 0.19) * pulse;
+    float alpha = halo * (uTron > 0.5 ? 0.28 : 0.19) * pulse;
     gl_FragColor = vec4(uColor, alpha);
   }
 `

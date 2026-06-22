@@ -21,7 +21,7 @@ export function SceneEnv() {
       {tron && (
         <directionalLight
           position={[10, 14, 12]}
-          intensity={0.95}
+          intensity={0.85}
           color="#ffffff"
         />
       )}
@@ -30,12 +30,14 @@ export function SceneEnv() {
         intensity={tron ? 0.22 : 0.55}
         color={TRON.cyanDim}
       />
-      <pointLight
-        position={[0, 5, 0]}
-        intensity={tron ? 0.35 : 0.55}
-        color={TRON.cyan}
-        distance={20}
-      />
+      {!tron && (
+        <pointLight
+          position={[0, 5, 0]}
+          intensity={0.55}
+          color={TRON.cyan}
+          distance={20}
+        />
+      )}
       <pointLight
         position={[0, 2, 8]}
         intensity={tron ? 0.28 : 0.28}
