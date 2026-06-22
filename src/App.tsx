@@ -304,6 +304,11 @@ export default function App() {
   }, [mode, tronEnabled])
 
   useEffect(() => {
+    document.body.classList.toggle('showroom-mode', mode === 'showroom')
+    return () => document.body.classList.remove('showroom-mode')
+  }, [mode])
+
+  useEffect(() => {
     const catalogIds = new Set(catalog.map((d) => d.id))
     setCompareIds((prev) => {
       const next = prev.filter((id) => catalogIds.has(id))

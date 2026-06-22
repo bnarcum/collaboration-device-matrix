@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import type { Category, Device } from '../data/types'
 import type { ShowroomFocusMode } from '../three/ShowroomCameraFocus'
+import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 
 const ShowroomScene = lazy(() =>
   import('../scenes/ShowroomScene').then((m) => ({ default: m.ShowroomScene })),
@@ -50,12 +51,15 @@ export function ModeViewport({
     )
   }
 
+  const tron = resolveTronShowroom()
+  const voidColor = tron ? TRON.void : '#051222'
+
   return (
     <Canvas
       camera={{ position: [9, 6, 9], fov: 45 }}
       dpr={[1, 2]}
-      gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-      style={{ background: 'transparent' }}
+      gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
+      style={{ background: voidColor }}
     >
       <Suspense fallback={null}>
         <ShowroomScene

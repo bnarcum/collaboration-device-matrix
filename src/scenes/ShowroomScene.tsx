@@ -44,8 +44,11 @@ export function ShowroomScene({
     [layout.rings],
   )
 
+  const tron = resolveTronShowroom()
+
   return (
     <>
+      <color attach="background" args={[tron ? TRON.void : '#051222']} />
       <SceneEnv />
       <OrbitControls
         makeDefault

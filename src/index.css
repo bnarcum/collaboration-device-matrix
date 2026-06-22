@@ -899,7 +899,20 @@ a:hover {
   width: 100%;
   height: 100%;
   outline: none;
-  background: transparent;
+  background: #051222;
+}
+
+body.showroom-mode .celestial-bg__glow,
+body.showroom-mode .celestial-bg__beams {
+  display: none;
+}
+
+body.showroom-mode .celestial-bg__vignette {
+  opacity: 0.35;
+}
+
+body.tron-showroom .canvas-wrap canvas {
+  background: #000000;
 }
 
 .overlay {

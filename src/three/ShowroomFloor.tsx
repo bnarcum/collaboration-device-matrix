@@ -27,15 +27,13 @@ export function ShowroomFloor({ showGrid }: FloorProps = {}) {
         receiveShadow
       >
         <circleGeometry args={[16, 96]} />
-        <meshStandardMaterial
+        <meshBasicMaterial
           color={tron ? TRON.floor : '#050c18'}
-          roughness={tron ? 0.32 : 0.38}
-          metalness={tron ? 0.38 : 0.12}
           side={THREE.DoubleSide}
         />
       </mesh>
 
-      <CenterDimDisc strength={tron ? 0.72 : 0.58} />
+      <FloorVignette strength={tron ? 0.55 : 0.42} />
 
       {gridOn && <GridDisc tron={tron} />}
     </group>
@@ -158,11 +156,12 @@ const frag = /* glsl */ `
   }
 `
 
-function CenterDimDisc({ strength = 0.65 }: { strength?: number }) {
+/** Soft origin vignette — covers the full disc so no hotspot reads as a stage light. */
+function FloorVignette({ strength = 0.5 }: { strength?: number }) {
   const uniforms = useMemo(
     () => ({
-      uInner: { value: 0.8 },
-      uOuter: { value: 5.2 },
+      uInner: { value: 1.2 },
+      uOuter: { value: 14.5 },
       uStrength: { value: strength },
     }),
     [strength],
@@ -174,7 +173,7 @@ function CenterDimDisc({ strength = 0.65 }: { strength?: number }) {
       position={[0, 0.001, 0]}
       renderOrder={0}
     >
-      <circleGeometry args={[6.5, 64]} />
+      <circleGeometry args={[16, 96]} />
       <shaderMaterial
         transparent
         depthWrite={false}
@@ -204,7 +203,7 @@ const dimFrag = /* glsl */ `
 
   void main() {
     vec2 c = vUv - 0.5;
-    float r = length(c) * 13.0;
+    float r = length(c) * 32.0;
     float dim = 1.0 - smoothstep(uInner, uOuter, r);
     if (dim <= 0.001) discard;
     gl_FragColor = vec4(0.0, 0.0, 0.0, dim * uStrength);

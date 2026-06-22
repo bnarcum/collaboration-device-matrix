@@ -47,28 +47,6 @@ export function ShowroomBackdrop() {
           />
         </mesh>
       )}
-      <mesh rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[14.5, 15.2, 128]} />
-        <meshBasicMaterial
-          color={tron ? TRON.cyan : '#02C8FF'}
-          transparent
-          opacity={tron ? 0.14 : 0.025}
-          depthWrite={false}
-          side={THREE.DoubleSide}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[10.5, 10.85, 96]} />
-        <meshBasicMaterial
-          color={tron ? TRON.orange : '#0A60FF'}
-          transparent
-          opacity={tron ? 0.1 : 0.015}
-          depthWrite={false}
-          side={THREE.DoubleSide}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
     </group>
   )
 }
