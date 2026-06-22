@@ -1,7 +1,8 @@
 /** ~1.5s synth activation sting (Web Audio — no external assets). */
+
 let sharedCtx: AudioContext | null = null
 
-function audioContext(): AudioContext | null {
+function getCtx(): AudioContext | null {
   if (typeof window === 'undefined') return null
   const Ctx =
     window.AudioContext ||
@@ -12,63 +13,64 @@ function audioContext(): AudioContext | null {
   return sharedCtx
 }
 
+/** Call during any user gesture so the context is unlocked before the sting. */
+export function primeTronAudio(): void {
+  const ctx = getCtx()
+  if (ctx?.state === 'suspended') void ctx.resume()
+}
+
 export function playTronGridSting(): void {
   if (typeof window === 'undefined') return
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-  const ctx = audioContext()
+  const ctx = getCtx()
   if (!ctx) return
 
-  const run = () => {
-    const t0 = ctx.currentTime
-    const master = ctx.createGain()
-    master.gain.setValueAtTime(0.0001, t0)
-    master.gain.exponentialRampToValueAtTime(0.2, t0 + 0.03)
-    master.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.65)
-    master.connect(ctx.destination)
+  // Must resume synchronously in the click handler — do not await before scheduling.
+  if (ctx.state === 'suspended') void ctx.resume()
 
-    const filter = ctx.createBiquadFilter()
-    filter.type = 'lowpass'
-    filter.Q.value = 8
-    filter.frequency.setValueAtTime(600, t0)
-    filter.frequency.exponentialRampToValueAtTime(5200, t0 + 0.55)
-    filter.frequency.exponentialRampToValueAtTime(900, t0 + 1.4)
-    filter.connect(master)
+  const t0 = ctx.currentTime + 0.02
+  const master = ctx.createGain()
+  master.gain.setValueAtTime(0, t0)
+  master.gain.linearRampToValueAtTime(0.42, t0 + 0.04)
+  master.gain.linearRampToValueAtTime(0, t0 + 1.7)
+  master.connect(ctx.destination)
 
-    const notes = [146.83, 185, 220, 277.18, 329.63, 440]
-    notes.forEach((freq, i) => {
-      const start = t0 + i * 0.11
-      const osc = ctx.createOscillator()
-      osc.type = i < notes.length - 1 ? 'square' : 'sawtooth'
-      osc.frequency.setValueAtTime(freq, start)
+  const filter = ctx.createBiquadFilter()
+  filter.type = 'lowpass'
+  filter.Q.value = 6
+  filter.frequency.setValueAtTime(500, t0)
+  filter.frequency.linearRampToValueAtTime(4800, t0 + 0.5)
+  filter.frequency.linearRampToValueAtTime(1200, t0 + 1.5)
+  filter.connect(master)
 
-      const env = ctx.createGain()
-      env.gain.setValueAtTime(0.0001, start)
-      env.gain.exponentialRampToValueAtTime(0.14, start + 0.015)
-      env.gain.exponentialRampToValueAtTime(0.0001, start + 0.32)
+  const notes = [146.83, 185, 220, 277.18, 329.63, 440]
+  notes.forEach((freq, i) => {
+    const start = t0 + i * 0.1
+    const osc = ctx.createOscillator()
+    osc.type = i < notes.length - 1 ? 'square' : 'sawtooth'
+    osc.frequency.setValueAtTime(freq, start)
 
-      osc.connect(env)
-      env.connect(filter)
-      osc.start(start)
-      osc.stop(start + 0.34)
-    })
+    const env = ctx.createGain()
+    env.gain.setValueAtTime(0, start)
+    env.gain.linearRampToValueAtTime(0.22, start + 0.012)
+    env.gain.linearRampToValueAtTime(0, start + 0.34)
 
-    const sub = ctx.createOscillator()
-    sub.type = 'sine'
-    sub.frequency.setValueAtTime(55, t0)
-    sub.frequency.exponentialRampToValueAtTime(92, t0 + 0.2)
-    const subEnv = ctx.createGain()
-    subEnv.gain.setValueAtTime(0.25, t0)
-    subEnv.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.45)
-    sub.connect(subEnv)
-    subEnv.connect(master)
-    sub.start(t0)
-    sub.stop(t0 + 0.46)
-  }
+    osc.connect(env)
+    env.connect(filter)
+    osc.start(start)
+    osc.stop(start + 0.36)
+  })
 
-  if (ctx.state === 'suspended') {
-    void ctx.resume().then(run).catch(() => {})
-  } else {
-    run()
-  }
+  const sub = ctx.createOscillator()
+  sub.type = 'sine'
+  sub.frequency.setValueAtTime(55, t0)
+  sub.frequency.linearRampToValueAtTime(98, t0 + 0.18)
+  const subEnv = ctx.createGain()
+  subEnv.gain.setValueAtTime(0.38, t0)
+  subEnv.gain.linearRampToValueAtTime(0, t0 + 0.48)
+  sub.connect(subEnv)
+  subEnv.connect(master)
+  sub.start(t0)
+  sub.stop(t0 + 0.5)
 }

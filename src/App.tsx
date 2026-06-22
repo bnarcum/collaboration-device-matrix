@@ -39,6 +39,7 @@ import {
 } from './hooks/useUrlState'
 import type { ShowroomFocusMode } from './three/ShowroomCameraFocus'
 import { useTronShowroom } from './theme/TronShowroomContext'
+import { playTronGridSting, primeTronAudio } from './ui/tronSting'
 
 const FinderOverlay = lazy(() =>
   import('./ui/FinderOverlay').then((m) => ({ default: m.FinderOverlay })),
@@ -91,6 +92,7 @@ export default function App() {
   const titleClickRef = useRef({ count: 0, timer: 0 as ReturnType<typeof setTimeout> | 0 })
 
   const onTitleClick = useCallback(() => {
+    primeTronAudio()
     const ref = titleClickRef.current
     ref.count += 1
     if (ref.timer) clearTimeout(ref.timer)
@@ -99,7 +101,9 @@ export default function App() {
     }, 650)
     if (ref.count >= 3) {
       ref.count = 0
-      setTronToast(tronEnabled ? 'Grid mode off' : 'Grid mode on')
+      const turningOn = !tronEnabled
+      if (turningOn) playTronGridSting()
+      setTronToast(turningOn ? 'Grid mode on' : 'Grid mode off')
       toggleTron()
       window.setTimeout(() => setTronToast(null), 2200)
     }

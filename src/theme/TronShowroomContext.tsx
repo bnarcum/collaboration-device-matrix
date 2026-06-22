@@ -12,7 +12,6 @@ import {
   resolveTronShowroom,
   setTronShowroomActive,
 } from './tronShowroom'
-import { playTronGridSting } from '../ui/tronSting'
 
 interface TronContextValue {
   enabled: boolean
@@ -31,7 +30,6 @@ export function TronShowroomProvider({ children }: { children: ReactNode }) {
   const toggle = useCallback(() => {
     setEnabled((prev) => {
       const next = !prev
-      if (next) playTronGridSting()
       setTronShowroomActive(next)
       return next
     })
