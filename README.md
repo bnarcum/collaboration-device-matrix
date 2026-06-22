@@ -45,7 +45,7 @@ python3 scripts/remove-backgrounds.py      # cutouts
 
 Default showroom uses the **celestial stage** look. **Tron: Legacy** grid mode is hidden:
 
-- **Triple-click** the title “Collaboration Device Matrix” to toggle (toast confirms)
+- **Triple-click** the title “Collaboration Device Matrix” to toggle (toast + short synth sting)
 - URL: `?tron=1` (on) or `?tron=0` (off) — shareable bookmark
 - Preference persists for the browser session
 
