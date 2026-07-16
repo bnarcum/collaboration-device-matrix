@@ -51,9 +51,9 @@ export const DEVICE_IMAGES: Record<string, string> = {
   'room-navigator-table': img('4b0fa15cf0'),
   'room-navigator-wall': img('2bfc3204c8'),
 
-  // Microphones (page 24)
+  // Microphones (page 23)
   'table-mic-pro': img('cbe669d0f2'),
-  'ceiling-mic-pro': img('5df84a40b4'),
+  'ceiling-mic-pro': img('3b82ce6285'),
   'table-mic': img('76da3a5033'),
   'ceiling-mic': img('5df84a40b4'),
 
@@ -153,9 +153,9 @@ export const DEVICE_PHOTO_ASPECT: Readonly<Partial<Record<string, number>>> = {
   'room-navigator-table': 2.2171,
   'room-navigator-wall': 1.1516,
   'table-mic-pro': 1.6308,
-  'ceiling-mic-pro': 0.9855,
+  'ceiling-mic-pro': 1.0105,
   'table-mic': 0.993,
-  'ceiling-mic': 1.0105,
+  'ceiling-mic': 1.6959,
   'desk-camera-1080': 1.9201,
   'quad-camera': 2.2811,
   'room-vision-ptz': 1.4755,

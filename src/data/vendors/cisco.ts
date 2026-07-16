@@ -436,7 +436,7 @@ export const CISCO_DEVICES: Device[] = [
     colors: ['carbon'],
     surface: C.graphite,
     shape: 'wireless-phone',
-    size: [0.06, 0.16, 0.02],
+    size: [0.15, 0.16, 0.02],
   },
   {
     id: 'wireless-860',
@@ -468,7 +468,7 @@ export const CISCO_DEVICES: Device[] = [
     colors: ['carbon'],
     surface: C.graphite,
     shape: 'wireless-phone',
-    size: [0.05, 0.16, 0.02],
+    size: [0.14, 0.16, 0.02],
   },
 
   // ───────── Headsets ─────────
@@ -648,7 +648,7 @@ export const CISCO_DEVICES: Device[] = [
     colors: ['carbon', 'first-light'],
     surface: C.firstLight,
     shape: 'mic-table',
-    size: [0.12, 0.022, 0.12],
+    size: [0.16, 0.16, 0.12],
   },
   {
     id: 'ceiling-mic',
@@ -682,7 +682,7 @@ export const CISCO_DEVICES: Device[] = [
     colors: ['carbon'],
     surface: C.graphite,
     shape: 'camera-puck',
-    size: [0.1, 0.05, 0.05],
+    size: [0.18, 0.08, 0.05],
   },
   {
     id: 'quad-camera',
