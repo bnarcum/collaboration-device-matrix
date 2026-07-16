@@ -122,7 +122,8 @@ export const CISCO_DEVICES: Device[] = [
     colors: ['carbon', 'first-light'],
     surface: C.carbon,
     shape: 'codec-kit',
-    size: [1.4, 0.55, 0.18],
+    size: [2.4, 1.1, 0.18],
+    photoScale: 1.05,
   },
   {
     id: 'room-bar',

@@ -129,7 +129,7 @@ export const DEVICE_PHOTO_ASPECT: Readonly<Partial<Record<string, number>>> = {
   'neat-board-50': 0.6061,
   'neat-board-65': 0.6446,
   'neat-board-pro-75': 0.6446,
-  'room-kit-eqx': 2.0479,
+  'room-kit-eqx': 1.847,
   'room-bar-byod': 2.5336,
   'room-bar': 1.8635,
   'room-bar-pro': 2.1417,
