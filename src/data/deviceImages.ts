@@ -10,15 +10,13 @@ function img(hash: string): string {
 }
 
 export const DEVICE_IMAGES: Record<string, string> = {
-  // Cisco (Collaboration Device Product Matrix brochure)
+  // Cisco (Collaboration Device Product Matrix brochure — June 2026)
   // Boards & integrators (pages 3–5).
-  // The brochure only contains two Board Pro G2 hero shots: a 3/4-angle
-  // wall-mount that looks tilted once the page background is removed,
-  // and a clean head-on floor-stand shot. We use the latter for both
-  // sizes — the billboards still scale to the device's `size` entry, so
-  // the 75" reads visibly larger than the 55".
-  'board-pro-g2-55': img('7a4fbdb9f3'),
-  'board-pro-g2-75': img('7a4fbdb9f3'),
+  // The brochure contains Board Pro G3 hero shots on pages 3–5. We use the
+  // clean floor-stand shot for both sizes — billboards still scale to each
+  // device's `size` entry so the 75" reads visibly larger than the 55".
+  'board-pro-g3-55': img('e98bdc9a7b'),
+  'board-pro-g3-75': img('e98bdc9a7b'),
   'room-kit-eqx': img('e7c7a7391f'),
   'room-bar-byod': img('4519aeafbe'),
 
@@ -56,13 +54,12 @@ export const DEVICE_IMAGES: Record<string, string> = {
 
   // Microphones (page 24)
   'table-mic-pro': img('cbe669d0f2'),
-  'ceiling-mic-pro': img('e0e483ccb3'),
+  'ceiling-mic-pro': img('5df84a40b4'),
   'table-mic': img('76da3a5033'),
-  'ceiling-mic': img('3b82ce6285'),
+  'ceiling-mic': img('5df84a40b4'),
 
   // Cameras (pages 25–26)
   'desk-camera-1080': img('adb4b47794'),
-  'desk-camera-4k': img('d293d11020'),
   'quad-camera': img('12b412d18f'),
   'room-vision-ptz': img('37e1d7469f'),
   'ptz-4k-camera': img('167ce81553'),
@@ -128,8 +125,8 @@ export const DEVICE_IMAGES: Record<string, string> = {
  * Used for billboard layout before textures finish loading.
  */
 export const DEVICE_PHOTO_ASPECT: Readonly<Partial<Record<string, number>>> = {
-  'board-pro-g2-55': 1.5097,
-  'board-pro-g2-75': 1.5097,
+  'board-pro-g3-55': 1.5097,
+  'board-pro-g3-75': 1.5097,
   'neat-board-50': 0.6061,
   'neat-board-65': 0.6446,
   'neat-board-pro-75': 0.6446,
@@ -161,7 +158,6 @@ export const DEVICE_PHOTO_ASPECT: Readonly<Partial<Record<string, number>>> = {
   'table-mic': 0.993,
   'ceiling-mic': 1.0105,
   'desk-camera-1080': 1.9201,
-  'desk-camera-4k': 1.3388,
   'quad-camera': 2.2811,
   'room-vision-ptz': 1.4755,
   'ptz-4k-camera': 1.4755,

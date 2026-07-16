@@ -48,7 +48,7 @@ except ImportError:
 
 
 ROOT = Path(__file__).resolve().parent.parent
-TS_PATH = ROOT / "src" / "data" / "cisco.ts"
+TS_PATH = ROOT / "src" / "data" / "vendors" / "cisco.ts"
 PDF_PATH = ROOT / "scripts" / "cisco_matrix.pdf"
 REPORT_PATH = ROOT / "docs" / "spec-audit.md"
 
@@ -63,8 +63,8 @@ REPORT_PATH = ROOT / "docs" / "spec-audit.md"
 # style checks because the columns sit side-by-side in the extracted text.
 # ---------------------------------------------------------------------------
 DEVICE_TOKENS: dict[str, list[str]] = {
-    "board-pro-g2-55": ["BOARD PRO 55/75 G2"],
-    "board-pro-g2-75": ["BOARD PRO 55/75 G2"],
+    "board-pro-g3-55": ["BOARD PRO 55/75 G3"],
+    "board-pro-g3-75": ["BOARD PRO 55/75 G3"],
     "room-kit-eqx": ["ROOM KIT EQX"],
     "room-bar": ["ROOM BAR ROOM BAR PRO"],  # page header for pp.6-8
     "room-bar-pro": ["ROOM BAR PRO"],
@@ -96,7 +96,6 @@ DEVICE_TOKENS: dict[str, list[str]] = {
     "table-mic": ["CISCO TABLE MICROPHONE"],
     "ceiling-mic": ["CISCO CEILING MICROPHONE"],
     "desk-camera-1080": ["DESK CAMERA 1080"],
-    "desk-camera-4k": ["DESK CAMERA 4K"],
     "quad-camera": ["QUAD CAMERA"],
     "room-vision-ptz": ["ROOM VISION PTZ"],
     "ptz-4k-camera": ["PTZ 4K CAMERA"],

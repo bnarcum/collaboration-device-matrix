@@ -16,13 +16,13 @@ export const PLATFORM_SOURCE_URLS = {
  */
 export const CISCO_DEVICE_PLATFORMS: Readonly<Record<string, DevicePlatforms>> = {
   // ── Room — MTR + native Zoom app ──
-  'board-pro-g2-55': {
+  'board-pro-g3-55': {
     webex: 'native',
     teams: 'mtr',
     zoom: 'zoom-native',
     google: 'guest',
   },
-  'board-pro-g2-75': {
+  'board-pro-g3-75': {
     webex: 'native',
     teams: 'mtr',
     zoom: 'zoom-native',
@@ -124,5 +124,4 @@ export const CISCO_DEVICE_PLATFORMS: Readonly<Record<string, DevicePlatforms>> =
 
   // ── Personal USB cameras — client apps ──
   'desk-camera-1080': { webex: 'app', teams: 'app', zoom: 'app', google: 'app' },
-  'desk-camera-4k': { webex: 'app', teams: 'app', zoom: 'app', google: 'app' },
 }

@@ -58,7 +58,7 @@ export function estimateBillboardPlane(
 /** Aisle tall-shelf img-wrap dimensions (must match index.css). */
 export const AISLE_TALL_IMG_WRAP = { width: 260, height: 460 } as const
 
-/** Reference board for cross-vendor aisle scale (75" Cisco Board Pro G2). */
+/** Reference board for cross-vendor aisle scale (75" Cisco Board Pro G3). */
 const AISLE_REF_BOARD = {
   displayWidth: 1.7,
   displayHeight: 1.05,

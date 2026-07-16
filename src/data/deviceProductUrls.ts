@@ -1,10 +1,10 @@
 /** Official product page URLs — verify with `npm run verify:product-urls`. */
 export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
   // Cisco
-'board-pro-g2-55':
-    'https://www.cisco.com/c/en/us/support/collaboration-endpoints/board-pro-g2/model.html',
-  'board-pro-g2-75':
-    'https://www.cisco.com/c/en/us/support/collaboration-endpoints/board-pro-g2/model.html',
+'board-pro-g3-55':
+    'https://www.webex.com/us/en/devices/board-series/cisco-board-pro.html',
+  'board-pro-g3-75':
+    'https://www.webex.com/us/en/devices/board-series/cisco-board-pro.html',
   'room-kit-eqx':
     'https://www.cisco.com/c/en/us/support/collaboration-endpoints/room-kit-eqx/model.html',
   'room-bar':
@@ -63,8 +63,6 @@ export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/telepresence-microphones/datasheet-c78-736073.html',
   'desk-camera-1080':
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/webex-desk-series/desk-camera-1080p-ds.html',
-  'desk-camera-4k':
-    'https://www.cisco.com/c/en/us/products/collateral/collaboration/datasheet-c78-744525.html',
   'quad-camera':
     'https://www.webex.com/us/en/devices/cameras/cisco-quad-camera.html',
   'room-vision-ptz':
