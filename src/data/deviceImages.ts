@@ -12,11 +12,10 @@ function img(hash: string): string {
 export const DEVICE_IMAGES: Record<string, string> = {
   // Cisco (Collaboration Device Product Matrix brochure — June 2026)
   // Boards & integrators (pages 3–5).
-  // The brochure contains Board Pro G3 hero shots on pages 3–5. We use the
-  // clean floor-stand shot for both sizes — billboards still scale to each
-  // device's `size` entry so the 75" reads visibly larger than the 55".
-  'board-pro-g3-55': img('e98bdc9a7b'),
-  'board-pro-g3-75': img('e98bdc9a7b'),
+  // Board Pro G3 floor-stand hero (page 3, center column). Page 3 also has
+  // Room Bar BYOD (e98bdc9a7b) and Room Kit EQX (e7c7a7391f) — do not swap.
+  'board-pro-g3-55': img('9dc39ce9a6'),
+  'board-pro-g3-75': img('9dc39ce9a6'),
   'room-kit-eqx': img('e7c7a7391f'),
   'room-bar-byod': img('4519aeafbe'),
 
