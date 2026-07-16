@@ -151,7 +151,8 @@ export const CISCO_DEVICES: Device[] = [
     colors: ['carbon', 'first-light'],
     surface: C.carbon,
     shape: 'video-bar',
-    size: [0.9, 0.08, 0.09],
+    size: [1.05, 0.08, 0.09],
+    photoScale: 1.05,
   },
   {
     id: 'room-bar-pro',
@@ -207,7 +208,8 @@ export const CISCO_DEVICES: Device[] = [
     colors: ['carbon', 'first-light'],
     surface: C.carbon,
     shape: 'video-bar',
-    size: [0.85, 0.075, 0.085],
+    size: [1.05, 0.075, 0.085],
+    photoScale: 1.05,
   },
   {
     id: 'room-kit-eq',
