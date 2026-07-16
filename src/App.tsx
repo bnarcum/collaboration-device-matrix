@@ -616,6 +616,22 @@ export default function App() {
           </a>
           <a
             className="source-link"
+            href="https://www.webex.com/content/dam/www/us/en/documents/pdf/cisco-device-brochure_cm-6028.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open the Cisco Device Brochure (PDF, opens in a new tab)"
+            title="Cisco Device Brochure (PDF)"
+          >
+            <span className="source-link-icon" aria-hidden>
+              ⤓
+            </span>
+            <span className="source-link-text">
+              <span className="source-link-label">Cisco Device Brochure</span>
+              <span className="source-link-meta">Cisco · PDF</span>
+            </span>
+          </a>
+          <a
+            className="source-link"
             href="https://roomos.cisco.com/doc/Welcome/Welcome"
             target="_blank"
             rel="noopener noreferrer"
