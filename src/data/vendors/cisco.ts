@@ -51,7 +51,7 @@ export const CISCO_DEVICES: Device[] = [
     surface: C.carbon,
     shape: 'board',
     size: [1.3, 0.8, 0.06],
-    photoScale: 1.15,
+    photoScale: 0.9,
   },
   {
     id: 'board-pro-g3-75',
@@ -92,7 +92,7 @@ export const CISCO_DEVICES: Device[] = [
     surface: C.carbon,
     shape: 'board',
     size: [1.7, 1.05, 0.07],
-    photoScale: 1.15,
+    photoScale: 0.9,
   },
   {
     id: 'room-kit-eqx',
