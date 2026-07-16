@@ -124,8 +124,8 @@ export const DEVICE_IMAGES: Record<string, string> = {
  * Used for billboard layout before textures finish loading.
  */
 export const DEVICE_PHOTO_ASPECT: Readonly<Partial<Record<string, number>>> = {
-  'board-pro-g3-55': 1.5097,
-  'board-pro-g3-75': 1.5097,
+  'board-pro-g3-55': 1.1786,
+  'board-pro-g3-75': 1.1786,
   'neat-board-50': 0.6061,
   'neat-board-65': 0.6446,
   'neat-board-pro-75': 0.6446,
@@ -134,7 +134,7 @@ export const DEVICE_PHOTO_ASPECT: Readonly<Partial<Record<string, number>>> = {
   'room-bar': 1.8635,
   'room-bar-pro': 2.1417,
   'room-kit-eq': 2.1504,
-  'room-kit-pro-g2': 1.3037,
+  'room-kit-pro-g2': 1.4894,
   'desk-pro-g2': 1.1606,
   'desk-mini': 1.2685,
   'wireless-9821': 1.0703,
