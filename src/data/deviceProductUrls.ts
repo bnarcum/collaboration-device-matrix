@@ -25,9 +25,27 @@ export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/webex-desk-mini/webex-desk-mini.html',
   'video-phone-8875':
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-8800-series/video-phone-8875-ds.html',
+  'desk-phone-8811':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-8800-series/datasheet-c78-739624.html',
+  'desk-phone-8841':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-8800-series/datasheet-c78-739624.html',
+  'desk-phone-8851':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-8800-series/datasheet-c78-739624.html',
+  'desk-phone-8861':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-8800-series/datasheet-c78-739624.html',
+  'kem-8800':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-8800-series/datasheet-c78-739624.html',
+  'desk-phone-9811':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-phones/desk-phone-9800-series-ds.html',
   'desk-phone-9871':
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-phones/desk-phone-9800-series-ds.html',
   'desk-phone-9841':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-phones/desk-phone-9800-series-ds.html',
+  'desk-phone-9851':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-phones/desk-phone-9800-series-ds.html',
+  'desk-phone-9861':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-phones/desk-phone-9800-series-ds.html',
+  'kem-9800':
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-phones/desk-phone-9800-series-ds.html',
   'conference-8832':
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-8800-series/datasheet-c78-739624.html',

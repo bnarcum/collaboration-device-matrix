@@ -456,7 +456,9 @@ function buildSections(
       id: 'phones-desk',
       category: 'phone',
       label: 'Desk phones',
-      match: (d) => d.category === 'phone' && d.shape === 'desk-phone',
+      match: (d) =>
+        d.category === 'phone' &&
+        (d.shape === 'desk-phone' || d.shape === 'kem'),
     },
     {
       id: 'phones-conf',
@@ -469,8 +471,7 @@ function buildSections(
       category: 'phone',
       label: 'Wireless phones',
       match: (d) =>
-        d.category === 'phone' &&
-        (d.shape === 'wireless-phone' || d.shape === 'kem'),
+        d.category === 'phone' && d.shape === 'wireless-phone',
     },
     {
       id: 'headsets',

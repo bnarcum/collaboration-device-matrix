@@ -98,8 +98,17 @@ export const CISCO_DEVICE_PLATFORMS: Readonly<Record<string, DevicePlatforms>> =
 
   // ── Phones — UC apps (not Teams Rooms) ──
   'video-phone-8875': { webex: 'app', teams: 'app', zoom: 'app' },
+  'desk-phone-8811': { webex: 'app', teams: 'app', zoom: 'app' },
+  'desk-phone-8841': { webex: 'app', teams: 'app', zoom: 'app' },
+  'desk-phone-8851': { webex: 'app', teams: 'app', zoom: 'app' },
+  'desk-phone-8861': { webex: 'app', teams: 'app', zoom: 'app' },
+  'kem-8800': { webex: 'app', teams: 'app', zoom: 'app' },
+  'desk-phone-9811': { webex: 'app', teams: 'app', zoom: 'app' },
   'desk-phone-9871': { webex: 'app', teams: 'app', zoom: 'app' },
   'desk-phone-9841': { webex: 'app', teams: 'app', zoom: 'app' },
+  'desk-phone-9851': { webex: 'app', teams: 'app', zoom: 'app' },
+  'desk-phone-9861': { webex: 'app', teams: 'app', zoom: 'app' },
+  'kem-9800': { webex: 'app', teams: 'app', zoom: 'app' },
   'conference-8832': { webex: 'app', teams: 'app', zoom: 'app' },
   'wireless-9821': { webex: 'app', teams: 'app', zoom: 'app' },
   'wireless-860': { webex: 'app', teams: 'app', zoom: 'app' },
