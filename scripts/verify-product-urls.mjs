@@ -67,7 +67,8 @@ function skuMismatch(id, title, url) {
 const BAD_BODY =
   /page not found|404 - page not found|cannot be found|error 404|>404<|we couldn't find|page you requested/i
 const BAD_TITLE = /page not found|404|not found/i
-const WEBEX_HOST = /^https:\/\/www\.webex\.com\//i
+const BOT_GUARD_HOST =
+  /^https:\/\/www\.(?:webex|cisco)\.com\//i
 
 const UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -81,8 +82,8 @@ async function checkOnce({ id, url }) {
   const body = await res.text()
   const title = body.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() ?? ''
 
-  if (res.status === 403 && WEBEX_HOST.test(url)) {
-    return { id, url, status: 'skip', detail: '403 (Webex bot guard — verify in browser)' }
+  if (res.status === 403 && BOT_GUARD_HOST.test(url)) {
+    return { id, url, status: 'skip', detail: '403 (bot guard — verify in browser)' }
   }
   if (res.status === 429 || res.status >= 500) {
     return { id, url, status: 'skip', detail: `HTTP ${res.status} (transient)` }
