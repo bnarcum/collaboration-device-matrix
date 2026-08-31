@@ -26,7 +26,7 @@ export function ShowroomFloor({ showGrid }: FloorProps = {}) {
         position={[0, 0, 0]}
         receiveShadow
       >
-        <circleGeometry args={[16, 96]} />
+        <circleGeometry args={[18, 96]} />
         <meshBasicMaterial
           color={tron ? TRON.floor : '#050c18'}
           side={THREE.DoubleSide}
@@ -52,7 +52,7 @@ function GridDisc({ tron }: { tron: boolean }) {
       uMinorColor: { value: new THREE.Color(tron ? TRON.gridMinor : '#1a283b') },
       uAccent: { value: new THREE.Color(tron ? TRON.cyan : '#02C8FF') },
       uFadeInner: { value: tron ? 11.5 : 10.5 },
-      uFadeOuter: { value: tron ? 16.5 : 16.5 },
+      uFadeOuter: { value: tron ? 18.5 : 18.5 },
       uOverallAlpha: { value: tron ? 1.0 : 0.92 },
       uTime: { value: 0 },
       uTron: { value: tron ? 1 : 0 },
@@ -71,7 +71,7 @@ function GridDisc({ tron }: { tron: boolean }) {
       position={[0, 0.002, 0]}
       renderOrder={1}
     >
-      <circleGeometry args={[16, 96]} />
+      <circleGeometry args={[18, 96]} />
       <shaderMaterial
         transparent
         depthWrite={false}
@@ -173,7 +173,7 @@ function FloorVignette({ strength = 0.5 }: { strength?: number }) {
       position={[0, 0.001, 0]}
       renderOrder={0}
     >
-      <circleGeometry args={[16, 96]} />
+      <circleGeometry args={[18, 96]} />
       <shaderMaterial
         transparent
         depthWrite={false}

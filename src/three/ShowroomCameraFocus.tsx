@@ -4,12 +4,9 @@ import * as THREE from 'three'
 import type { Category, Device } from '../data/types'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { estimateBillboardPlane } from './billboardSizing'
+import type { ShowroomPlacement } from './showroomLayout'
 
-export interface ShowroomPlacement {
-  device: Device
-  position: [number, number, number]
-  rotationY: number
-}
+export type { ShowroomPlacement }
 
 interface CameraFrame {
   position: THREE.Vector3
@@ -68,6 +65,48 @@ function overviewFrame(): CameraFrame {
   }
 }
 
+/** Frame a filtered horseshoe so devices sit mid-view, not on the horizon. */
+function frameForCategory(placements: ShowroomPlacement[]): CameraFrame {
+  if (placements.length === 0) return overviewFrame()
+
+  let cx = 0
+  let cz = 0
+  let minX = Infinity
+  let maxX = -Infinity
+  let minZ = Infinity
+  let maxZ = -Infinity
+  let lookYSum = 0
+
+  for (const p of placements) {
+    const [x, , z] = p.position
+    const plane = estimateBillboardPlane(p.device)
+    cx += x
+    cz += z
+    minX = Math.min(minX, x - plane.planeW * 0.45)
+    maxX = Math.max(maxX, x + plane.planeW * 0.45)
+    minZ = Math.min(minZ, z)
+    maxZ = Math.max(maxZ, z)
+    lookYSum += plane.planeH * 0.4 + 0.1
+  }
+
+  const n = placements.length
+  cx /= n
+  cz /= n
+  const lookY = lookYSum / n
+  const width = Math.max(1.1, maxX - minX)
+  const depth = Math.max(0.8, maxZ - minZ)
+
+  const fov = (45 * Math.PI) / 180
+  const fitW = width * 0.5 / Math.tan(fov * 0.5)
+  const standOff = Math.max(2.15, fitW * 0.9, depth * 0.5 + 1.85)
+  const lift = Math.min(2.15, Math.max(0.95, lookY * 0.55 + width * 0.1))
+
+  return {
+    position: new THREE.Vector3(cx + width * 0.03, lookY + lift, maxZ + standOff),
+    target: new THREE.Vector3(cx, lookY, cz),
+  }
+}
+
 export type ShowroomFocusMode = 'hero' | 'ring'
 
 interface Props {
@@ -77,7 +116,6 @@ interface Props {
   filter?: Category | 'all'
   /** hero = tight product shot; ring = full showroom floor (overview). */
   focusMode?: ShowroomFocusMode
-  ringRadius?: number
 }
 
 /** Stable key for layout changes (filter / device list / ring geometry). */
@@ -139,13 +177,15 @@ export function ShowroomCameraFocus({
         const placement = placements.find((p) => p.device.id === selected.id)
         if (!placement) return
         frame = frameForDevice(placement.device, placement.position)
+      } else if (filter !== 'all' && placements.length > 0) {
+        frame = frameForCategory(placements)
       } else {
         frame = overviewFrame()
       }
 
       applyGoalToCamera(frame, true)
     },
-    [selected, placements, focusMode, applyGoalToCamera],
+    [selected, placements, focusMode, filter, applyGoalToCamera],
   )
 
   useLayoutEffect(() => {
