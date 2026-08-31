@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Html, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
@@ -45,6 +45,7 @@ export function ShowroomScene({
   )
 
   const tron = resolveTronShowroom()
+  const [hoveredId, setHoveredId] = useState<string | null>(null)
 
   return (
     <>
@@ -83,8 +84,10 @@ export function ShowroomScene({
           position={p.position}
           rotationY={p.rotationY}
           selected={selected?.id === p.device.id}
+          hovered={hoveredId === p.device.id}
           showLabel
           onClick={onSelect}
+          onHover={(d) => setHoveredId(d?.id ?? null)}
         />
       ))}
 

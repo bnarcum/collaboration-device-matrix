@@ -1,5 +1,21 @@
 import type { Category, Device, RoomSize } from './types'
 
+export type FinderNeed = 'any' | 'video' | 'wireless' | 'kem'
+
+export const FINDER_NEED_LABELS: Record<FinderNeed, string> = {
+  any: 'No extra requirement',
+  video: 'Needs video',
+  wireless: 'Wireless / mobile',
+  kem: 'Key expansion',
+}
+
+export const FINDER_NEED_ORDER: FinderNeed[] = [
+  'any',
+  'video',
+  'wireless',
+  'kem',
+]
+
 export const FINDER_QUESTIONS = [
   {
     title: 'What kind of space?',
@@ -33,17 +49,62 @@ export const FINDER_QUESTIONS = [
       { label: 'Headset', value: 'headset' as Category, hint: 'USB, Bluetooth, DECT' },
     ],
   },
+  {
+    title: 'Any must-have?',
+    options: [
+      { label: 'Anything', value: 'any' as FinderNeed, hint: 'No extra filter' },
+      { label: 'Video', value: 'video' as FinderNeed, hint: 'Camera or video phone' },
+      {
+        label: 'Wireless',
+        value: 'wireless' as FinderNeed,
+        hint: 'DECT, Wi-Fi, on the go',
+      },
+      {
+        label: 'More line keys',
+        value: 'kem' as FinderNeed,
+        hint: 'Key expansion module',
+      },
+    ],
+  },
 ] as const
 
-/** Narrow a device list using completed Finder answers (room size + optional category). */
+export function deviceMatchesFinderNeed(
+  device: Device,
+  need?: FinderNeed,
+): boolean {
+  if (!need || need === 'any') return true
+  if (need === 'video') {
+    return (
+      device.category === 'camera' ||
+      Boolean(device.camera) ||
+      /video/i.test(device.name) ||
+      /video|camera|1080|4k/i.test(device.formFactor)
+    )
+  }
+  if (need === 'wireless') {
+    return (
+      device.shape === 'wireless-phone' ||
+      device.roomSizes.includes('mobile') ||
+      /wireless|dect|wi-?fi/i.test(`${device.family} ${device.formFactor}`)
+    )
+  }
+  return (
+    device.shape === 'kem' ||
+    /expansion|kem/i.test(`${device.name} ${device.formFactor}`)
+  )
+}
+
+/** Narrow a device list using completed Finder answers. */
 export function filterDevicesByFinder(
   devices: readonly Device[],
   roomSize: RoomSize,
   category?: Category,
+  need?: FinderNeed,
 ): Device[] {
   return devices.filter((d) => {
     if (!d.roomSizes.includes(roomSize)) return false
     if (category && d.category !== category) return false
+    if (!deviceMatchesFinderNeed(d, need)) return false
     return true
   })
 }

@@ -1,11 +1,16 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { CATEGORY_LABELS, type Category, type RoomSize } from '../data/types'
-import { FINDER_QUESTIONS } from '../data/finder'
+import {
+  FINDER_NEED_LABELS,
+  FINDER_QUESTIONS,
+  type FinderNeed,
+} from '../data/finder'
 
 export interface FinderState {
-  step: 0 | 1 | 2
+  step: 0 | 1 | 2 | 3
   roomSize?: RoomSize
   category?: Category
+  need?: FinderNeed
 }
 
 interface Props {
@@ -14,7 +19,7 @@ interface Props {
 }
 
 export function FinderOverlay({ state, setState }: Props) {
-  if (state.step >= 2) {
+  if (state.step >= 3) {
     return (
       <motion.div
         className="finder-summary"
@@ -44,6 +49,22 @@ export function FinderOverlay({ state, setState }: Props) {
             {state.category ? formatCategory(state.category) : 'Anything'}
             <span className="chip-edit">edit</span>
           </button>
+          <button
+            className="chip"
+            onClick={() =>
+              setState({
+                step: 2,
+                roomSize: state.roomSize,
+                category: state.category,
+              })
+            }
+            title="Change requirement"
+          >
+            {state.need && state.need !== 'any'
+              ? FINDER_NEED_LABELS[state.need]
+              : 'Any requirement'}
+            <span className="chip-edit">edit</span>
+          </button>
         </div>
         <button
           className="finder-restart"
@@ -55,7 +76,7 @@ export function FinderOverlay({ state, setState }: Props) {
     )
   }
 
-  const q = FINDER_QUESTIONS[state.step as 0 | 1]
+  const q = FINDER_QUESTIONS[state.step as 0 | 1 | 2]
   if (!q) return null
 
   return (
@@ -69,11 +90,17 @@ export function FinderOverlay({ state, setState }: Props) {
         transition={{ duration: 0.25 }}
       >
         <div className="finder-step">
-          <span>Step {state.step + 1} of 2</span>
+          <span>Step {state.step + 1} of 3</span>
           {state.step > 0 && (
             <button
               className="finder-back"
-              onClick={() => setState({ step: 0 })}
+              onClick={() =>
+                setState(
+                  state.step === 2
+                    ? { step: 1, roomSize: state.roomSize }
+                    : { step: 0 },
+                )
+              }
             >
               ← Back
             </button>
@@ -91,11 +118,18 @@ export function FinderOverlay({ state, setState }: Props) {
                     step: 1,
                     roomSize: opt.value as RoomSize,
                   })
-                } else {
+                } else if (state.step === 1) {
                   setState({
                     step: 2,
                     roomSize: state.roomSize,
                     category: opt.value as Category | undefined,
+                  })
+                } else {
+                  setState({
+                    step: 3,
+                    roomSize: state.roomSize,
+                    category: state.category,
+                    need: (opt.value as FinderNeed | undefined) ?? 'any',
                   })
                 }
               }}

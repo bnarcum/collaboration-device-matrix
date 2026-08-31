@@ -26,5 +26,8 @@ jobs:
       - name: Verify product image files
         run: node scripts/verify-device-images.mjs
 
+      - name: Verify brochure catalog coverage
+        run: npm run verify:brochure
+
       - name: Verify product URLs
         run: npm run verify:product-urls

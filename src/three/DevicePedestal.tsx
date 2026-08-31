@@ -8,6 +8,7 @@ import { useReducedMotion } from '../hooks/useReducedMotion'
 import { DeviceFloatingLabel } from '../ui/DeviceFloatingLabel'
 import { DeviceModel } from './DeviceModel'
 import {
+  categoryMinFootprint,
   estimateBillboardPlane,
   type BillboardPlane,
 } from './billboardSizing'
@@ -22,7 +23,8 @@ interface Props {
   /** Scale applied uniformly. */
   scale?: number
   selected?: boolean
-  /** Show floating label & price chip. */
+  hovered?: boolean
+  /** Show floating label when selected or hovered. */
   showLabel?: boolean
   onClick?: (device: Device) => void
   /** Hover handler for the carousel mode. */
@@ -37,6 +39,7 @@ export function DevicePedestal({
   rotationY = 0,
   scale = 1,
   selected = false,
+  hovered = false,
   showLabel = false,
   onClick,
   onHover,
@@ -108,6 +111,7 @@ export function DevicePedestal({
               displaySize={displaySize}
               photoScale={device.photoScale}
               pedestalScale={scale}
+              minFootprint={categoryMinFootprint(device) * scale}
               aspectHint={devicePhotoAspect(device.id)}
               selected={selected}
               onPlaneSize={onPlaneSize}
@@ -126,7 +130,7 @@ export function DevicePedestal({
         </>
       )}
       {selected && <SelectionSpot footprint={footprint} />}
-      {showLabel && (
+      {showLabel && (selected || hovered) && (
         <Html
           position={[0, (imageUrl ? planeH : device.size[1]) + 0.35, 0]}
           center

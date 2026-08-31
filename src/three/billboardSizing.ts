@@ -24,7 +24,11 @@ export function computeBillboardPlane(
   displayWidth: number,
   displayHeight: number,
   imageAspect: number,
-  options?: { photoScale?: number; pedestalScale?: number },
+  options?: {
+    photoScale?: number
+    pedestalScale?: number
+    minFootprint?: number
+  },
 ): BillboardPlane {
   const photoScale = options?.photoScale ?? 1
   const pedestalScale = options?.pedestalScale ?? 1
@@ -40,7 +44,25 @@ export function computeBillboardPlane(
     planeW = planeH * imageAspect
   }
 
+  const min = options?.minFootprint ?? 0
+  const footprint = Math.max(planeW, planeH)
+  if (min > 0 && footprint < min) {
+    const grow = min / footprint
+    planeW *= grow
+    planeH *= grow
+  }
+
   return { planeW, planeH, footprint: Math.max(planeW, planeH) }
+}
+
+/** Keep small SKUs readable in the showroom without changing catalog size. */
+export function categoryMinFootprint(device: Device): number {
+  if (device.shape === 'camera-puck') return 0.14
+  if (device.shape === 'kem') return 0.14
+  if (device.category === 'phone') return 0.13
+  if (device.category === 'headset') return 0.12
+  if (device.shape === 'mic-table' || device.shape === 'mic-ceiling') return 0.12
+  return 0
 }
 
 /** Footprint estimate before the texture finishes loading. */
@@ -52,6 +74,7 @@ export function estimateBillboardPlane(
   return computeBillboardPlane(device.size[0], device.size[1], aspect, {
     photoScale: devicePhotoScale(device),
     pedestalScale,
+    minFootprint: categoryMinFootprint(device) * pedestalScale,
   })
 }
 
@@ -82,7 +105,10 @@ export function aisleProductImageRatios(device: Device): AisleImageRatios {
     device.size[0],
     device.size[1],
     aspect,
-    { photoScale: devicePhotoScale(device) },
+    {
+      photoScale: devicePhotoScale(device),
+      minFootprint: categoryMinFootprint(device),
+    },
   )
 
   const refPlane = computeBillboardPlane(

@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "verify:product-urls": "node scripts/verify-product-urls.mjs",
-    "verify:images": "node scripts/verify-device-images.mjs"
+    "verify:images": "node scripts/verify-device-images.mjs",
+    "verify:brochure": "python3 scripts/audit-brochure-coverage.py"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

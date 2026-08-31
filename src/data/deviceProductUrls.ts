@@ -55,12 +55,38 @@ export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/webex-wireless-phone/datasheet-c78-744461.html',
   'dect-6825':
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-dect-6800-series-multiplatform-firmware/ip-dect-6800-series-ds.html',
+  'wireless-3905':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-sip-phone-3900-series/data_sheet_c78-612429.html',
+  'desk-phone-6821':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-phone-6800-series-multiplatform-firmware/datasheet-c78-737307.html',
+  'dect-6823':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-dect-6800-series-multiplatform-firmware/ip-dect-6800-series-ds.html',
+  'desk-phone-6851':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-phone-6800-series-multiplatform-firmware/datasheet-c78-737307.html',
+  'kem-6851':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-phone-6800-series-multiplatform-firmware/datasheet-c78-737307.html',
+  'desk-phone-6901':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-6900-series/data_sheet_c78-603025.html',
+  'desk-phone-7811':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-7800-series/datasheet-c78-729490.html',
+  'desk-phone-7821':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-7800-series/datasheet-c78-729490.html',
+  'conference-7832':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-7800-series/datasheet-c78-729490.html',
+  'desk-phone-7841':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-7800-series/datasheet-c78-729490.html',
+  'desk-phone-7861':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-7800-series/datasheet-c78-729490.html',
   'headset-320':
     'https://www.cisco.com/c/en/us/support/collaboration-endpoints/headset-320/model.html',
   'headset-520':
     'https://www.webex.com/us/en/devices/headsets/cisco-headset-500-series.html',
+  'headset-530':
+    'https://www.webex.com/us/en/devices/headsets/cisco-headset-500-series.html',
   'headset-560':
     'https://www.webex.com/us/en/devices/headsets/cisco-headset-500-series.html',
+  'headset-720':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/headset-720-series/headset-720-ds.html',
   'headset-730':
     'https://www.cisco.com/c/en/us/support/collaboration-endpoints/headset-730/model.html',
   'headset-bang-olufsen-900':

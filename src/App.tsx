@@ -18,7 +18,11 @@ import { VENDORS } from './data/vendors'
 import { DeviceDrawer } from './ui/DeviceDrawer'
 import { CompareTray } from './ui/CompareTray'
 import { CompareModal } from './ui/CompareModal'
-import { filterDevicesByFinder } from './data/finder'
+import {
+  filterDevicesByFinder,
+  FINDER_NEED_ORDER,
+  type FinderNeed,
+} from './data/finder'
 import type { FinderState } from './ui/FinderOverlay'
 import { SearchBar } from './ui/SearchBar'
 import { CelestialBackground } from './ui/CelestialBackground'
@@ -143,6 +147,11 @@ export default function App() {
     'for',
     null,
     enumCodec(['any', ...CATEGORY_ORDER], null),
+  )
+  const [finderNeedRaw, setFinderNeedRaw] = useUrlState<FinderNeed | null>(
+    'need',
+    null,
+    enumCodec(FINDER_NEED_ORDER, null),
   )
   const [compareIds, setCompareIds] = useUrlState<string[]>(
     'compare',
@@ -332,31 +341,48 @@ export default function App() {
   const finderState: FinderState = useMemo(() => {
     if (!roomSize) return { step: 0 }
     if (finderForRaw === null) return { step: 1, roomSize }
+    if (finderNeedRaw === null) {
+      return {
+        step: 2,
+        roomSize,
+        category:
+          finderForRaw === 'any' ? undefined : (finderForRaw as Category),
+      }
+    }
     return {
-      step: 2,
+      step: 3,
       roomSize,
       category:
         finderForRaw === 'any' ? undefined : (finderForRaw as Category),
+      need: finderNeedRaw,
     }
-  }, [roomSize, finderForRaw])
+  }, [roomSize, finderForRaw, finderNeedRaw])
 
   const setFinderState = useCallback(
     (s: FinderState) => {
       if (s.step === 0) {
         setRoomSize(null)
         setFinderForRaw(null)
+        setFinderNeedRaw(null)
         setFinderPanelOpen(true)
       } else if (s.step === 1) {
         setRoomSize(s.roomSize ?? null)
         setFinderForRaw(null)
+        setFinderNeedRaw(null)
+        setFinderPanelOpen(true)
+      } else if (s.step === 2) {
+        setRoomSize(s.roomSize ?? null)
+        setFinderForRaw(s.category ?? 'any')
+        setFinderNeedRaw(null)
         setFinderPanelOpen(true)
       } else {
         setRoomSize(s.roomSize ?? null)
         setFinderForRaw(s.category ?? 'any')
+        setFinderNeedRaw(s.need ?? 'any')
         setFinderPanelOpen(false)
       }
     },
-    [setRoomSize, setFinderForRaw],
+    [setRoomSize, setFinderForRaw, setFinderNeedRaw],
   )
 
   const openFinder = useCallback(() => {
@@ -367,16 +393,17 @@ export default function App() {
   const clearFinder = useCallback(() => {
     setRoomSize(null)
     setFinderForRaw(null)
+    setFinderNeedRaw(null)
     setFinderPanelOpen(false)
-  }, [setRoomSize, setFinderForRaw])
+  }, [setRoomSize, setFinderForRaw, setFinderNeedRaw])
 
-  const finderComplete = finderState.step >= 2
+  const finderComplete = finderState.step >= 3
 
   useEffect(() => {
-    if (roomSize && finderForRaw === null) {
+    if (roomSize && (finderForRaw === null || finderNeedRaw === null)) {
       setFinderPanelOpen(true)
     }
-  }, [roomSize, finderForRaw])
+  }, [roomSize, finderForRaw, finderNeedRaw])
 
   const visibleDevices = useMemo(() => {
     const byCategory =
@@ -405,8 +432,15 @@ export default function App() {
       visibleDevices,
       finderState.roomSize,
       finderState.category,
+      finderState.need,
     )
-  }, [visibleDevices, finderComplete, finderState.roomSize, finderState.category])
+  }, [
+    visibleDevices,
+    finderComplete,
+    finderState.roomSize,
+    finderState.category,
+    finderState.need,
+  ])
 
   const selectDevice = useCallback(
     (d: Device | null) => {
@@ -469,7 +503,7 @@ export default function App() {
         tag === 'select' ||
         target?.isContentEditable === true
       if (e.key === 'Escape') {
-        if (finderPanelOpen && finderState.step < 2) {
+        if (finderPanelOpen && finderState.step < 3) {
           clearFinder()
           e.preventDefault()
           return
@@ -731,7 +765,7 @@ export default function App() {
               onClearFinder={clearFinder}
             />
           )}
-          {(finderPanelOpen && finderState.step < 2) || finderComplete ? (
+          {(finderPanelOpen && finderState.step < 3) || finderComplete ? (
             <Suspense fallback={null}>
               <FinderOverlay state={finderState} setState={setFinderState} />
             </Suspense>

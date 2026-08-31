@@ -6,8 +6,8 @@ const NA = '—'
 export function compareDisplay(d: Device): string {
   if (d.display) return d.display
   if (d.category === 'camera') return 'N/A (camera-only)'
-  if (d.category === 'phone' || d.category === 'headset')
-    return 'N/A (no integrated display)'
+  if (d.category === 'headset') return 'N/A (headset)'
+  if (d.shape === 'kem') return 'See form factor'
   if (d.category === 'peripheral' && d.shape === 'navigator')
     return d.formFactor.includes('touch') ? 'See form factor' : NA
   return NA
@@ -15,8 +15,10 @@ export function compareDisplay(d: Device): string {
 
 export function compareCamera(d: Device): string {
   if (d.camera) return d.camera
-  if (d.category === 'phone' || d.category === 'headset')
-    return 'N/A (voice device)'
+  if (d.id.includes('8875') || /video phone/i.test(d.name))
+    return 'Integrated HD camera'
+  if (d.category === 'headset') return 'N/A (headset)'
+  if (d.category === 'phone') return 'No camera'
   if (d.category === 'peripheral') return 'N/A (peripheral)'
   return NA
 }
@@ -35,6 +37,10 @@ export function compareConnectivity(d: Device): string {
 
 export function compareSoftware(d: Device): string {
   if (d.software?.length) return d.software.join(', ')
+  if (d.category === 'phone' || d.category === 'headset') {
+    if (d.family.includes('9800')) return 'PhoneOS'
+    return 'SIP / multiplatform firmware'
+  }
   if (d.vendorId === 'cisco') return 'RoomOS (see datasheet)'
   return NA
 }

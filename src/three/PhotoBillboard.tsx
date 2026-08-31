@@ -47,6 +47,7 @@ interface Props {
   displaySize: [number, number]
   photoScale?: number
   pedestalScale?: number
+  minFootprint?: number
   /** Known width ÷ height before the texture loads. */
   aspectHint?: number
   selected?: boolean
@@ -89,6 +90,7 @@ export function PhotoBillboard({
   displaySize,
   photoScale = 1,
   pedestalScale = 1,
+  minFootprint = 0,
   aspectHint,
   selected = false,
   onPlaneSize,
@@ -120,8 +122,9 @@ export function PhotoBillboard({
     return computeBillboardPlane(displaySize[0], displaySize[1], aspect, {
       photoScale,
       pedestalScale,
+      minFootprint,
     })
-  }, [texture, aspectHint, displaySize, photoScale, pedestalScale])
+  }, [texture, aspectHint, displaySize, photoScale, pedestalScale, minFootprint])
 
   useEffect(() => {
     onPlaneSize?.(plane)

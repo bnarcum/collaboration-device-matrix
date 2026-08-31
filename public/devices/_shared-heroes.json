@@ -1,0 +1,12 @@
+{
+  "comment": "Device IDs allowed to share the same product photo. Any other shared hash fails CI.",
+  "groups": [
+    ["board-pro-g3-55", "board-pro-g3-75"],
+    ["dect-6823", "dect-6825"],
+    ["logitech-rally-bar", "logitech-rally-bar-mini"],
+    ["logitech-tap-ip", "logitech-tap-usb", "logitech-tap-scheduler"],
+    ["poly-studio-x70", "poly-studio-x72"],
+    ["poly-trio-8500", "poly-trio-8800"],
+    ["neat-board-65", "neat-board-pro-75"]
+  ]
+}
