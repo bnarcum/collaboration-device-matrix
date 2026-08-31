@@ -15,6 +15,7 @@ const source = readFileSync(
 )
 
 const entries = [
+  ...source.matchAll(/^\s*'([^']+)':\s*\n\s*'([^']+)'/gm),
   ...source.matchAll(/^\s+'([^']+)':\s*'([^']+)'/gm),
   ...source.matchAll(/^\s+([a-z][a-z0-9-]*):\s*'([^']+)'/gm),
 ].map(([, id, url]) => ({ id, url }))
@@ -25,6 +26,42 @@ const urls = [...unique.values()]
 if (urls.length === 0) {
   console.error('No product URLs found in deviceProductUrls.ts')
   process.exit(1)
+}
+
+const catalogIds = new Set()
+for (const file of [
+  'cisco.ts',
+  'logitech.ts',
+  'poly.ts',
+  'poly-voice.ts',
+  'neat.ts',
+]) {
+  const src = readFileSync(join(root, 'src/data/vendors', file), 'utf8')
+  for (const m of src.matchAll(/^\s+id:\s*'([^']+)'/gm)) catalogIds.add(m[1])
+}
+
+function skuFromId(id) {
+  return id.match(/(\d{3,5})/)?.[1] ?? null
+}
+
+function seriesFromSku(sku) {
+  if (sku.length < 3) return null
+  return `${sku.slice(0, -2)}00`
+}
+
+/** Fail when the page title names a different SKU (e.g. 8811 → 8832 datasheet). */
+function skuMismatch(id, title, url) {
+  const sku = skuFromId(id)
+  if (!sku) return null
+  const hay = `${title} ${url}`.toLowerCase()
+  if (hay.includes(sku)) return null
+  const series = seriesFromSku(sku)
+  if (series && hay.includes(series) && /series/.test(hay)) return null
+  const others = [...title.matchAll(/\b(\d{3,5})\b/g)]
+    .map((m) => m[1])
+    .filter((s) => s !== sku && s !== series)
+  if (others.length === 0) return null
+  return `Title names ${others.join(', ')} (expected ${sku})`
 }
 
 const BAD_BODY =
@@ -56,6 +93,10 @@ async function checkOnce({ id, url }) {
   if (BAD_BODY.test(body) || BAD_TITLE.test(title)) {
     return { id, url, status: 'fail', detail: `Bad content in page (${title.slice(0, 60)})` }
   }
+  const mismatch = skuMismatch(id, title, url)
+  if (mismatch) {
+    return { id, url, status: 'fail', detail: mismatch }
+  }
   return { id, url, status: 'ok', detail: title.slice(0, 70) }
 }
 
@@ -79,9 +120,29 @@ async function check(entry) {
   return { ...entry, status: 'skip', detail: 'Network — verify in browser' }
 }
 
+const missing = [...catalogIds].filter((id) => !unique.has(id)).sort()
+const extra = [...unique.keys()].filter((id) => !catalogIds.has(id)).sort()
+
 const results = []
 for (const entry of urls) {
   results.push(await check(entry))
+}
+
+for (const id of missing) {
+  results.push({
+    id,
+    url: '',
+    status: 'fail',
+    detail: 'No product URL in deviceProductUrls.ts',
+  })
+}
+for (const id of extra) {
+  results.push({
+    id,
+    url: unique.get(id)?.url ?? '',
+    status: 'fail',
+    detail: 'URL id is not in the catalog',
+  })
 }
 
 let fails = 0
