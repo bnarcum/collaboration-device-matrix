@@ -31,9 +31,32 @@ UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 # device_id -> source URL (official vendor assets)
 IMAGE_SOURCES: dict[str, str] = {
     # Logitech — gallery where available; else use hashes from datasheet extract
+    "logitech-rally-bar-huddle": (
+        "https://resource.logitech.com/content/dam/logitech/en/products/"
+        "video-conferencing/rally-bar-huddle/gallery/rally-bar-huddle-front-01-new.png"
+    ),
     "logitech-meetup": (
         "https://resource.logitech.com/content/dam/logitech/en/products/"
         "video-conferencing/meetup/gallery/meetup-gallery-global-1.png"
+    ),
+    "logitech-meetup-2": (
+        "https://resource.logitech.com/content/dam/logitech/en/products/"
+        "video-conferencing/meetup-2/gallery/meetup-2-graphite-01.png"
+    ),
+    "logitech-rally-board-65": (
+        "https://resource.logitech.com/content/dam/logitech/en/products/"
+        "video-conferencing/rally-board-65/gallery-images/graphite/"
+        "rally-board-65-graphite-01.png"
+    ),
+    "logitech-rally-ai-camera": (
+        "https://resource.logitech.com/content/dam/logitech/en/products/"
+        "video-conferencing/rally-ai-camera/gallery-images/graphite/"
+        "rally-ai-camera-graphite-front-01.png"
+    ),
+    "logitech-rally-ai-camera-pro": (
+        "https://resource.logitech.com/content/dam/logitech/en/products/"
+        "video-conferencing/rally-ai-camera-pro/gallery-images/graphite/"
+        "rally-ai-camera-pro-graphite-front-01.png"
     ),
     "logitech-zone-wired-2": (
         "https://resource.logitech.com/content/dam/logitech/en/products/"
@@ -55,6 +78,10 @@ IMAGE_SOURCES: dict[str, str] = {
         "zone-true-wireless-earbuds-gallery-1-graphite.png"
     ),
     # Poly — HP worldwide DAM (also embedded on poly.com)
+    "poly-studio-x32": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/video-conferencing/"
+        "Poly_Studio_X32@2x.png"
+    ),
     "poly-studio-x30": (
         "https://www.hp.com/content/dam/sites/worldwide/poly/video-conferencing/"
         "Poly_Studio_X32@2x.png"
@@ -74,6 +101,26 @@ IMAGE_SOURCES: dict[str, str] = {
     "poly-studio-x72": (
         "https://www.hp.com/content/dam/sites/worldwide/poly/video-conferencing/"
         "Poly_Studio_X72_Desktop@2x.png"
+    ),
+    "poly-studio-v12": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/video-conferencing/"
+        "PC_Poly_Studio_V12@2x.jpg"
+    ),
+    "poly-studio-v52": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/video-conferencing/"
+        "Poly_Studio_V52_Desktop@2x.png"
+    ),
+    "poly-studio-v72": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/video-conferencing/"
+        "Poly_Studio_V72_Desktop@2x.png"
+    ),
+    "poly-studio-e60": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/video-conferencing/"
+        "Poly_Studio_E60@2x.jpg"
+    ),
+    "poly-tc10": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/video-conferencing/"
+        "Product_cards_desktop_poly_tc10@2x.jpg"
     ),
     "poly-studio-g62": (
         "https://www.hp.com/content/dam/sites/worldwide/poly/video-conferencing/"
@@ -100,6 +147,18 @@ IMAGE_SOURCES: dict[str, str] = {
         "https://www.hp.com/content/dam/sites/worldwide/poly/desk-phones/"
         "edge-b-series/Poly-Edge-B30-Desktop.png"
     ),
+    "poly-edge-e100": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/desk-phones/"
+        "Poly%20Edge%20E100_E220@2x.png"
+    ),
+    "poly-edge-e350": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/desk-phones/"
+        "Poly%20Edge%20E300%20Series@2x.png"
+    ),
+    "poly-edge-e550": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/desk-phones/"
+        "Poly%20Edge%20E500%20Series@2x.png"
+    ),
     "poly-ccx-400": (
         "https://www.hp.com/content/dam/sites/worldwide/poly/phones/Poly_CCX_400_Card@2x.jpg"
     ),
@@ -112,6 +171,9 @@ IMAGE_SOURCES: dict[str, str] = {
     ),
     "poly-ccx-700": (
         "https://www.hp.com/content/dam/sites/worldwide/poly/desk-phones/CCX%20700@2x.png"
+    ),
+    "poly-trio-c60": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/phones/Poly_trio_c60@2x.jpg"
     ),
     "poly-trio-8300": (
         "https://www.hp.com/content/dam/sites/worldwide/poly/phones/Poly_trio_8300@2x.jpg"
@@ -150,12 +212,13 @@ IMAGE_SOURCES: dict[str, str] = {
         "https://www.hp.com/content/dam/sites/worldwide/poly/headsets/"
         "Poly_encore_pro_700_series_desktop@2x.jpg"
     ),
-    # Neat — product card art from cdn.neat.no (board-pro shared by 65"/75")
-    "neat-bar": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/bar-2--2x.jpg",
+    # Neat — product card art from cdn.neat.no (board-pro shared by Board 65 / Board Pro)
+    "neat-bar": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/bar--2x.jpg",
+    "neat-bar-gen2": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/bar-2--2x.jpg",
     "neat-bar-pro": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/bar-pro--2x.jpg",
+    "neat-board-32": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/board-32--2x.jpg",
     "neat-board-50": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/board-50--2x.jpg",
-    "neat-board-65": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/board-pro--2x.jpg",
-    "neat-board-pro-75": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/board-pro--2x.jpg",
+    "neat-board-pro": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/board-pro--2x.jpg",
     "neat-pad": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/pad--2x.jpg",
     "neat-pad-pro": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/pad-pro--2x.jpg",
     "neat-frame": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/frame--2x.jpg",
@@ -247,6 +310,10 @@ def main() -> int:
             errors.append(f"{device_id}: missing img-{sha}.webp (run extract-pdf-images.py)")
 
     map_path = out_dir / "_import-map.json"
+    if only is not None and map_path.exists():
+        existing = json.loads(map_path.read_text())
+        existing.update(mapping)
+        mapping = existing
     map_path.write_text(json.dumps(mapping, indent=2, sort_keys=True))
     print(f"\nmapping written: {map_path.relative_to(Path.cwd())}")
     print(f"devices mapped: {len(mapping)}")

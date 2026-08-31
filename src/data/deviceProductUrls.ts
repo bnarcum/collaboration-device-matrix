@@ -119,12 +119,22 @@ export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
     'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/rally-bar.html',
   'logitech-rally-bar-mini':
     'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/rally-bar-mini.html',
+  'logitech-rally-bar-huddle':
+    'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/rallybarhuddle.html',
   'logitech-rally-plus':
     'https://www.logitech.com/en-us/products/video-conferencing/conference-cameras/rally-plus.html',
+  'logitech-rally-board-65':
+    'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/rally-board-65.html',
   'logitech-meetup':
     'https://www.logitech.com/en-us/products/video-conferencing/conference-cameras/meetup-conferencecam.html',
+  'logitech-meetup-2':
+    'https://www.logitech.com/en-us/products/video-conferencing/conference-cameras/meetup2.html',
   'logitech-rally-camera':
     'https://www.logitech.com/en-us/products/video-conferencing/conference-cameras/rally-ultra-hd-ptz-camera.html',
+  'logitech-rally-ai-camera':
+    'https://www.logitech.com/en-us/products/video-conferencing/conference-cameras/rally-ai-camera.html',
+  'logitech-rally-ai-camera-pro':
+    'https://www.logitech.com/en-us/products/video-conferencing/conference-cameras/rally-ai-camera-pro.html',
   'logitech-sight':
     'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/sight.html',
   'logitech-scribe':
@@ -146,6 +156,8 @@ export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
 
   'poly-studio-x30':
     'https://docs.poly.com/bundle/video-room-prep-guide/page/studio-x30-specifications.html',
+  'poly-studio-x32':
+    'https://www.hp.com/us-en/poly/video-conferencing/all-in-one/studio-x32.html',
   'poly-studio-x50':
     'https://docs.poly.com/bundle/video-room-prep-guide/page/studio-x50-specifications.html',
   'poly-studio-x52':
@@ -154,20 +166,38 @@ export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
     'https://www.hp.com/us-en/poly/video-conferencing/all-in-one/studio-x70.html',
   'poly-studio-x72':
     'https://www.hp.com/us-en/poly/video-conferencing/all-in-one/studio-x72.html',
+  'poly-studio-v12':
+    'https://www.hp.com/us-en/poly/video-conferencing/usb/studio-v12.html',
+  'poly-studio-v52':
+    'https://www.hp.com/us-en/poly/video-conferencing/usb/studio-v52.html',
+  'poly-studio-v72':
+    'https://www.hp.com/us-en/poly/video-conferencing/usb/studio-v72.html',
   'poly-studio-g62':
     'https://www.hp.com/us-en/poly/video-conferencing/modular/studio-g62.html',
+  'poly-studio-e60':
+    'https://www.hp.com/us-en/poly/video-conferencing/cameras-and-accessories/studio-e60.html',
   'poly-studio-e70':
     'https://www.hp.com/us-en/poly/video-conferencing/cameras-and-accessories/studio-e70.html',
   'poly-studio-p15':
     'https://www.hp.com/us-en/poly/video-conferencing/personal-video-and-webcams/studio-p15.html',
+  'poly-tc10':
+    'https://docs.poly.com/bundle/tc10-ag-current/page/poly-tc10-overview.html',
 
   'poly-edge-b10': 'https://www.hp.com/us-en/poly/phones/desk-phones.html',
   'poly-edge-b20': 'https://www.hp.com/us-en/poly/phones/desk-phones.html',
   'poly-edge-b30': 'https://www.hp.com/us-en/poly/phones/desk-phones.html',
+  'poly-edge-e100':
+    'https://docs.poly.com/bundle/edge-e-ug-current/page/poly-edge-e-series-overview.html',
+  'poly-edge-e350':
+    'https://docs.poly.com/bundle/edge-e-ug-current/page/poly-edge-e-series-overview.html',
+  'poly-edge-e550':
+    'https://docs.poly.com/bundle/edge-e-ug-current/page/poly-edge-e-series-overview.html',
   'poly-ccx-400': 'https://www.hp.com/us-en/poly/phones/desk-phones.html',
   'poly-ccx-505': 'https://www.hp.com/us-en/poly/phones/desk-phones/ccx-500-505.html',
   'poly-ccx-600': 'https://www.hp.com/us-en/poly/phones/desk-phones/ccx-600.html',
   'poly-ccx-700': 'https://www.hp.com/us-en/poly/phones/desk-phones.html',
+  'poly-trio-c60':
+    'https://www.hp.com/us-en/poly/phones/ip-conference/trio-c60.html',
   'poly-trio-8300': 'https://www.hp.com/us-en/poly/phones/ip-conference.html',
   'poly-trio-8500': 'https://www.hp.com/us-en/poly/phones/ip-conference.html',
   'poly-trio-8800': 'https://www.hp.com/us-en/poly/phones/ip-conference.html',
@@ -186,15 +216,16 @@ export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
   'poly-encorepro-710':
     'https://www.poly.com/us/en/products/headsets/contact-center-headsets/encorepro-700-series',
 
-  'neat-bar': 'https://www.neat.no/neat-bar/',
-  'neat-bar-pro': 'https://www.neat.no/neat-bar-pro/',
-  'neat-board-50': 'https://www.neat.no/neat-board/',
-  'neat-board-65': 'https://www.neat.no/neat-board/',
-  'neat-board-pro-75': 'https://www.neat.no/neat-board-pro/',
-  'neat-pad': 'https://www.neat.no/neat-pad/',
-  'neat-pad-pro': 'https://www.neat.no/neat-pad-pro/',
-  'neat-frame': 'https://www.neat.no/neat-frame/',
-  'neat-center': 'https://www.neat.no/neat-center/',
+  'neat-bar': 'https://www.neat.no/bar/',
+  'neat-bar-gen2': 'https://www.neat.no/bar-2/',
+  'neat-bar-pro': 'https://www.neat.no/bar-pro/',
+  'neat-board-32': 'https://www.neat.no/board-32/',
+  'neat-board-50': 'https://www.neat.no/board-50/',
+  'neat-board-pro': 'https://www.neat.no/board-pro/',
+  'neat-pad': 'https://www.neat.no/pad/',
+  'neat-pad-pro': 'https://www.neat.no/pad-pro/',
+  'neat-frame': 'https://www.neat.no/frame/',
+  'neat-center': 'https://www.neat.no/center/',
 }
 
 export function deviceProductUrl(deviceId: string): string | undefined {

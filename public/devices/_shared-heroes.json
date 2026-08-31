@@ -5,8 +5,9 @@
     ["dect-6823", "dect-6825"],
     ["logitech-rally-bar", "logitech-rally-bar-mini"],
     ["logitech-tap-ip", "logitech-tap-usb", "logitech-tap-scheduler"],
+    ["poly-studio-x30", "poly-studio-x32"],
+    ["poly-studio-x50", "poly-studio-v52"],
     ["poly-studio-x70", "poly-studio-x72"],
-    ["poly-trio-8500", "poly-trio-8800"],
-    ["neat-board-65", "neat-board-pro-75"]
+    ["poly-trio-8500", "poly-trio-8800"]
   ]
 }
