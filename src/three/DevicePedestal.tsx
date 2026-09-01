@@ -24,7 +24,7 @@ interface Props {
   scale?: number
   selected?: boolean
   hovered?: boolean
-  /** Show floating label when selected or hovered. */
+  /** Show the name pill above the device. */
   showLabel?: boolean
   onClick?: (device: Device) => void
   /** Hover handler for the carousel mode. */
@@ -130,17 +130,18 @@ export function DevicePedestal({
         </>
       )}
       {selected && <SelectionSpot footprint={footprint} />}
-      {showLabel && (selected || hovered) && (
+      {showLabel && (
         <Html
           position={[0, (imageUrl ? planeH : device.size[1]) + 0.35, 0]}
           center
           distanceFactor={6}
           zIndexRange={[1, 0]}
+          pointerEvents="none"
         >
           <DeviceFloatingLabel
             name={device.name}
             vendorId={device.vendorId}
-            selected={selected}
+            selected={selected || hovered}
           />
         </Html>
       )}
