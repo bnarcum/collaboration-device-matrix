@@ -49,9 +49,14 @@ export function ShowroomScene({
   allMode = 'floor',
   onEnterCategory,
 }: Props) {
+  const narrow = useNarrowViewport()
   const layout = useMemo(
-    () => layoutByCategory(devices, filter, { allMode }),
-    [devices, filter, allMode],
+    () =>
+      layoutByCategory(devices, filter, {
+        allMode,
+        compactRows: narrow && filter !== 'all' && allMode === 'floor',
+      }),
+    [devices, filter, allMode, narrow],
   )
   const bounds = useMemo(
     () => placementBounds(layout.placements),
@@ -59,7 +64,6 @@ export function ShowroomScene({
   )
 
   const tron = resolveTronShowroom()
-  const narrow = useNarrowViewport()
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const floorMode = allMode === 'floor'
   const minDistance = floorMode
@@ -80,7 +84,7 @@ export function ShowroomScene({
       ? narrow
         ? 26
         : 20
-      : Math.max(narrow ? 18 : 16, bounds.span * (narrow ? 2.6 : 2.4))
+      : Math.max(narrow ? 34 : 16, bounds.span * (narrow ? 3.4 : 2.4))
     : allMode === 'wall' || allMode === 'layers'
       ? Math.max(36, bounds.span * 2.2)
       : 20
@@ -92,7 +96,9 @@ export function ShowroomScene({
         extent={
           allMode === 'wall' || allMode === 'layers'
             ? Math.max(22, bounds.span * 0.7 + 8)
-            : 18
+            : narrow
+              ? Math.max(18, bounds.span * 0.85 + 8)
+              : 18
         }
       />
       <OrbitControls

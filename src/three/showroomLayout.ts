@@ -93,9 +93,19 @@ function packRow(
   return { radius, slots }
 }
 
-function rowCountFor(devices: Device[]): number {
+function rowCountFor(devices: Device[], compactRows = false): number {
   const n = devices.length
   if (n <= 1) return 1
+
+  // Portrait cannot frame a wide 3-row horseshoe; split fat categories tighter.
+  if (compactRows) {
+    if (n <= 8) return 1
+    if (n <= 16) return 2
+    if (n <= 24) return 3
+    if (n <= 36) return 4
+    return 5
+  }
+
   const oneR = Math.max(MIN_ARC_RADIUS, packedArcLength(devices) / ARC_SWEEP)
   if (n < TWO_ROW_COUNT && oneR <= TWO_ROW_RADIUS) return 1
 
@@ -137,7 +147,10 @@ export function arcRingTheta(sweep = ARC_SWEEP): {
  * Filtered view: front-facing horseshoe so every SKU stays in camera.
  * Large / wide sets split into two or three concentric arcs.
  */
-export function compactSlots(devices: Device[]): {
+export function compactSlots(
+  devices: Device[],
+  compactRows = false,
+): {
   slots: { radius: number; angle: number }[]
   rings: { radius: number; thetaStart: number; thetaLength: number }[]
 } {
@@ -146,7 +159,7 @@ export function compactSlots(devices: Device[]): {
     return { slots: [], rings: [{ radius: MIN_ARC_RADIUS, ...theta }] }
   }
 
-  const rows = splitRows(devices, rowCountFor(devices))
+  const rows = splitRows(devices, rowCountFor(devices, compactRows))
   const slots: { radius: number; angle: number }[] = []
   const rings: { radius: number; thetaStart: number; thetaLength: number }[] =
     []
@@ -377,7 +390,12 @@ export function layoutProductWall(devices: Device[]): ShowroomLayout {
 export function layoutByCategory(
   devices: Device[],
   filter: Category | 'all',
-  options?: { stacked?: boolean; allMode?: ShowroomAllMode },
+  options?: {
+    stacked?: boolean
+    allMode?: ShowroomAllMode
+    /** Extra horseshoe rows so a portrait camera can see every SKU. */
+    compactRows?: boolean
+  },
 ): ShowroomLayout {
   const allMode = options?.allMode ?? (options?.stacked ? 'layers' : 'floor')
   if (filter === 'all' && allMode === 'layers') {
@@ -399,7 +417,7 @@ export function layoutByCategory(
     if (inCat.length === 0) continue
 
     if (useCompactArc) {
-      const compact = compactSlots(inCat)
+      const compact = compactSlots(inCat, options?.compactRows === true)
       compact.rings.forEach((ring, i) => {
         rings.push({
           category: cat,

@@ -27,7 +27,7 @@ const OVERVIEW: CameraFrame = {
 }
 
 const OVERVIEW_NARROW: CameraFrame = {
-  position: new THREE.Vector3(11.4, 9.2, 11.4),
+  position: new THREE.Vector3(13.2, 10.4, 13.2),
   target: new THREE.Vector3(0, 0.22, 0),
 }
 
@@ -150,9 +150,14 @@ function overviewFrame(
 }
 
 /** Frame a filtered horseshoe so devices sit mid-view, not on the horizon. */
+function horizontalFov(verticalFov: number, aspect: number): number {
+  return 2 * Math.atan(Math.tan(verticalFov * 0.5) * Math.max(aspect, 0.35))
+}
+
 function frameForCategory(
   placements: ShowroomPlacement[],
   narrow = false,
+  aspect = 16 / 9,
 ): CameraFrame {
   if (placements.length === 0) return overviewFrame([], narrow)
 
@@ -183,13 +188,16 @@ function frameForCategory(
   const width = Math.max(1.1, maxX - minX)
   const depth = Math.max(0.8, maxZ - minZ)
 
-  const fov = ((narrow ? 52 : 45) * Math.PI) / 180
-  const fitW = width * 0.5 / Math.tan(fov * 0.5)
-  const standOff =
-    Math.max(2.15, fitW * 0.9, depth * 0.5 + 1.85) * (narrow ? 1.28 : 1)
+  const vFov = ((narrow ? 52 : 45) * Math.PI) / 180
+  const widthFov = narrow ? horizontalFov(vFov, aspect) : vFov
+  const fitW = width * 0.5 / Math.tan(widthFov * 0.5)
+  const fitH = lookY / Math.tan(vFov * 0.5)
+  const standOff = narrow
+    ? Math.max(3.4, fitW * 1.06, fitH * 0.55, depth * 0.55 + 2.2)
+    : Math.max(2.15, fitW * 0.9, depth * 0.5 + 1.85)
   const lift = Math.min(
-    narrow ? 2.55 : 2.15,
-    Math.max(narrow ? 1.35 : 0.95, lookY * 0.55 + width * 0.1),
+    narrow ? 2.8 : 2.15,
+    Math.max(narrow ? 1.5 : 0.95, lookY * 0.55 + width * (narrow ? 0.16 : 0.1)),
   )
 
   return {
@@ -228,8 +236,9 @@ function placementsLayoutKeyNarrow(
   filter: Category | 'all',
   allMode: ShowroomAllMode,
   narrow: boolean,
+  aspect = 1,
 ): string {
-  return `${placementsLayoutKey(placements, filter, allMode)}|n${narrow ? 1 : 0}`
+  return `${placementsLayoutKey(placements, filter, allMode)}|n${narrow ? 1 : 0}|a${aspect.toFixed(2)}`
 }
 
 /**
@@ -244,6 +253,7 @@ export function ShowroomCameraFocus({
   allMode = 'floor',
 }: Props) {
   const camera = useThree((s) => s.camera)
+  const viewportAspect = useThree((s) => s.size.width / Math.max(s.size.height, 1))
   const controls = useThree((s) => s.controls) as OrbitControlsLike | null
   const reducedMotion = useReducedMotion()
   const narrow = useNarrowViewport()
@@ -251,8 +261,15 @@ export function ShowroomCameraFocus({
   const animating = useRef(false)
   const userInteracting = useRef(false)
   const layoutKey = useMemo(
-    () => placementsLayoutKeyNarrow(placements, filter, allMode, narrow),
-    [placements, filter, allMode, narrow],
+    () =>
+      placementsLayoutKeyNarrow(
+        placements,
+        filter,
+        allMode,
+        narrow,
+        viewportAspect,
+      ),
+    [placements, filter, allMode, narrow, viewportAspect],
   )
 
   const applyGoalToCamera = useCallback(
@@ -282,18 +299,27 @@ export function ShowroomCameraFocus({
         if (!placement) return
         frame = frameForDevice(placement.device, placement.position, allMode)
       } else if (filter !== 'all' && placements.length > 0) {
-        frame = frameForCategory(placements, narrow)
+        frame = frameForCategory(placements, narrow, viewportAspect)
       } else if (allMode === 'wall' && placements.length > 0) {
         frame = frameForWall(placements)
       } else if (allMode === 'hub' && placements.length > 0) {
-        frame = frameForCategory(placements, narrow)
+        frame = frameForCategory(placements, narrow, viewportAspect)
       } else {
         frame = overviewFrame(placements, narrow)
       }
 
       applyGoalToCamera(frame, true)
     },
-    [selected, placements, focusMode, filter, allMode, narrow, applyGoalToCamera],
+    [
+      selected,
+      placements,
+      focusMode,
+      filter,
+      allMode,
+      narrow,
+      viewportAspect,
+      applyGoalToCamera,
+    ],
   )
 
   useLayoutEffect(() => {
