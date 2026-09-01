@@ -17,6 +17,15 @@ import { TronPlatform } from './TronPlatform'
 import { PhotoBillboard } from './PhotoBillboard'
 import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 
+/** Spread neighboring pills onto 3 height lanes so they collide less on an arc. */
+function labelLane(id: string): number {
+  let hash = 0
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash * 31 + id.charCodeAt(i)) >>> 0
+  }
+  return hash % 3
+}
+
 interface Props {
   device: Device
   position?: [number, number, number]
@@ -134,10 +143,23 @@ export function DevicePedestal({
       {selected && <SelectionSpot footprint={footprint} />}
       {showLabel && (
         <Html
-          position={[0, (imageUrl ? planeH : device.size[1]) + 0.35, 0]}
+          position={[
+            0,
+            (imageUrl ? planeH : device.size[1]) +
+              (selected || hovered ? 0.3 : 0.14 + labelLane(device.id) * 0.2),
+            0,
+          ]}
           center
-          distanceFactor={narrow ? 4.2 : 6}
-          zIndexRange={[1, 0]}
+          distanceFactor={
+            selected || hovered
+              ? narrow
+                ? 6.4
+                : 9
+              : narrow
+                ? 8.6
+                : 13
+          }
+          zIndexRange={selected || hovered ? [12, 8] : [1, 0]}
           pointerEvents="none"
         >
           <DeviceFloatingLabel

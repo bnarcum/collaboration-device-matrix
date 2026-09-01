@@ -10,44 +10,46 @@ export function deviceLabelStyles(
 ): CSSProperties {
   if (resolveTronShowroom()) {
     return {
-      padding: '3px 10px',
+      padding: selected ? '3px 8px' : '1px 5px',
       borderRadius: 2,
       background: 'rgba(0, 0, 0, 0.78)',
       border: `1px solid ${selected ? TRON.orange : TRON.cyan}`,
-      fontSize: 10,
+      fontSize: selected ? 10 : 8,
       fontWeight: 700,
-      letterSpacing: '0.06em',
+      letterSpacing: selected ? '0.06em' : '0.02em',
       textTransform: 'uppercase',
       fontFamily:
         'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
       color: selected ? TRON.orange : TRON.cyan,
       whiteSpace: 'nowrap',
+      lineHeight: 1.2,
       boxShadow: selected
         ? `0 0 16px rgba(255, 102, 0, 0.55), inset 0 0 6px rgba(255, 102, 0, 0.15)`
-        : `0 0 12px rgba(0, 255, 240, 0.4), inset 0 0 6px rgba(0, 255, 240, 0.1)`,
+        : `0 0 8px rgba(0, 255, 240, 0.28), inset 0 0 6px rgba(0, 255, 240, 0.08)`,
       textShadow: selected
         ? '0 0 8px rgba(255, 102, 0, 0.9)'
-        : '0 0 6px rgba(0, 255, 240, 0.75)',
+        : '0 0 4px rgba(0, 255, 240, 0.65)',
     }
   }
 
   const theme = vendorLabelTheme(vendorId, selected)
 
   return {
-    padding: '4px 10px',
+    padding: selected ? '3px 8px' : '1px 5px',
     borderRadius: 999,
     background: theme.background,
     border: `1px solid ${theme.border}`,
-    fontSize: 11,
+    fontSize: selected ? 11 : 8,
     fontWeight: 600,
     color: theme.color,
     whiteSpace: 'nowrap',
+    lineHeight: 1.2,
     boxShadow:
       vendorId === 'neat' && !selected
-        ? '0 2px 10px rgba(0, 0, 0, 0.45)'
+        ? '0 2px 8px rgba(0, 0, 0, 0.4)'
         : selected
           ? '0 0 12px rgba(2, 200, 255, 0.4)'
-          : '0 2px 8px rgba(0, 0, 0, 0.35)',
+          : '0 1px 5px rgba(0, 0, 0, 0.3)',
   }
 }
 
