@@ -5,13 +5,14 @@ import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
  * Wireframe dome + horizon rings behind the showroom — visible stage depth
  * without competing with devices on the reflective floor.
  */
-export function ShowroomBackdrop() {
+export function ShowroomBackdrop({ radius = 22 }: { radius?: number }) {
   const tron = resolveTronShowroom()
+  const r = Math.max(22, radius)
 
   return (
     <group position={[0, -0.05, 0]}>
       <mesh>
-        <icosahedronGeometry args={[22, 3]} />
+        <icosahedronGeometry args={[r, 3]} />
         <meshBasicMaterial
           color={tron ? TRON.cyanDim : '#2a7ab8'}
           wireframe
@@ -22,7 +23,7 @@ export function ShowroomBackdrop() {
         />
       </mesh>
       <mesh scale={0.92}>
-        <icosahedronGeometry args={[22, 2]} />
+        <icosahedronGeometry args={[r, 2]} />
         <meshBasicMaterial
           color={tron ? TRON.cyan : '#02C8FF'}
           wireframe
@@ -35,7 +36,7 @@ export function ShowroomBackdrop() {
       </mesh>
       {tron && (
         <mesh scale={0.78}>
-          <icosahedronGeometry args={[22, 1]} />
+          <icosahedronGeometry args={[r, 1]} />
           <meshBasicMaterial
             color={TRON.orange}
             wireframe

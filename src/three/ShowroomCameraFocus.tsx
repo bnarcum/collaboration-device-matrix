@@ -4,7 +4,7 @@ import * as THREE from 'three'
 import type { Category, Device } from '../data/types'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { estimateBillboardPlane } from './billboardSizing'
-import type { ShowroomPlacement } from './showroomLayout'
+import type { ShowroomAllMode, ShowroomPlacement } from './showroomLayout'
 
 export type { ShowroomPlacement }
 
@@ -28,11 +28,20 @@ const OVERVIEW: CameraFrame = {
 function frameForDevice(
   device: Device,
   position: [number, number, number],
+  allMode: ShowroomAllMode = 'floor',
 ): CameraFrame {
-  const [x, , z] = position
+  const [x, y, z] = position
   const plane = estimateBillboardPlane(device)
-  const lookY = plane.planeH * 0.42 + 0.12
+  const lookY = y + plane.planeH * 0.42 + 0.12
   const target = new THREE.Vector3(x, lookY, z)
+
+  if (allMode === 'wall' || allMode === 'hub') {
+    const standOff = 2.4 + plane.footprint * 0.35
+    return {
+      position: new THREE.Vector3(x, lookY + 1.15, z + standOff),
+      target,
+    }
+  }
 
   const radial = new THREE.Vector3(x, 0, z)
   const distFromCenter = radial.length()
@@ -58,10 +67,75 @@ function frameForDevice(
   return { position: positionOut, target }
 }
 
-function overviewFrame(): CameraFrame {
+function frameForWall(placements: ShowroomPlacement[]): CameraFrame {
+  if (placements.length === 0) return overviewFrame()
+
+  let minX = Infinity
+  let maxX = -Infinity
+  let minY = Infinity
+  let maxY = -Infinity
+  let minZ = Infinity
+  let maxZ = -Infinity
+
+  for (const p of placements) {
+    const [x, y, z] = p.position
+    const plane = estimateBillboardPlane(p.device)
+    minX = Math.min(minX, x - plane.planeW * 0.5)
+    maxX = Math.max(maxX, x + plane.planeW * 0.5)
+    minY = Math.min(minY, y)
+    maxY = Math.max(maxY, y + plane.planeH)
+    minZ = Math.min(minZ, z)
+    maxZ = Math.max(maxZ, z)
+  }
+
+  const cx = (minX + maxX) / 2
+  const cy = (minY + maxY) / 2
+  const cz = (minZ + maxZ) / 2
+  const width = Math.max(1, maxX - minX)
+  const height = Math.max(1, maxY - minY)
+  const fov = (45 * Math.PI) / 180
+  const fit = Math.max(width, height * 1.15) * 0.5 / Math.tan(fov * 0.5)
+  const standOff = Math.max(10, fit * 1.05)
+
   return {
-    position: OVERVIEW.position.clone(),
-    target: OVERVIEW.target.clone(),
+    position: new THREE.Vector3(cx, cy + height * 0.04, maxZ + standOff),
+    target: new THREE.Vector3(cx, cy, cz),
+  }
+}
+
+function overviewFrame(placements: ShowroomPlacement[] = []): CameraFrame {
+  if (placements.length === 0) {
+    return {
+      position: OVERVIEW.position.clone(),
+      target: OVERVIEW.target.clone(),
+    }
+  }
+
+  let maxR = 0
+  let maxY = 0
+  for (const p of placements) {
+    const [x, y, z] = p.position
+    const plane = estimateBillboardPlane(p.device)
+    maxR = Math.max(maxR, Math.hypot(x, z) + plane.footprint * 0.3)
+    maxY = Math.max(maxY, y + plane.planeH)
+  }
+
+  if (maxY < 1.4) {
+    return {
+      position: OVERVIEW.position.clone(),
+      target: OVERVIEW.target.clone(),
+    }
+  }
+
+  const midY = maxY * 0.42
+  const dist = Math.max(16, maxR * 1.5, maxY * 1.35)
+  return {
+    position: new THREE.Vector3(
+      dist * 0.74,
+      midY + Math.max(5.2, maxY * 0.32),
+      dist * 0.74,
+    ),
+    target: new THREE.Vector3(0, midY, 0),
   }
 }
 
@@ -116,18 +190,20 @@ interface Props {
   filter?: Category | 'all'
   /** hero = tight product shot; ring = full showroom floor (overview). */
   focusMode?: ShowroomFocusMode
+  allMode?: ShowroomAllMode
 }
 
 /** Stable key for layout changes (filter / device list / ring geometry). */
 export function placementsLayoutKey(
   placements: ShowroomPlacement[],
   filter: Category | 'all' = 'all',
+  allMode: ShowroomAllMode = 'floor',
 ): string {
   const parts = placements.map(
     (p) => `${p.device.id}@${p.position.map((n) => n.toFixed(2)).join(',')}`,
   )
   parts.sort()
-  return `${filter}|${parts.join(';')}`
+  return `${filter}|${allMode}|${parts.join(';')}`
 }
 
 /**
@@ -139,6 +215,7 @@ export function ShowroomCameraFocus({
   placements,
   filter = 'all',
   focusMode = 'ring',
+  allMode = 'floor',
 }: Props) {
   const camera = useThree((s) => s.camera)
   const controls = useThree((s) => s.controls) as OrbitControlsLike | null
@@ -147,8 +224,8 @@ export function ShowroomCameraFocus({
   const animating = useRef(false)
   const userInteracting = useRef(false)
   const layoutKey = useMemo(
-    () => placementsLayoutKey(placements, filter),
-    [placements, filter],
+    () => placementsLayoutKey(placements, filter, allMode),
+    [placements, filter, allMode],
   )
 
   const applyGoalToCamera = useCallback(
@@ -176,16 +253,20 @@ export function ShowroomCameraFocus({
       if (selected && focusMode === 'hero') {
         const placement = placements.find((p) => p.device.id === selected.id)
         if (!placement) return
-        frame = frameForDevice(placement.device, placement.position)
+        frame = frameForDevice(placement.device, placement.position, allMode)
       } else if (filter !== 'all' && placements.length > 0) {
         frame = frameForCategory(placements)
+      } else if (allMode === 'wall' && placements.length > 0) {
+        frame = frameForWall(placements)
+      } else if (allMode === 'hub' && placements.length > 0) {
+        frame = frameForCategory(placements)
       } else {
-        frame = overviewFrame()
+        frame = overviewFrame(placements)
       }
 
       applyGoalToCamera(frame, true)
     },
-    [selected, placements, focusMode, filter, applyGoalToCamera],
+    [selected, placements, focusMode, filter, allMode, applyGoalToCamera],
   )
 
   useLayoutEffect(() => {

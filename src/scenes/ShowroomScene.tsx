@@ -15,6 +15,9 @@ import {
 import {
   layoutByCategory,
   placementBounds,
+  WALL_PEDESTAL_SCALE,
+  type ShowroomAllMode,
+  type ShowroomMarker,
   type ShowroomRing,
 } from '../three/showroomLayout'
 import { useReducedMotion } from '../hooks/useReducedMotion'
@@ -26,6 +29,9 @@ interface Props {
   selected?: Device | null
   onSelect: (d: Device) => void
   focusMode?: ShowroomFocusMode
+  /** All-view mock: floor rings, stacked orbits, category hub, or product wall. */
+  allMode?: ShowroomAllMode
+  onEnterCategory?: (category: Category) => void
 }
 
 /**
@@ -39,10 +45,12 @@ export function ShowroomScene({
   selected,
   onSelect,
   focusMode = 'ring',
+  allMode = 'floor',
+  onEnterCategory,
 }: Props) {
   const layout = useMemo(
-    () => layoutByCategory(devices, filter),
-    [devices, filter],
+    () => layoutByCategory(devices, filter, { allMode }),
+    [devices, filter, allMode],
   )
   const bounds = useMemo(
     () => placementBounds(layout.placements),
@@ -55,18 +63,31 @@ export function ShowroomScene({
   return (
     <>
       {tron && <color attach="background" args={[TRON.void]} />}
-      <SceneEnv />
+      <SceneEnv
+        extent={
+          allMode === 'wall' || allMode === 'layers'
+            ? Math.max(22, bounds.span * 0.7 + 8)
+            : 18
+        }
+      />
       <OrbitControls
         makeDefault
         enablePan
         enableRotate
         enableDamping
         dampingFactor={0.08}
-        minDistance={filter === 'all' ? 2.5 : 1.8}
-        maxDistance={
-          filter === 'all' ? 20 : Math.max(16, bounds.span * 2.4)
+        minDistance={
+          allMode === 'wall' ? 6 : allMode === 'hub' ? 2.8 : allMode === 'layers' ? 4.5 : filter === 'all' ? 2.5 : 1.8
         }
-        maxPolarAngle={Math.PI * 0.48}
+        maxDistance={
+          allMode === 'wall' || allMode === 'layers'
+            ? Math.max(36, bounds.span * 2.2)
+            : filter === 'all'
+              ? 20
+              : Math.max(16, bounds.span * 2.4)
+        }
+        maxPolarAngle={Math.PI * (allMode === 'wall' ? 0.5 : allMode === 'layers' ? 0.49 : 0.48)}
+        minPolarAngle={allMode === 'layers' ? 0.18 : 0}
       />
 
       <ShowroomFloor />
@@ -79,6 +100,18 @@ export function ShowroomScene({
         />
       ))}
 
+      {layout.markers?.map((marker) => (
+        <CategoryMarker
+          key={`marker-${marker.category}-${marker.position.join(',')}`}
+          marker={marker}
+          onClick={
+            onEnterCategory
+              ? () => onEnterCategory(marker.category)
+              : undefined
+          }
+        />
+      ))}
+
       {layout.placements.map((p) => (
         <DevicePedestal
           key={p.device.id}
@@ -87,8 +120,13 @@ export function ShowroomScene({
           rotationY={p.rotationY}
           selected={selected?.id === p.device.id}
           hovered={hoveredId === p.device.id}
-          showLabel
-          onClick={onSelect}
+          scale={allMode === 'wall' ? WALL_PEDESTAL_SCALE : 1}
+          showLabel={allMode !== 'hub'}
+          onClick={
+            allMode === 'hub' && onEnterCategory
+              ? (d) => onEnterCategory(d.category)
+              : onSelect
+          }
           onHover={(d) => setHoveredId(d?.id ?? null)}
         />
       ))}
@@ -98,6 +136,7 @@ export function ShowroomScene({
         placements={layout.placements}
         filter={filter}
         focusMode={focusMode}
+        allMode={filter === 'all' ? allMode : 'floor'}
       />
 
       <TronPostFX />
@@ -119,6 +158,7 @@ function CategoryRing({
   label: string
 }) {
   const { radius, thetaStart, thetaLength, labelPosition, showLabel } = ring
+  const elevation = ring.elevation ?? 0
   const tron = resolveTronShowroom()
   const reduced = useReducedMotion()
   const segments = Math.max(
@@ -141,7 +181,7 @@ function CategoryRing({
   })
 
   return (
-    <group position={[0, 0.004, 0]}>
+    <group position={[0, elevation + 0.004, 0]}>
       {/* renderOrder=-1 forces the ring into the floor pass so devices and
           their billboards always paint on top of it, even where the photo
           alpha is too soft to write depth on its own. */}
@@ -300,6 +340,67 @@ function RingLabel({
       >
         {label}
       </div>
+    </Html>
+  )
+}
+
+function CategoryMarker({
+  marker,
+  onClick,
+}: {
+  marker: ShowroomMarker
+  onClick?: () => void
+}) {
+  const tron = resolveTronShowroom()
+  const title = CATEGORY_LABELS[marker.category]
+  return (
+    <Html
+      position={marker.position}
+      center
+      distanceFactor={8}
+      zIndexRange={[2, 0]}
+      style={{ pointerEvents: onClick ? 'auto' : 'none' }}
+    >
+      <button
+        type="button"
+        onClick={onClick}
+        style={
+          tron
+            ? {
+                padding: '5px 12px',
+                borderRadius: 2,
+                background: 'rgba(0, 0, 0, 0.78)',
+                border: `1px solid ${TRON.cyan}`,
+                color: TRON.cyan,
+                fontSize: 10,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                fontWeight: 700,
+                fontFamily:
+                  'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                whiteSpace: 'nowrap',
+                cursor: onClick ? 'pointer' : 'default',
+              }
+            : {
+                padding: '6px 13px',
+                borderRadius: 999,
+                background: 'rgba(5, 8, 15, 0.82)',
+                border: '1px solid rgba(2, 200, 255, 0.7)',
+                color: '#e6f0fa',
+                fontSize: 11,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+                cursor: onClick ? 'pointer' : 'default',
+              }
+        }
+      >
+        {title}
+        <span style={{ opacity: 0.7, marginLeft: 8, letterSpacing: 0 }}>
+          {marker.count}
+        </span>
+      </button>
     </Html>
   )
 }

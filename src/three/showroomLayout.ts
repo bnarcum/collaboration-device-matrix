@@ -11,6 +11,8 @@ export interface ShowroomPlacement {
 export interface ShowroomRing {
   category: Category
   radius: number
+  /** Height of this orbit above the floor (stacked All-view mock). */
+  elevation?: number
   /** World-space floor label, outside the rotated ring mesh. */
   labelPosition: [number, number, number]
   thetaStart: number
@@ -21,7 +23,20 @@ export interface ShowroomRing {
 export interface ShowroomLayout {
   rings: ShowroomRing[]
   placements: ShowroomPlacement[]
+  /** Category islands / row captions for Hub and Wall mocks. */
+  markers?: ShowroomMarker[]
 }
+
+export interface ShowroomMarker {
+  category: Category
+  count: number
+  position: [number, number, number]
+}
+
+export type ShowroomAllMode = 'floor' | 'layers' | 'hub' | 'wall'
+
+/** Uniform scale for the camera-facing product wall so ~120 SKUs fit one frame. */
+export const WALL_PEDESTAL_SCALE = 0.62
 
 /** Gap between billboard footprints along a filtered arc (meters). */
 const COMPACT_GAP = 0.32
@@ -184,18 +199,196 @@ function placeOnCircle(
   device: Device,
   radius: number,
   angle: number,
+  y = 0,
 ): ShowroomPlacement {
   return {
     device,
-    position: [Math.cos(angle) * radius, 0, Math.sin(angle) * radius],
+    position: [Math.cos(angle) * radius, y, Math.sin(angle) * radius],
     rotationY: faceInward(angle),
   }
+}
+
+function chunkDevices(devices: Device[], size: number): Device[][] {
+  const out: Device[][] = []
+  for (let i = 0; i < devices.length; i += size) {
+    out.push(devices.slice(i, i + size))
+  }
+  return out
+}
+
+function layerCap(category: Category): number {
+  if (category === 'room') return 11
+  if (category === 'phone') return 15
+  if (category === 'headset') return 12
+  return 14
+}
+
+function layerRise(devices: Device[]): number {
+  const h = Math.max(
+    ...devices.map((d) => estimateBillboardPlane(d).planeH),
+    0.3,
+  )
+  return Math.max(1.05, h * 0.62 + 0.85)
+}
+
+/**
+ * Mock All-view: each category is one or more full orbits stacked in Y,
+ * slightly stepped inward like an amphitheater so upper layers stay readable.
+ */
+export function layoutStackedLayers(devices: Device[]): ShowroomLayout {
+  const rings: ShowroomRing[] = []
+  const placements: ShowroomPlacement[] = []
+  let y = 0
+
+  CATEGORY_ORDER.forEach((cat, catIndex) => {
+    const inCat = devices.filter((d) => d.category === cat)
+    if (inCat.length === 0) return
+
+    const rows = chunkDevices(inCat, layerCap(cat))
+    rows.forEach((row, rowIndex) => {
+      const radius = Math.max(3.4, 8.2 - catIndex * 0.7 - rowIndex * 0.12)
+      const stagger = (catIndex * 0.19 + rowIndex * Math.PI / Math.max(row.length, 1))
+      const step = (Math.PI * 2) / row.length
+
+      row.forEach((d, i) => {
+        placements.push(placeOnCircle(d, radius, stagger + i * step, y))
+      })
+
+      rings.push({
+        category: cat,
+        radius,
+        elevation: y,
+        labelPosition: [radius + 0.85, 0.18, 0],
+        thetaStart: 0,
+        thetaLength: Math.PI * 2,
+        showLabel: rowIndex === 0,
+      })
+
+      y += layerRise(row)
+    })
+    y += 0.28
+  })
+
+  return { rings, placements }
+}
+
+function pickHero(devices: Device[]): Device {
+  const cisco = devices.filter((d) => d.vendorId === 'cisco')
+  const pool = cisco.length > 0 ? cisco : devices
+  return pool.reduce((best, d) =>
+    deviceFootprint(d) >= deviceFootprint(best) ? d : best,
+  )
+}
+
+/**
+ * Mock All-view: one hero per category on a 2×3 floor, with a count label.
+ * Clicking an island should enter that category's horseshoe.
+ */
+export function layoutCategoryHub(devices: Device[]): ShowroomLayout {
+  const placements: ShowroomPlacement[] = []
+  const markers: ShowroomMarker[] = []
+  const colX = [-3.7, 0, 3.7]
+  const rowZ = [-1.85, 2.05]
+  let slot = 0
+
+  for (const cat of CATEGORY_ORDER) {
+    const inCat = devices.filter((d) => d.category === cat)
+    if (inCat.length === 0) continue
+    const col = slot % 3
+    const row = Math.floor(slot / 3)
+    slot += 1
+    const x = colX[col] ?? 0
+    const z = rowZ[row] ?? 0
+    const hero = pickHero(inCat)
+    placements.push({
+      device: hero,
+      position: [x, 0, z],
+      rotationY: 0,
+    })
+    markers.push({
+      category: cat,
+      count: inCat.length,
+      position: [x, 0.04, z + 0.95],
+    })
+  }
+
+  return { rings: [], placements, markers }
+}
+
+/**
+ * Mock All-view: camera-facing grid, one band per category, slight cylindrical
+ * curve so the wall reads as a shop display instead of a flat poster.
+ */
+export function layoutProductWall(devices: Device[]): ShowroomLayout {
+  const placements: ShowroomPlacement[] = []
+  const markers: ShowroomMarker[] = []
+  let y = 0
+
+  for (const cat of CATEGORY_ORDER) {
+    const inCat = devices.filter((d) => d.category === cat)
+    if (inCat.length === 0) continue
+
+    const perRow =
+      cat === 'room' ? 10 : cat === 'phone' ? 14 : cat === 'headset' ? 12 : 11
+    const rows = chunkDevices(inCat, perRow)
+    const bandTop = y
+    let bandMinX = 0
+
+    rows.forEach((row, rowIndex) => {
+      const widths = row.map((d) => {
+        const plane = estimateBillboardPlane(d, WALL_PEDESTAL_SCALE)
+        return Math.max(plane.planeW, 0.28) + 0.22
+      })
+      const total = widths.reduce((s, w) => s + w, 0)
+      let cursor = -total / 2
+      if (rowIndex === 0) bandMinX = cursor
+      const rowH = Math.max(
+        ...row.map((d) => estimateBillboardPlane(d, WALL_PEDESTAL_SCALE).planeH),
+        0.28,
+      )
+
+      row.forEach((d, i) => {
+        const w = widths[i] ?? 0.7
+        const x = cursor + w / 2
+        cursor += w
+        const z = -0.028 * x * x
+        placements.push({
+          device: d,
+          position: [x, y, z],
+          rotationY: -x * 0.03,
+        })
+      })
+
+      y += rowH * 0.7 + 0.36
+    })
+
+    const bandMid = (bandTop + y) * 0.5
+    markers.push({
+      category: cat,
+      count: inCat.length,
+      position: [bandMinX - 1.15, bandMid, 0.15],
+    })
+    y += 0.32
+  }
+
+  return { rings: [], placements, markers }
 }
 
 export function layoutByCategory(
   devices: Device[],
   filter: Category | 'all',
+  options?: { stacked?: boolean; allMode?: ShowroomAllMode },
 ): ShowroomLayout {
+  const allMode = options?.allMode ?? (options?.stacked ? 'layers' : 'floor')
+  if (filter === 'all' && allMode === 'layers') {
+    return layoutStackedLayers(devices)
+  }
+  if (filter === 'all' && allMode === 'hub') {
+    return layoutCategoryHub(devices)
+  }
+  if (filter === 'all' && allMode === 'wall') {
+    return layoutProductWall(devices)
+  }
   const useCompactArc = filter !== 'all'
   const rings: ShowroomRing[] = []
   const placements: ShowroomPlacement[] = []
