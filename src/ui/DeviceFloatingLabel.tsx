@@ -3,6 +3,17 @@ import type { VendorId } from '../data/types'
 import { vendorLabelTheme } from '../data/vendors'
 import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 
+/** Idle showroom pills use the model token so dense arcs stay readable. */
+export function shortShowroomName(name: string): string {
+  const models = name.match(/\d{3,5}[A-Za-z]?/g)
+  if (!models || models.length === 0) return name
+  const model = models[models.length - 1]
+  if (/kem|key exp/i.test(name)) return `${model} KEM`
+  if (/dect/i.test(name)) return `${model} DECT`
+  if (/conference/i.test(name)) return `${model} Conf`
+  return model
+}
+
 /** Inline styles for 3D Html pills — same fill as active topbar vendor/mode pills. */
 export function deviceLabelStyles(
   vendorId: VendorId,

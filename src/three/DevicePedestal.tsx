@@ -5,8 +5,10 @@ import * as THREE from 'three'
 import type { Device } from '../data/types'
 import { deviceImage, devicePhotoAspect } from '../data/deviceImages'
 import { useReducedMotion } from '../hooks/useReducedMotion'
-import { useNarrowViewport } from '../hooks/useNarrowViewport'
-import { DeviceFloatingLabel } from '../ui/DeviceFloatingLabel'
+import {
+  DeviceFloatingLabel,
+  shortShowroomName,
+} from '../ui/DeviceFloatingLabel'
 import { DeviceModel } from './DeviceModel'
 import {
   categoryMinFootprint,
@@ -59,7 +61,6 @@ export function DevicePedestal({
   const baseY = position[1]
   const imageUrl = deviceImage(device.id)
   const prefersReducedMotion = useReducedMotion()
-  const narrow = useNarrowViewport()
   const displaySize = useMemo(
     () => [device.size[0], device.size[1]] as [number, number],
     [device.size],
@@ -146,24 +147,19 @@ export function DevicePedestal({
           position={[
             0,
             (imageUrl ? planeH : device.size[1]) +
-              (selected || hovered ? 0.3 : 0.14 + labelLane(device.id) * 0.2),
+              (selected || hovered ? 0.28 : 0.12 + labelLane(device.id) * 0.16),
             0,
           ]}
           center
-          distanceFactor={
-            selected || hovered
-              ? narrow
-                ? 6.4
-                : 9
-              : narrow
-                ? 8.6
-                : 13
-          }
           zIndexRange={selected || hovered ? [12, 8] : [1, 0]}
           pointerEvents="none"
         >
           <DeviceFloatingLabel
-            name={device.name}
+            name={
+              selected || hovered
+                ? device.name
+                : shortShowroomName(device.name)
+            }
             vendorId={device.vendorId}
             selected={selected || hovered}
           />
