@@ -38,6 +38,9 @@ export type ShowroomAllMode = 'floor' | 'layers' | 'hub' | 'wall'
 /** Uniform scale for the camera-facing product wall so ~120 SKUs fit one frame. */
 export const WALL_PEDESTAL_SCALE = 0.62
 
+/** Mobile category shelf — keeps SKUs readable without matching the All-view wall mock. */
+export const MOBILE_SHELF_SCALE = 1
+
 /** Gap between billboard footprints along a filtered arc (meters). */
 const COMPACT_GAP = 0.32
 
@@ -387,6 +390,64 @@ export function layoutProductWall(devices: Device[]): ShowroomLayout {
   return { rings: [], placements, markers }
 }
 
+function shelfColumns(count: number): number {
+  if (count <= 3) return count
+  if (count <= 8) return 3
+  if (count <= 28) return 4
+  return 5
+}
+
+/**
+ * Portrait category view: camera-facing shelf so every SKU sits in the
+ * frustum. Desktop filtered view stays on the horseshoe (compactSlots).
+ */
+export function layoutFacingShelf(
+  devices: Device[],
+  category: Category,
+  pedestalScale = MOBILE_SHELF_SCALE,
+): ShowroomLayout {
+  const n = devices.length
+  if (n === 0) return { rings: [], placements: [], markers: [] }
+
+  const cols = shelfColumns(n)
+  const rows = Math.ceil(n / cols)
+  const planes = devices.map((d) => estimateBillboardPlane(d, pedestalScale))
+  const cellW = Math.max(
+    ...planes.map((p) => p.planeW),
+    0.36,
+  ) + 0.28
+  const cellH = Math.max(
+    ...planes.map((p) => p.planeH),
+    0.32,
+  ) + 0.55
+
+  const placements: ShowroomPlacement[] = devices.map((device, i) => {
+    const row = Math.floor(i / cols)
+    const col = i % cols
+    const inRow = Math.min(cols, n - row * cols)
+    const x = (col - (inRow - 1) / 2) * cellW
+    const y = (rows - 1 - row) * cellH
+    const z = -0.016 * x * x
+    return {
+      device,
+      position: [x, y, z],
+      rotationY: 0,
+    }
+  })
+
+  return {
+    rings: [],
+    placements,
+    markers: [
+      {
+        category,
+        count: n,
+        position: [0, -0.52, 0.22],
+      },
+    ],
+  }
+}
+
 export function layoutByCategory(
   devices: Device[],
   filter: Category | 'all',
@@ -395,6 +456,8 @@ export function layoutByCategory(
     allMode?: ShowroomAllMode
     /** Extra horseshoe rows so a portrait camera can see every SKU. */
     compactRows?: boolean
+    /** Portrait category: facing shelf instead of concentric horseshoes. */
+    facingShelf?: boolean
   },
 ): ShowroomLayout {
   const allMode = options?.allMode ?? (options?.stacked ? 'layers' : 'floor')
@@ -406,6 +469,12 @@ export function layoutByCategory(
   }
   if (filter === 'all' && allMode === 'wall') {
     return layoutProductWall(devices)
+  }
+  if (filter !== 'all' && options?.facingShelf) {
+    return layoutFacingShelf(
+      devices.filter((d) => d.category === filter),
+      filter,
+    )
   }
   const useCompactArc = filter !== 'all'
   const rings: ShowroomRing[] = []
@@ -457,24 +526,29 @@ export function layoutByCategory(
 
 export function placementBounds(placements: ShowroomPlacement[]) {
   if (placements.length === 0) {
-    return { width: 2, depth: 2, maxZ: 1, span: 2 }
+    return { width: 2, depth: 2, height: 2, maxZ: 1, span: 2 }
   }
 
   let minX = Infinity
   let maxX = -Infinity
+  let minY = Infinity
+  let maxY = -Infinity
   let minZ = Infinity
   let maxZ = -Infinity
 
   for (const p of placements) {
-    const [x, , z] = p.position
+    const [x, y, z] = p.position
     const plane = estimateBillboardPlane(p.device)
     minX = Math.min(minX, x - plane.planeW * 0.45)
     maxX = Math.max(maxX, x + plane.planeW * 0.45)
+    minY = Math.min(minY, y)
+    maxY = Math.max(maxY, y + plane.planeH)
     minZ = Math.min(minZ, z)
     maxZ = Math.max(maxZ, z)
   }
 
   const width = Math.max(1.1, maxX - minX)
   const depth = Math.max(0.8, maxZ - minZ)
-  return { width, depth, maxZ, span: Math.max(width, depth) }
+  const height = Math.max(0.8, maxY - minY)
+  return { width, depth, height, maxZ, span: Math.max(width, depth, height) }
 }

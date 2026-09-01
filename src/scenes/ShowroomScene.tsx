@@ -54,7 +54,7 @@ export function ShowroomScene({
     () =>
       layoutByCategory(devices, filter, {
         allMode,
-        compactRows: narrow && filter !== 'all' && allMode === 'floor',
+        facingShelf: narrow && filter !== 'all' && allMode === 'floor',
       }),
     [devices, filter, allMode, narrow],
   )
@@ -111,7 +111,7 @@ export function ShowroomScene({
         zoomSpeed={narrow ? 0.85 : 1}
         minDistance={minDistance}
         maxDistance={maxDistance}
-        maxPolarAngle={Math.PI * (allMode === 'wall' ? 0.5 : allMode === 'layers' ? 0.49 : 0.48)}
+        maxPolarAngle={Math.PI * (allMode === 'wall' || (narrow && filter !== 'all') ? 0.5 : allMode === 'layers' ? 0.49 : 0.48)}
         minPolarAngle={allMode === 'layers' ? 0.18 : 0}
       />
 

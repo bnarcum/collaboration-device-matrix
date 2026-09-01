@@ -165,17 +165,21 @@ function frameForCategory(
   let cz = 0
   let minX = Infinity
   let maxX = -Infinity
+  let minY = Infinity
+  let maxY = -Infinity
   let minZ = Infinity
   let maxZ = -Infinity
   let lookYSum = 0
 
   for (const p of placements) {
-    const [x, , z] = p.position
+    const [x, y, z] = p.position
     const plane = estimateBillboardPlane(p.device)
     cx += x
     cz += z
     minX = Math.min(minX, x - plane.planeW * 0.45)
     maxX = Math.max(maxX, x + plane.planeW * 0.45)
+    minY = Math.min(minY, y)
+    maxY = Math.max(maxY, y + plane.planeH + 0.38)
     minZ = Math.min(minZ, z)
     maxZ = Math.max(maxZ, z)
     lookYSum += plane.planeH * 0.4 + 0.1
@@ -184,10 +188,26 @@ function frameForCategory(
   const n = placements.length
   cx /= n
   cz /= n
-  const lookY = lookYSum / n
   const width = Math.max(1.1, maxX - minX)
+  const height = Math.max(0.8, maxY - minY)
   const depth = Math.max(0.8, maxZ - minZ)
+  const tall = height > 1.35 && height >= width * 0.5
 
+  // Facing shelf (mobile category): frame the XY billboard, not a floor arc.
+  if (narrow && tall) {
+    const cy = (minY + maxY) / 2
+    const vFov = (52 * Math.PI) / 180
+    const hFov = horizontalFov(vFov, aspect)
+    const fitW = width * 0.5 / Math.tan(hFov * 0.5)
+    const fitH = height * 0.5 / Math.tan(vFov * 0.5)
+    const standOff = Math.max(4.2, fitW * 1.16, fitH * 1.16)
+    return {
+      position: new THREE.Vector3(cx, cy + height * 0.03, maxZ + standOff),
+      target: new THREE.Vector3(cx, cy, (minZ + maxZ) / 2),
+    }
+  }
+
+  const lookY = lookYSum / n
   const vFov = ((narrow ? 52 : 45) * Math.PI) / 180
   const widthFov = narrow ? horizontalFov(vFov, aspect) : vFov
   const fitW = width * 0.5 / Math.tan(widthFov * 0.5)
