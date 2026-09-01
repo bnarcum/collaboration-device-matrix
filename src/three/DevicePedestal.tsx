@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import type { Device } from '../data/types'
 import { deviceImage, devicePhotoAspect } from '../data/deviceImages'
 import { useReducedMotion } from '../hooks/useReducedMotion'
+import { useNarrowViewport } from '../hooks/useNarrowViewport'
 import { DeviceFloatingLabel } from '../ui/DeviceFloatingLabel'
 import { DeviceModel } from './DeviceModel'
 import {
@@ -49,6 +50,7 @@ export function DevicePedestal({
   const baseY = position[1]
   const imageUrl = deviceImage(device.id)
   const prefersReducedMotion = useReducedMotion()
+  const narrow = useNarrowViewport()
   const displaySize = useMemo(
     () => [device.size[0], device.size[1]] as [number, number],
     [device.size],
@@ -134,7 +136,7 @@ export function DevicePedestal({
         <Html
           position={[0, (imageUrl ? planeH : device.size[1]) + 0.35, 0]}
           center
-          distanceFactor={6}
+          distanceFactor={narrow ? 4.2 : 6}
           zIndexRange={[1, 0]}
           pointerEvents="none"
         >

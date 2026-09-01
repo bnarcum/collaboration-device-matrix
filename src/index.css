@@ -36,6 +36,15 @@ body,
   padding: 0;
 }
 
+@media (max-width: 720px) {
+  html,
+  body,
+  #root,
+  .app {
+    height: 100dvh;
+  }
+}
+
 body {
   background: #04101f;
   color: var(--fg-1);
@@ -1333,15 +1342,68 @@ body.tron-showroom .canvas-wrap canvas {
   }
 }
 
-/* Mobile */
+/* Mobile — chrome and touch targets only; 3D layout math stays desktop. */
 @media (max-width: 720px) {
-  .filters {
-    max-width: calc(100% - 2rem);
+  .topbar {
+    padding: 0.5rem 0.7rem;
+    gap: 0.45rem 0.55rem;
   }
-  .compare-tray {
-    left: 1rem;
-    right: 1rem;
+
+  .brand-title {
+    font-size: 0.92rem;
+  }
+
+  .vendor-switch button,
+  .mode-switch button {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.75rem;
+  }
+
+  .filters {
+    left: 0.55rem;
+    right: 0.55rem;
+    bottom: max(0.5rem, env(safe-area-inset-bottom));
     max-width: none;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0.4rem 0.45rem;
+    gap: 0.28rem;
+  }
+
+  .filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filters button {
+    flex: 0 0 auto;
+    padding: 0.34rem 0.7rem;
+    font-size: 0.72rem;
+  }
+
+  .filters-mock {
+    display: none;
+  }
+
+  .compare-tray {
+    left: 0.55rem;
+    right: 0.55rem;
+    bottom: 4.15rem;
+    max-width: none;
+  }
+
+  .drawer {
+    top: auto;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: min(72dvh, 640px);
+    border-left: none;
+    border-top: 1px solid var(--line-strong);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.45);
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
   }
 }
 

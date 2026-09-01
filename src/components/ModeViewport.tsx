@@ -4,6 +4,7 @@ import type { Category, Device } from '../data/types'
 import type { ShowroomFocusMode } from '../three/ShowroomCameraFocus'
 import type { ShowroomAllMode } from '../three/showroomLayout'
 import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
+import { useNarrowViewport } from '../hooks/useNarrowViewport'
 
 const ShowroomScene = lazy(() =>
   import('../scenes/ShowroomScene').then((m) => ({ default: m.ShowroomScene })),
@@ -43,6 +44,8 @@ export function ModeViewport({
   allMode = 'floor',
   onEnterCategory,
 }: Props) {
+  const narrow = useNarrowViewport()
+
   if (mode === 'showcase') {
     return (
       <Suspense fallback={<SceneFallback />}>
@@ -60,8 +63,11 @@ export function ModeViewport({
 
   return (
     <Canvas
-      camera={{ position: [9, 6, 9], fov: 45 }}
-      dpr={[1, 2]}
+      camera={{
+        position: narrow ? [11.2, 8.8, 11.2] : [9, 6, 9],
+        fov: narrow ? 52 : 45,
+      }}
+      dpr={narrow ? [1, 1.5] : [1, 2]}
       gl={{
         antialias: true,
         alpha: !tron,

@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import type { Category, Device } from '../data/types'
 import { useReducedMotion } from '../hooks/useReducedMotion'
+import { useNarrowViewport } from '../hooks/useNarrowViewport'
 import { estimateBillboardPlane } from './billboardSizing'
 import type { ShowroomAllMode, ShowroomPlacement } from './showroomLayout'
 
@@ -23,6 +24,11 @@ interface OrbitControlsLike {
 const OVERVIEW: CameraFrame = {
   position: new THREE.Vector3(9, 6, 9),
   target: new THREE.Vector3(0, 0, 0),
+}
+
+const OVERVIEW_NARROW: CameraFrame = {
+  position: new THREE.Vector3(11.4, 9.2, 11.4),
+  target: new THREE.Vector3(0, 0.22, 0),
 }
 
 function frameForDevice(
@@ -103,11 +109,15 @@ function frameForWall(placements: ShowroomPlacement[]): CameraFrame {
   }
 }
 
-function overviewFrame(placements: ShowroomPlacement[] = []): CameraFrame {
+function overviewFrame(
+  placements: ShowroomPlacement[] = [],
+  narrow = false,
+): CameraFrame {
+  const fallback = narrow ? OVERVIEW_NARROW : OVERVIEW
   if (placements.length === 0) {
     return {
-      position: OVERVIEW.position.clone(),
-      target: OVERVIEW.target.clone(),
+      position: fallback.position.clone(),
+      target: fallback.target.clone(),
     }
   }
 
@@ -122,8 +132,8 @@ function overviewFrame(placements: ShowroomPlacement[] = []): CameraFrame {
 
   if (maxY < 1.4) {
     return {
-      position: OVERVIEW.position.clone(),
-      target: OVERVIEW.target.clone(),
+      position: fallback.position.clone(),
+      target: fallback.target.clone(),
     }
   }
 
@@ -140,8 +150,11 @@ function overviewFrame(placements: ShowroomPlacement[] = []): CameraFrame {
 }
 
 /** Frame a filtered horseshoe so devices sit mid-view, not on the horizon. */
-function frameForCategory(placements: ShowroomPlacement[]): CameraFrame {
-  if (placements.length === 0) return overviewFrame()
+function frameForCategory(
+  placements: ShowroomPlacement[],
+  narrow = false,
+): CameraFrame {
+  if (placements.length === 0) return overviewFrame([], narrow)
 
   let cx = 0
   let cz = 0
@@ -170,10 +183,14 @@ function frameForCategory(placements: ShowroomPlacement[]): CameraFrame {
   const width = Math.max(1.1, maxX - minX)
   const depth = Math.max(0.8, maxZ - minZ)
 
-  const fov = (45 * Math.PI) / 180
+  const fov = ((narrow ? 52 : 45) * Math.PI) / 180
   const fitW = width * 0.5 / Math.tan(fov * 0.5)
-  const standOff = Math.max(2.15, fitW * 0.9, depth * 0.5 + 1.85)
-  const lift = Math.min(2.15, Math.max(0.95, lookY * 0.55 + width * 0.1))
+  const standOff =
+    Math.max(2.15, fitW * 0.9, depth * 0.5 + 1.85) * (narrow ? 1.28 : 1)
+  const lift = Math.min(
+    narrow ? 2.55 : 2.15,
+    Math.max(narrow ? 1.35 : 0.95, lookY * 0.55 + width * 0.1),
+  )
 
   return {
     position: new THREE.Vector3(cx + width * 0.03, lookY + lift, maxZ + standOff),
@@ -206,6 +223,15 @@ export function placementsLayoutKey(
   return `${filter}|${allMode}|${parts.join(';')}`
 }
 
+function placementsLayoutKeyNarrow(
+  placements: ShowroomPlacement[],
+  filter: Category | 'all',
+  allMode: ShowroomAllMode,
+  narrow: boolean,
+): string {
+  return `${placementsLayoutKey(placements, filter, allMode)}|n${narrow ? 1 : 0}`
+}
+
 /**
  * Frames OrbitControls on the selected device (hero) or showroom overview (ring).
  * Lerps only when focus inputs change — pauses while the user orbits.
@@ -220,12 +246,13 @@ export function ShowroomCameraFocus({
   const camera = useThree((s) => s.camera)
   const controls = useThree((s) => s.controls) as OrbitControlsLike | null
   const reducedMotion = useReducedMotion()
+  const narrow = useNarrowViewport()
   const goal = useRef<CameraFrame>(overviewFrame())
   const animating = useRef(false)
   const userInteracting = useRef(false)
   const layoutKey = useMemo(
-    () => placementsLayoutKey(placements, filter, allMode),
-    [placements, filter, allMode],
+    () => placementsLayoutKeyNarrow(placements, filter, allMode, narrow),
+    [placements, filter, allMode, narrow],
   )
 
   const applyGoalToCamera = useCallback(
@@ -255,18 +282,18 @@ export function ShowroomCameraFocus({
         if (!placement) return
         frame = frameForDevice(placement.device, placement.position, allMode)
       } else if (filter !== 'all' && placements.length > 0) {
-        frame = frameForCategory(placements)
+        frame = frameForCategory(placements, narrow)
       } else if (allMode === 'wall' && placements.length > 0) {
         frame = frameForWall(placements)
       } else if (allMode === 'hub' && placements.length > 0) {
-        frame = frameForCategory(placements)
+        frame = frameForCategory(placements, narrow)
       } else {
-        frame = overviewFrame(placements)
+        frame = overviewFrame(placements, narrow)
       }
 
       applyGoalToCamera(frame, true)
     },
-    [selected, placements, focusMode, filter, allMode, applyGoalToCamera],
+    [selected, placements, focusMode, filter, allMode, narrow, applyGoalToCamera],
   )
 
   useLayoutEffect(() => {

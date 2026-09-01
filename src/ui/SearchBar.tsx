@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useNarrowViewport } from '../hooks/useNarrowViewport'
 import type { Device } from '../data/types'
 import { CATEGORY_LABELS, VENDOR_LABELS } from '../data/types'
 
@@ -55,19 +56,7 @@ export function SearchBar({ devices, onSelect }: Props) {
   const [active, setActive] = useState(0)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const wrapRef = useRef<HTMLDivElement | null>(null)
-  const [collapsed, setCollapsed] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false
-    return window.matchMedia('(max-width: 720px)').matches
-  })
-
-  // Track viewport so we can collapse to an icon-only chip on narrow screens.
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const mq = window.matchMedia('(max-width: 720px)')
-    const onChange = (e: MediaQueryListEvent) => setCollapsed(e.matches)
-    mq.addEventListener('change', onChange)
-    return () => mq.removeEventListener('change', onChange)
-  }, [])
+  const collapsed = useNarrowViewport()
 
   // Cmd/Ctrl+K → focus the search box.
   useEffect(() => {
@@ -75,7 +64,7 @@ export function SearchBar({ devices, onSelect }: Props) {
       const isK = e.key === 'k' || e.key === 'K'
       if (isK && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
-        setCollapsed(false)
+        setOpen(true)
         // Defer focus until after the input is rendered (in case it was an icon).
         requestAnimationFrame(() => {
           inputRef.current?.focus()

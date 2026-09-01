@@ -21,6 +21,7 @@ import {
   type ShowroomRing,
 } from '../three/showroomLayout'
 import { useReducedMotion } from '../hooks/useReducedMotion'
+import { useNarrowViewport } from '../hooks/useNarrowViewport'
 import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 
 interface Props {
@@ -58,7 +59,31 @@ export function ShowroomScene({
   )
 
   const tron = resolveTronShowroom()
+  const narrow = useNarrowViewport()
   const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const floorMode = allMode === 'floor'
+  const minDistance = floorMode
+    ? filter === 'all'
+      ? narrow
+        ? 3.4
+        : 2.5
+      : narrow
+        ? 2.2
+        : 1.8
+    : allMode === 'wall'
+      ? 6
+      : allMode === 'hub'
+        ? 2.8
+        : 4.5
+  const maxDistance = floorMode
+    ? filter === 'all'
+      ? narrow
+        ? 26
+        : 20
+      : Math.max(narrow ? 18 : 16, bounds.span * (narrow ? 2.6 : 2.4))
+    : allMode === 'wall' || allMode === 'layers'
+      ? Math.max(36, bounds.span * 2.2)
+      : 20
 
   return (
     <>
@@ -75,17 +100,11 @@ export function ShowroomScene({
         enablePan
         enableRotate
         enableDamping
-        dampingFactor={0.08}
-        minDistance={
-          allMode === 'wall' ? 6 : allMode === 'hub' ? 2.8 : allMode === 'layers' ? 4.5 : filter === 'all' ? 2.5 : 1.8
-        }
-        maxDistance={
-          allMode === 'wall' || allMode === 'layers'
-            ? Math.max(36, bounds.span * 2.2)
-            : filter === 'all'
-              ? 20
-              : Math.max(16, bounds.span * 2.4)
-        }
+        dampingFactor={narrow ? 0.12 : 0.08}
+        rotateSpeed={narrow ? 0.72 : 1}
+        zoomSpeed={narrow ? 0.85 : 1}
+        minDistance={minDistance}
+        maxDistance={maxDistance}
         maxPolarAngle={Math.PI * (allMode === 'wall' ? 0.5 : allMode === 'layers' ? 0.49 : 0.48)}
         minPolarAngle={allMode === 'layers' ? 0.18 : 0}
       />
@@ -295,11 +314,12 @@ function RingLabel({
   label: string
   position: [number, number, number]
 }) {
+  const narrow = useNarrowViewport()
   return (
     <Html
       position={position}
       center
-      distanceFactor={9}
+      distanceFactor={narrow ? 6.4 : 9}
       style={{ pointerEvents: 'none' }}
       zIndexRange={[1, 0]}
     >

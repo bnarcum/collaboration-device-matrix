@@ -881,19 +881,21 @@ function Filters({
       {onAllModeChange && (
         <>
           <button
+            className="filters-mock"
             data-active={value === 'all' && allMode === 'hub' ? 'true' : 'false'}
             onClick={() => pickAll('hub')}
           >
             Hub
           </button>
           <button
+            className="filters-mock"
             data-active={value === 'all' && allMode === 'wall' ? 'true' : 'false'}
             onClick={() => pickAll('wall')}
           >
             Wall
           </button>
           <button
-            className="filters-layers"
+            className="filters-mock filters-layers"
             data-active={value === 'all' && allMode === 'layers' ? 'true' : 'false'}
             onClick={() => pickAll('layers')}
           >
