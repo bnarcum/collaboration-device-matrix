@@ -15,8 +15,6 @@ import {
 import {
   layoutByCategory,
   placementBounds,
-  WALL_PEDESTAL_SCALE,
-  type ShowroomAllMode,
   type ShowroomMarker,
   type ShowroomRing,
 } from '../three/showroomLayout'
@@ -30,9 +28,6 @@ interface Props {
   selected?: Device | null
   onSelect: (d: Device) => void
   focusMode?: ShowroomFocusMode
-  /** All-view mock: floor rings, stacked orbits, category hub, or product wall. */
-  allMode?: ShowroomAllMode
-  onEnterCategory?: (category: Category) => void
 }
 
 /**
@@ -46,17 +41,14 @@ export function ShowroomScene({
   selected,
   onSelect,
   focusMode = 'ring',
-  allMode = 'floor',
-  onEnterCategory,
 }: Props) {
   const narrow = useNarrowViewport()
   const layout = useMemo(
     () =>
       layoutByCategory(devices, filter, {
-        allMode,
-        facingShelf: narrow && filter !== 'all' && allMode === 'floor',
+        facingShelf: narrow && filter !== 'all',
       }),
-    [devices, filter, allMode, narrow],
+    [devices, filter, narrow],
   )
   const bounds = useMemo(
     () => placementBounds(layout.placements),
@@ -65,40 +57,27 @@ export function ShowroomScene({
 
   const tron = resolveTronShowroom()
   const [hoveredId, setHoveredId] = useState<string | null>(null)
-  const floorMode = allMode === 'floor'
-  const minDistance = floorMode
-    ? filter === 'all'
+  const minDistance =
+    filter === 'all'
       ? narrow
         ? 3.4
         : 2.5
       : narrow
         ? 2.2
         : 1.8
-    : allMode === 'wall'
-      ? 6
-      : allMode === 'hub'
-        ? 2.8
-        : 4.5
-  const maxDistance = floorMode
-    ? filter === 'all'
+  const maxDistance =
+    filter === 'all'
       ? narrow
         ? 26
         : 20
       : Math.max(narrow ? 34 : 16, bounds.span * (narrow ? 3.4 : 2.4))
-    : allMode === 'wall' || allMode === 'layers'
-      ? Math.max(36, bounds.span * 2.2)
-      : 20
 
   return (
     <>
       {tron && <color attach="background" args={[TRON.void]} />}
       <SceneEnv
         extent={
-          allMode === 'wall' || allMode === 'layers'
-            ? Math.max(22, bounds.span * 0.7 + 8)
-            : narrow
-              ? Math.max(18, bounds.span * 0.85 + 8)
-              : 18
+          narrow ? Math.max(18, bounds.span * 0.85 + 8) : 18
         }
       />
       <OrbitControls
@@ -111,8 +90,8 @@ export function ShowroomScene({
         zoomSpeed={narrow ? 0.85 : 1}
         minDistance={minDistance}
         maxDistance={maxDistance}
-        maxPolarAngle={Math.PI * (allMode === 'wall' || (narrow && filter !== 'all') ? 0.5 : allMode === 'layers' ? 0.49 : 0.48)}
-        minPolarAngle={allMode === 'layers' ? 0.18 : 0}
+        maxPolarAngle={Math.PI * (narrow && filter !== 'all' ? 0.5 : 0.48)}
+        minPolarAngle={0}
       />
 
       <ShowroomFloor />
@@ -129,11 +108,6 @@ export function ShowroomScene({
         <CategoryMarker
           key={`marker-${marker.category}-${marker.position.join(',')}`}
           marker={marker}
-          onClick={
-            onEnterCategory
-              ? () => onEnterCategory(marker.category)
-              : undefined
-          }
         />
       ))}
 
@@ -145,13 +119,8 @@ export function ShowroomScene({
           rotationY={p.rotationY}
           selected={selected?.id === p.device.id}
           hovered={hoveredId === p.device.id}
-          scale={allMode === 'wall' ? WALL_PEDESTAL_SCALE : 1}
-          showLabel={allMode !== 'hub'}
-          onClick={
-            allMode === 'hub' && onEnterCategory
-              ? (d) => onEnterCategory(d.category)
-              : onSelect
-          }
+          showLabel
+          onClick={onSelect}
           onHover={(d) => setHoveredId(d?.id ?? null)}
         />
       ))}
@@ -161,7 +130,6 @@ export function ShowroomScene({
         placements={layout.placements}
         filter={filter}
         focusMode={focusMode}
-        allMode={filter === 'all' ? allMode : 'floor'}
       />
 
       <TronPostFX />
@@ -372,10 +340,8 @@ function RingLabel({
 
 function CategoryMarker({
   marker,
-  onClick,
 }: {
   marker: ShowroomMarker
-  onClick?: () => void
 }) {
   const tron = resolveTronShowroom()
   const title = CATEGORY_LABELS[marker.category]
@@ -385,11 +351,9 @@ function CategoryMarker({
       center
       distanceFactor={8}
       zIndexRange={[2, 0]}
-      style={{ pointerEvents: onClick ? 'auto' : 'none' }}
+      style={{ pointerEvents: 'none' }}
     >
-      <button
-        type="button"
-        onClick={onClick}
+      <div
         style={
           tron
             ? {
@@ -405,7 +369,6 @@ function CategoryMarker({
                 fontFamily:
                   'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
                 whiteSpace: 'nowrap',
-                cursor: onClick ? 'pointer' : 'default',
               }
             : {
                 padding: '6px 13px',
@@ -418,7 +381,6 @@ function CategoryMarker({
                 textTransform: 'uppercase',
                 fontWeight: 600,
                 whiteSpace: 'nowrap',
-                cursor: onClick ? 'pointer' : 'default',
               }
         }
       >
@@ -426,7 +388,7 @@ function CategoryMarker({
         <span style={{ opacity: 0.7, marginLeft: 8, letterSpacing: 0 }}>
           {marker.count}
         </span>
-      </button>
+      </div>
     </Html>
   )
 }

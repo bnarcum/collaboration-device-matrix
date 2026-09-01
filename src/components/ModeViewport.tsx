@@ -2,7 +2,6 @@ import { lazy, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import type { Category, Device } from '../data/types'
 import type { ShowroomFocusMode } from '../three/ShowroomCameraFocus'
-import type { ShowroomAllMode } from '../three/showroomLayout'
 import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 import { useNarrowViewport } from '../hooks/useNarrowViewport'
 
@@ -30,8 +29,6 @@ interface Props {
   onSelect: (d: Device) => void
   filter: Category | 'all'
   showroomFocus?: ShowroomFocusMode
-  allMode?: ShowroomAllMode
-  onEnterCategory?: (category: Category) => void
 }
 
 export function ModeViewport({
@@ -41,8 +38,6 @@ export function ModeViewport({
   onSelect,
   filter,
   showroomFocus = 'ring',
-  allMode = 'floor',
-  onEnterCategory,
 }: Props) {
   const narrow = useNarrowViewport()
 
@@ -82,8 +77,6 @@ export function ModeViewport({
           selected={selected}
           onSelect={onSelect}
           focusMode={showroomFocus}
-          allMode={allMode}
-          onEnterCategory={onEnterCategory}
         />
       </Suspense>
     </Canvas>

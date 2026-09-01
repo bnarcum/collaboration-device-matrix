@@ -42,7 +42,6 @@ import {
   type UrlCodec,
 } from './hooks/useUrlState'
 import type { ShowroomFocusMode } from './three/ShowroomCameraFocus'
-import type { ShowroomAllMode } from './three/showroomLayout'
 import { useTronShowroom } from './theme/TronShowroomContext'
 import { playTronGridSting, primeTronAudio } from './ui/tronSting'
 
@@ -133,11 +132,6 @@ export default function App() {
     'filter',
     'all',
     enumCodec(FILTER_VALUES, 'all'),
-  )
-  const [allMode, setAllMode] = useUrlState<ShowroomAllMode>(
-    'layout',
-    'floor',
-    enumCodec(['floor', 'layers', 'hub', 'wall'] as const, 'floor'),
   )
   const [showroomFocus, setShowroomFocus] = useUrlState<ShowroomFocusMode>(
     'camera',
@@ -747,8 +741,6 @@ export default function App() {
           onSelect={(d) => selectDevice(d)}
           filter={filter}
           showroomFocus={showroomFocus}
-          allMode={filter === 'all' ? allMode : 'floor'}
-          onEnterCategory={(c) => setFilter(c)}
         />
 
         <div className="overlay">
@@ -756,8 +748,6 @@ export default function App() {
             <Filters
               value={filter}
               onChange={setFilter}
-              allMode={allMode}
-              onAllModeChange={setAllMode}
             />
           )}
           {EMBED_MODE && mode === 'showroom' && showroomFocus === 'hero' && selected && (
@@ -853,19 +843,11 @@ function Filters({
   value,
   onChange,
   inline = false,
-  allMode = 'floor',
-  onAllModeChange,
 }: {
   value: Category | 'all'
   onChange: (c: Category | 'all') => void
   inline?: boolean
-  allMode?: ShowroomAllMode
-  onAllModeChange?: (next: ShowroomAllMode) => void
 }) {
-  const pickAll = (mode: ShowroomAllMode) => {
-    onAllModeChange?.(mode)
-    onChange('all')
-  }
   return (
     <div
       className={inline ? 'filters filters--inline' : 'filters'}
@@ -873,36 +855,11 @@ function Filters({
       aria-label={inline ? undefined : 'Category filter'}
     >
       <button
-        data-active={value === 'all' && allMode === 'floor' ? 'true' : 'false'}
-        onClick={() => pickAll('floor')}
+        data-active={value === 'all' ? 'true' : 'false'}
+        onClick={() => onChange('all')}
       >
         All
       </button>
-      {onAllModeChange && (
-        <>
-          <button
-            className="filters-mock"
-            data-active={value === 'all' && allMode === 'hub' ? 'true' : 'false'}
-            onClick={() => pickAll('hub')}
-          >
-            Hub
-          </button>
-          <button
-            className="filters-mock"
-            data-active={value === 'all' && allMode === 'wall' ? 'true' : 'false'}
-            onClick={() => pickAll('wall')}
-          >
-            Wall
-          </button>
-          <button
-            className="filters-mock filters-layers"
-            data-active={value === 'all' && allMode === 'layers' ? 'true' : 'false'}
-            onClick={() => pickAll('layers')}
-          >
-            Layers
-          </button>
-        </>
-      )}
       {CATEGORY_ORDER.map((c) => (
         <button
           key={c}

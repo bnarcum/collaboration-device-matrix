@@ -950,10 +950,6 @@ body.tron-showroom .canvas-wrap canvas {
   backdrop-filter: none;
 }
 
-.filters-layers {
-  margin-left: 0.15rem;
-}
-
 .aisle-toolbar {
   position: absolute;
   bottom: 1rem;
@@ -1380,10 +1376,6 @@ body.tron-showroom .canvas-wrap canvas {
     flex: 0 0 auto;
     padding: 0.34rem 0.7rem;
     font-size: 0.72rem;
-  }
-
-  .filters-mock {
-    display: none;
   }
 
   .compare-tray {
