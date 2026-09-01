@@ -10,14 +10,17 @@ interface FloorProps {
    * showroom look). Default is `false` unless Tron theme is active.
    */
   showGrid?: boolean
+  /** Disc radius in meters. Grows with the All-view ring layout. */
+  radius?: number
 }
 
 /**
  * Dark polished floor for the Showroom scene.
  */
-export function ShowroomFloor({ showGrid }: FloorProps = {}) {
+export function ShowroomFloor({ showGrid, radius = 18 }: FloorProps = {}) {
   const tron = resolveTronShowroom()
   const gridOn = showGrid ?? tron
+  const r = Math.max(18, radius)
 
   return (
     <group>
@@ -26,21 +29,21 @@ export function ShowroomFloor({ showGrid }: FloorProps = {}) {
         position={[0, 0, 0]}
         receiveShadow
       >
-        <circleGeometry args={[18, 96]} />
+        <circleGeometry args={[r, 96]} />
         <meshBasicMaterial
           color={tron ? TRON.floor : '#050c18'}
           side={THREE.DoubleSide}
         />
       </mesh>
 
-      <FloorVignette strength={tron ? 0.55 : 0.42} />
+      <FloorVignette strength={tron ? 0.55 : 0.42} radius={r} />
 
-      {gridOn && <GridDisc tron={tron} />}
+      {gridOn && <GridDisc tron={tron} radius={r} />}
     </group>
   )
 }
 
-function GridDisc({ tron }: { tron: boolean }) {
+function GridDisc({ tron, radius }: { tron: boolean; radius: number }) {
   const reduced = useReducedMotion()
   const uniforms = useMemo(
     () => ({
@@ -51,13 +54,13 @@ function GridDisc({ tron }: { tron: boolean }) {
       uMajorColor: { value: new THREE.Color(tron ? TRON.gridMajor : '#34557a') },
       uMinorColor: { value: new THREE.Color(tron ? TRON.gridMinor : '#1a283b') },
       uAccent: { value: new THREE.Color(tron ? TRON.cyan : '#02C8FF') },
-      uFadeInner: { value: tron ? 11.5 : 10.5 },
-      uFadeOuter: { value: tron ? 18.5 : 18.5 },
+      uFadeInner: { value: radius * 0.62 },
+      uFadeOuter: { value: radius * 1.02 },
       uOverallAlpha: { value: tron ? 1.0 : 0.92 },
       uTime: { value: 0 },
       uTron: { value: tron ? 1 : 0 },
     }),
-    [tron],
+    [tron, radius],
   )
 
   useFrame(({ clock }) => {
@@ -71,7 +74,7 @@ function GridDisc({ tron }: { tron: boolean }) {
       position={[0, 0.002, 0]}
       renderOrder={1}
     >
-      <circleGeometry args={[18, 96]} />
+      <circleGeometry args={[radius, 96]} />
       <shaderMaterial
         transparent
         depthWrite={false}
@@ -157,14 +160,21 @@ const frag = /* glsl */ `
 `
 
 /** Soft origin vignette — covers the full disc so no hotspot reads as a stage light. */
-function FloorVignette({ strength = 0.5 }: { strength?: number }) {
+function FloorVignette({
+  strength = 0.5,
+  radius = 18,
+}: {
+  strength?: number
+  radius?: number
+}) {
   const uniforms = useMemo(
     () => ({
       uInner: { value: 1.2 },
-      uOuter: { value: 14.5 },
+      uOuter: { value: radius * 0.8 },
       uStrength: { value: strength },
+      uScale: { value: radius * 2 },
     }),
-    [strength],
+    [strength, radius],
   )
 
   return (
@@ -173,7 +183,7 @@ function FloorVignette({ strength = 0.5 }: { strength?: number }) {
       position={[0, 0.001, 0]}
       renderOrder={0}
     >
-      <circleGeometry args={[18, 96]} />
+      <circleGeometry args={[radius, 96]} />
       <shaderMaterial
         transparent
         depthWrite={false}
@@ -200,10 +210,11 @@ const dimFrag = /* glsl */ `
   uniform float uInner;
   uniform float uOuter;
   uniform float uStrength;
+  uniform float uScale;
 
   void main() {
     vec2 c = vUv - 0.5;
-    float r = length(c) * 32.0;
+    float r = length(c) * uScale;
     float dim = 1.0 - smoothstep(uInner, uOuter, r);
     if (dim <= 0.001) discard;
     gl_FragColor = vec4(0.0, 0.0, 0.0, dim * uStrength);

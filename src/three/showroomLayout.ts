@@ -26,6 +26,14 @@ export interface ShowroomLayout {
 /** Gap between billboard footprints along a filtered arc (meters). */
 const COMPACT_GAP = 0.32
 
+/** All-view full rings: extra along-arc space for the always-on name pill. */
+const ALL_GAP = 0.7
+const ALL_LABEL_PAD = 0.4
+const ALL_RADIAL_GAP = 1.55
+const ALL_CATEGORY_GAP = 1.25
+const ALL_INNER_RADIUS = 3.6
+const TAU = Math.PI * 2
+
 /** Front-facing horseshoe, opening toward +Z (camera). */
 export const ARC_SWEEP = (168 * Math.PI) / 180
 export const ARC_CENTER = -Math.PI / 2
@@ -36,10 +44,6 @@ const TWO_ROW_RADIUS = 2.7
 const THREE_ROW_COUNT = 28
 const THREE_ROW_RADIUS = 5.0
 const ROW_GAP = 0.52
-
-function fullRingAngles(count: number): number[] {
-  return Array.from({ length: count }, (_, i) => (i / count) * Math.PI * 2)
-}
 
 function deviceFootprint(device: Device): number {
   return estimateBillboardPlane(device).footprint
@@ -176,6 +180,96 @@ export function compactSlots(devices: Device[]): {
   return { slots, rings }
 }
 
+function arcWidth(device: Device): number {
+  const plane = estimateBillboardPlane(device)
+  return Math.max(plane.planeW, 0.42) + ALL_LABEL_PAD
+}
+
+function radialClearance(device: Device): number {
+  const plane = estimateBillboardPlane(device)
+  return Math.max(plane.planeH, plane.planeW) * 0.5
+}
+
+function packedCircleNeed(devices: Device[]): number {
+  if (devices.length === 0) return 0
+  return (
+    devices.reduce((sum, d) => sum + arcWidth(d), 0) + ALL_GAP * devices.length
+  )
+}
+
+function packOnCircle(
+  devices: Device[],
+  minR: number,
+  stagger = 0,
+): { radius: number; slots: { radius: number; angle: number }[] } {
+  if (devices.length === 0) {
+    return { radius: minR, slots: [] }
+  }
+  const need = packedCircleNeed(devices)
+  const radius = Math.max(minR, need / TAU)
+  let cursor = stagger * radius
+  const slots = devices.map((d) => {
+    const w = arcWidth(d)
+    const mid = cursor + w / 2
+    cursor += w + ALL_GAP
+    return { radius, angle: mid / radius }
+  })
+  return { radius, slots }
+}
+
+function ringsForCircle(devices: Device[], minR: number): number {
+  const n = devices.length
+  if (n <= 1) return 1
+  for (let rows = 1; rows <= n; rows++) {
+    const groups = splitRows(devices, rows)
+    let r = minR
+    let fits = true
+    for (const row of groups) {
+      if (packedCircleNeed(row) / TAU > r + 0.02) {
+        fits = false
+        break
+      }
+      const clear = Math.max(...row.map(radialClearance), 0.35)
+      r += clear + ALL_RADIAL_GAP
+    }
+    if (fits) return rows
+  }
+  return n
+}
+
+/**
+ * All-view layout: footprint-aware full rings, split when one circle is too tight.
+ */
+export function packFullRings(
+  devices: Device[],
+  startRadius: number,
+): {
+  slots: { radius: number; angle: number }[]
+  rings: { radius: number }[]
+} {
+  if (devices.length === 0) {
+    return { slots: [], rings: [{ radius: startRadius }] }
+  }
+
+  const rows = splitRows(devices, ringsForCircle(devices, startRadius))
+  const packed: { radius: number; slots: { radius: number; angle: number }[] }[] =
+    []
+
+  let minR = startRadius
+  rows.forEach((row, i) => {
+    const stagger = i % 2 === 1 ? ALL_GAP / (2 * Math.max(minR, 1)) : 0
+    const ring = packOnCircle(row, minR, stagger)
+    packed.push(ring)
+    const clear = Math.max(...row.map(radialClearance), 0.35)
+    minR = ring.radius + clear + ALL_RADIAL_GAP
+  })
+
+  return {
+    slots: packed.flatMap((row) => row.slots),
+    rings: packed.map((row) => ({ radius: row.radius })),
+  }
+}
+
 function faceInward(angle: number): number {
   return -angle + Math.PI / 2
 }
@@ -199,7 +293,7 @@ export function layoutByCategory(
   const useCompactArc = filter !== 'all'
   const rings: ShowroomRing[] = []
   const placements: ShowroomPlacement[] = []
-  let baseRadius = 2.4
+  let baseRadius = useCompactArc ? 2.4 : ALL_INNER_RADIUS
 
   for (const cat of CATEGORY_ORDER) {
     const inCat = devices.filter((d) => d.category === cat)
@@ -225,20 +319,26 @@ export function layoutByCategory(
       continue
     }
 
-    const radius = baseRadius
-    const angles = fullRingAngles(inCat.length)
-    rings.push({
-      category: cat,
-      radius,
-      labelPosition: [radius + 0.55, 0.03, 0],
-      thetaStart: 0,
-      thetaLength: Math.PI * 2,
-      showLabel: true,
+    const packed = packFullRings(inCat, baseRadius)
+    packed.rings.forEach((ring, i, arr) => {
+      rings.push({
+        category: cat,
+        radius: ring.radius,
+        labelPosition: [ring.radius + 0.75, 0.03, 0],
+        thetaStart: 0,
+        thetaLength: TAU,
+        showLabel: i === arr.length - 1,
+      })
     })
     inCat.forEach((d, i) => {
-      placements.push(placeOnCircle(d, radius, angles[i] ?? 0))
+      const slot = packed.slots[i]
+      if (!slot) return
+      placements.push(placeOnCircle(d, slot.radius, slot.angle))
     })
-    baseRadius += 2.0
+    const last = packed.rings[packed.rings.length - 1]
+    const lastRow = splitRows(inCat, packed.rings.length).at(-1) ?? inCat
+    const clear = Math.max(...lastRow.map(radialClearance), 0.35)
+    baseRadius = (last?.radius ?? baseRadius) + clear + ALL_CATEGORY_GAP
   }
 
   return { rings, placements }
@@ -246,13 +346,14 @@ export function layoutByCategory(
 
 export function placementBounds(placements: ShowroomPlacement[]) {
   if (placements.length === 0) {
-    return { width: 2, depth: 2, maxZ: 1, span: 2 }
+    return { width: 2, depth: 2, maxZ: 1, span: 2, maxR: 2 }
   }
 
   let minX = Infinity
   let maxX = -Infinity
   let minZ = Infinity
   let maxZ = -Infinity
+  let maxR = 0
 
   for (const p of placements) {
     const [x, , z] = p.position
@@ -261,9 +362,10 @@ export function placementBounds(placements: ShowroomPlacement[]) {
     maxX = Math.max(maxX, x + plane.planeW * 0.45)
     minZ = Math.min(minZ, z)
     maxZ = Math.max(maxZ, z)
+    maxR = Math.max(maxR, Math.hypot(x, z) + plane.footprint * 0.35)
   }
 
   const width = Math.max(1.1, maxX - minX)
   const depth = Math.max(0.8, maxZ - minZ)
-  return { width, depth, maxZ, span: Math.max(width, depth) }
+  return { width, depth, maxZ, span: Math.max(width, depth), maxR }
 }

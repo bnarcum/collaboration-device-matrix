@@ -55,21 +55,23 @@ export function ShowroomScene({
   return (
     <>
       {tron && <color attach="background" args={[TRON.void]} />}
-      <SceneEnv />
+      <SceneEnv extent={Math.max(18, bounds.maxR + 6)} />
       <OrbitControls
         makeDefault
         enablePan
         enableRotate
         enableDamping
         dampingFactor={0.08}
-        minDistance={filter === 'all' ? 2.5 : 1.8}
+        minDistance={filter === 'all' ? 3.2 : 1.8}
         maxDistance={
-          filter === 'all' ? 20 : Math.max(16, bounds.span * 2.4)
+          filter === 'all'
+            ? Math.max(28, bounds.span * 1.8)
+            : Math.max(16, bounds.span * 2.4)
         }
         maxPolarAngle={Math.PI * 0.48}
       />
 
-      <ShowroomFloor />
+      <ShowroomFloor radius={Math.max(18, bounds.maxR + 5)} />
 
       {layout.rings.map((ring, i) => (
         <CategoryRing

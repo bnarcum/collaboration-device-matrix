@@ -22,7 +22,7 @@ interface OrbitControlsLike {
 
 const OVERVIEW: CameraFrame = {
   position: new THREE.Vector3(9, 6, 9),
-  target: new THREE.Vector3(0, 0, 0),
+  target: new THREE.Vector3(0, 0.35, 0),
 }
 
 function frameForDevice(
@@ -58,10 +58,25 @@ function frameForDevice(
   return { position: positionOut, target }
 }
 
-function overviewFrame(): CameraFrame {
+function overviewFrame(placements: ShowroomPlacement[] = []): CameraFrame {
+  if (placements.length === 0) {
+    return {
+      position: OVERVIEW.position.clone(),
+      target: OVERVIEW.target.clone(),
+    }
+  }
+
+  let maxR = 0
+  for (const p of placements) {
+    const [x, , z] = p.position
+    const plane = estimateBillboardPlane(p.device)
+    maxR = Math.max(maxR, Math.hypot(x, z) + plane.footprint * 0.35)
+  }
+
+  const dist = Math.max(12, maxR * 1.35)
   return {
-    position: OVERVIEW.position.clone(),
-    target: OVERVIEW.target.clone(),
+    position: new THREE.Vector3(dist * 0.78, Math.max(6.5, dist * 0.48), dist * 0.78),
+    target: new THREE.Vector3(0, 0.45, 0),
   }
 }
 
@@ -180,7 +195,7 @@ export function ShowroomCameraFocus({
       } else if (filter !== 'all' && placements.length > 0) {
         frame = frameForCategory(placements)
       } else {
-        frame = overviewFrame()
+        frame = overviewFrame(placements)
       }
 
       applyGoalToCamera(frame, true)
