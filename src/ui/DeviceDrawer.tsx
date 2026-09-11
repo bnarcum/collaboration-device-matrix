@@ -1,9 +1,14 @@
+import { useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Device } from '../data/types'
 import { CATEGORY_LABELS, ROOM_SIZE_LABELS, VENDOR_LABELS } from '../data/types'
 import { vendorConfig } from '../data/vendors'
 import { deviceImage } from '../data/deviceImages'
 import { deviceProductUrl } from '../data/deviceProductUrls'
+import {
+  similarDevices,
+  type SimilarPeer,
+} from '../data/similarDevices'
 import {
   MEETING_PLATFORM_LABELS,
   MEETING_PLATFORM_ORDER,
@@ -19,21 +24,31 @@ const COLOR_LABELS: Record<Device['colors'][number], string> = {
 
 interface Props {
   device: Device | null
+  catalog: Device[]
   onClose: () => void
+  onSelect: (d: Device) => void
   inCompare: boolean
+  compareIds: string[]
   canAddCompare: boolean
   onToggleCompare: (d: Device) => void
 }
 
 export function DeviceDrawer({
   device,
+  catalog,
   onClose,
+  onSelect,
   inCompare,
+  compareIds,
   canAddCompare,
   onToggleCompare,
 }: Props) {
   const productUrl = device ? deviceProductUrl(device.id) : undefined
   const vendor = device ? vendorConfig(device.vendorId) : null
+  const peers = useMemo(
+    () => (device ? similarDevices(device, catalog) : []),
+    [device, catalog],
+  )
 
   return (
     <AnimatePresence>
@@ -93,6 +108,16 @@ export function DeviceDrawer({
             <p className="spec">
               {device.roomSizes.map((r) => ROOM_SIZE_LABELS[r]).join(' · ')}
             </p>
+
+            {peers.length > 0 && (
+              <ComparedWith
+                peers={peers}
+                compareIds={compareIds}
+                canAddCompare={canAddCompare}
+                onSelect={onSelect}
+                onToggleCompare={onToggleCompare}
+              />
+            )}
 
             {device.highlights?.length > 0 && (
               <>
@@ -237,5 +262,71 @@ export function DeviceDrawer({
         </>
       )}
     </AnimatePresence>
+  )
+}
+
+function ComparedWith({
+  peers,
+  compareIds,
+  canAddCompare,
+  onSelect,
+  onToggleCompare,
+}: {
+  peers: SimilarPeer[]
+  compareIds: string[]
+  canAddCompare: boolean
+  onSelect: (d: Device) => void
+  onToggleCompare: (d: Device) => void
+}) {
+  return (
+    <section className="compared" aria-label="Usually compared with">
+      <h4>Usually compared with</h4>
+      <p className="compared-note">
+        Closest analogs in the current catalog — not an official ranking.
+      </p>
+      <ul className="compared-list">
+        {peers.map((peer) => {
+          const img = deviceImage(peer.device.id)
+          const peerInCompare = compareIds.includes(peer.device.id)
+          return (
+            <li key={peer.device.id} className="compared-row">
+              <button
+                type="button"
+                className="compared-open"
+                onClick={() => onSelect(peer.device)}
+              >
+                <span className="compared-thumb">
+                  {img ? <img src={img} alt="" /> : <span aria-hidden>●</span>}
+                </span>
+                <span className="compared-copy">
+                  <span
+                    className="vendor-tag"
+                    data-vendor={peer.device.vendorId}
+                  >
+                    {VENDOR_LABELS[peer.device.vendorId]}
+                  </span>
+                  <strong>{peer.device.name}</strong>
+                  <span className="compared-reason">{peer.reason}</span>
+                </span>
+              </button>
+              <button
+                type="button"
+                className="compared-add"
+                onClick={() => onToggleCompare(peer.device)}
+                data-active={peerInCompare ? 'true' : 'false'}
+                disabled={!peerInCompare && !canAddCompare}
+                aria-label={
+                  peerInCompare
+                    ? `${peer.device.name} is in compare`
+                    : `Add ${peer.device.name} to compare`
+                }
+              >
+                {peerInCompare ? '✓' : '＋'}
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+    </section>
   )
 }

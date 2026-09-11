@@ -1154,6 +1154,100 @@ body.tron-showroom .canvas-wrap canvas {
   color: var(--fg-2);
 }
 
+.compared {
+  margin-top: 0.35rem;
+}
+
+.compared-note {
+  margin: 0 0 0.65rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--fg-3);
+}
+
+.compared-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.compared-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.35rem;
+  margin: 0;
+}
+
+.compared-open {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  padding: 0.45rem 0.55rem;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+}
+
+.compared-open:hover {
+  border-color: rgba(2, 200, 255, 0.45);
+  background: rgba(2, 200, 255, 0.06);
+}
+
+.compared-thumb {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+}
+
+.compared-thumb img {
+  max-width: 40px;
+  max-height: 40px;
+  object-fit: contain;
+}
+
+.compared-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  gap: 0.08rem;
+}
+
+.compared-copy .vendor-tag {
+  margin: 0 0 0.1rem;
+}
+
+.compared-copy strong {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.compared-reason {
+  font-size: 0.72rem;
+  color: var(--fg-3);
+}
+
+.compared-add {
+  flex: 0 0 auto;
+  min-width: 2.4rem;
+  padding: 0 0.55rem;
+}
+
 .price-pill {
   display: inline-block;
   padding: 0.3rem 0.65rem;

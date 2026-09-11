@@ -783,8 +783,11 @@ export default function App() {
 
         <DeviceDrawer
           device={selected}
+          catalog={catalog}
           onClose={() => selectDevice(null)}
+          onSelect={(d) => selectDevice(d)}
           inCompare={!!selected && compare.some((c) => c.id === selected.id)}
+          compareIds={compareIds}
           canAddCompare={compare.length < MAX_COMPARE}
           onToggleCompare={toggleCompare}
         />
