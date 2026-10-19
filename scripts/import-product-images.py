@@ -58,6 +58,20 @@ IMAGE_SOURCES: dict[str, str] = {
         "video-conferencing/rally-ai-camera-pro/gallery-images/graphite/"
         "rally-ai-camera-pro-graphite-front-01.png"
     ),
+    "logitech-rally-bar-2": (
+        "https://resource.logitech.com/content/dam/logitech/en/products/"
+        "video-conferencing/rally-bar-2/gallery/rally-bar2-video-bar-graphite-gallery1.png"
+    ),
+    "logitech-tap-ip-2": (
+        "https://resource.logitech.com/content/dam/logitech/en/products/"
+        "video-conferencing/tap-ip-2/gallery/"
+        "logitech-tap-ip-2-3qtr-angle-left-graphite-gallery-1.png"
+    ),
+    "logitech-tap-scheduler-2": (
+        "https://resource.logitech.com/content/dam/logitech/en/products/"
+        "video-conferencing/tap-scheduler-2/gallery/"
+        "logitech-tap-scheduler-2-graphite-3qtr-angle-green-screen-gallery-1.png"
+    ),
     "logitech-zone-wired-2": (
         "https://resource.logitech.com/content/dam/logitech/en/products/"
         "headsets/zone-wired-2/gallery/"
@@ -203,6 +217,10 @@ IMAGE_SOURCES: dict[str, str] = {
     "poly-voyager-focus-2": (
         "https://www.hp.com/content/dam/sites/worldwide/poly/headsets/"
         "Poly_voyager_focus_2_desktop@2x.jpg"
+    ),
+    "poly-focus-6": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/headsets/"
+        "bluetooth-headsets-and-earbuds/focus-series/HP-Poly-Focus-625-Fold-Headset-Catalog.jpg"
     ),
     "poly-savi-7310": (
         "https://www.hp.com/content/dam/sites/worldwide/poly/headsets/"

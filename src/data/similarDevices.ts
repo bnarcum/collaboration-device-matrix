@@ -18,7 +18,7 @@ const CURATED: Record<string, CuratedLink[]> = {
     { id: 'neat-bar', reason: 'Huddle / small video bar' },
   ],
   'room-bar-pro': [
-    { id: 'logitech-rally-bar', reason: 'Medium-room video bar' },
+    { id: 'logitech-rally-bar-2', reason: 'Medium-room video bar' },
     { id: 'poly-studio-x70', reason: 'Medium-room video bar' },
     { id: 'neat-bar-pro', reason: 'Medium-room video bar' },
   ],
@@ -62,7 +62,7 @@ const CURATED: Record<string, CuratedLink[]> = {
   'conference-8832': [{ id: 'poly-trio-c60', reason: 'Table conference phone' }],
   'headset-730': [
     { id: 'logitech-zone-wireless-2', reason: 'Wireless stereo headset' },
-    { id: 'poly-voyager-focus-2', reason: 'Wireless stereo headset' },
+    { id: 'poly-focus-6', reason: 'Wireless ANC stereo headset' },
   ],
   'headset-720': [
     { id: 'logitech-zone-wireless-2', reason: 'Wireless stereo headset' },
@@ -73,12 +73,12 @@ const CURATED: Record<string, CuratedLink[]> = {
     { id: 'poly-blackwire-5200', reason: 'Wired office headset' },
   ],
   'room-navigator-table': [
-    { id: 'logitech-tap-ip', reason: 'Tabletop room controller' },
+    { id: 'logitech-tap-ip-2', reason: 'Tabletop room controller' },
     { id: 'poly-tc10', reason: 'Tabletop room controller' },
     { id: 'neat-pad', reason: 'Tabletop room controller' },
   ],
   'room-navigator-wall': [
-    { id: 'logitech-tap-scheduler', reason: 'Wall room scheduler' },
+    { id: 'logitech-tap-scheduler-2', reason: 'Wall room scheduler' },
     { id: 'neat-pad', reason: 'Room scheduling / control pad' },
   ],
   'room-vision-ptz': [

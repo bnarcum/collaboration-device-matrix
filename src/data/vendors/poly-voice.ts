@@ -407,6 +407,31 @@ export const POLY_VOICE_DEVICES: Device[] = [
     shape: 'headset-on-ear',
     size: [0.19, 0.21, 0.09],
   },
+  {
+    id: 'poly-mission-800',
+    vendorId: 'poly',
+    name: 'Mission 800 Series',
+    category: 'headset',
+    family: 'Mission',
+    formFactor: 'Corded USB-C headset with feedback ANC (mono or stereo)',
+    tagline:
+      'Top of the new HP Poly Mission USB line with up to four mics, feedback ANC, and AI noise reduction. The Mission 400 and 600 series cover lighter-duty seats.',
+    highlights: [
+      'Feedback ANC · up to 4 noise-canceling mics',
+      'On-device AI noise reduction',
+      'Teams Open Office certified',
+      'Busy light and boom-rotation mute',
+    ],
+    useCases: ['Open office', 'Contact center', 'Hybrid work'],
+    roomSizes: ['personal'],
+    audio: 'Mono or stereo · feedback ANC · super-wideband · SoundGuard Digital',
+    connectivity: ['USB-C', 'USB-A adapter'],
+    software: ['Poly Lens', 'Microsoft Teams', 'Zoom', 'Google Meet'],
+    colors: ['carbon'],
+    surface: SURFACE,
+    shape: 'headset-on-ear',
+    size: [0.19, 0.21, 0.09],
+  },
 
   // ── Bluetooth headsets ──
   {
@@ -480,6 +505,31 @@ export const POLY_VOICE_DEVICES: Device[] = [
     surface: SURFACE,
     shape: 'headset-over-ear',
     size: [0.21, 0.23, 0.11],
+  },
+  {
+    id: 'poly-focus-6',
+    vendorId: 'poly',
+    name: 'Focus 6 Series',
+    category: 'headset',
+    family: 'Focus',
+    formFactor: 'Bluetooth on-ear headset with hybrid ANC and hideaway boom',
+    tagline:
+      'Slim HP Poly Focus 620/625 headset with six mics, hybrid ANC, and up to 25 hours of talk time.',
+    highlights: [
+      'Hybrid ANC with transparency mode',
+      '6 mics · Acoustic Fence 2.0',
+      'Hideaway boom mic',
+      'Wireless charging and replaceable battery',
+    ],
+    useCases: ['Open office', 'Hybrid work', 'Mobile professionals'],
+    roomSizes: ['personal', 'mobile'],
+    audio: 'Stereo · hybrid ANC · 6 digital MEMS mics',
+    connectivity: ['Bluetooth', 'USB adapter'],
+    software: ['Poly Lens', 'Microsoft Teams', 'Zoom', 'Google Meet'],
+    colors: ['carbon'],
+    surface: SURFACE,
+    shape: 'headset-over-ear',
+    size: [0.18, 0.2, 0.08],
   },
 
   // ── DECT / contact center ──

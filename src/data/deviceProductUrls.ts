@@ -103,6 +103,8 @@ export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
   // Logitech, Poly, Neat
   'logitech-rally-bar':
     'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/rally-bar.html',
+  'logitech-rally-bar-2':
+    'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/rally-bar-2.html',
   'logitech-rally-bar-mini':
     'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/rally-bar-mini.html',
   'logitech-rally-bar-huddle':
@@ -127,10 +129,14 @@ export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
     'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/scribe.html',
   'logitech-tap-ip':
     'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/tap-ip.html',
+  'logitech-tap-ip-2':
+    'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/tap-ip-2.html',
   'logitech-tap-usb':
     'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/tap.html',
   'logitech-tap-scheduler':
     'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/tap-scheduler.html',
+  'logitech-tap-scheduler-2':
+    'https://www.logitech.com/en-us/products/video-conferencing/room-solutions/tap-scheduler-2.html',
   'logitech-zone-wired-2':
     'https://www.logitech.com/en-us/products/headsets/zone-wired-2-business.html',
   'logitech-zone-wireless-2':
@@ -191,12 +197,16 @@ export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
     'https://www.poly.com/us/en/products/headsets/usb-headsets/blackwire-5200-series',
   'poly-blackwire-8225':
     'https://www.poly.com/us/en/products/headsets/usb-headsets/blackwire-8225',
+  'poly-mission-800':
+    'https://www.hp.com/us-en/poly/headsets/usb-headsets/mission-series.html',
   'poly-voyager-4300':
     'https://www.poly.com/us/en/products/headsets/bluetooth-headsets/voyager-4300-series',
   'poly-voyager-5200':
     'https://www.poly.com/us/en/products/headsets/bluetooth-headsets/voyager-5200',
   'poly-voyager-focus-2':
     'https://www.poly.com/us/en/products/headsets/voyager-focus-2',
+  'poly-focus-6':
+    'https://www.hp.com/us-en/poly/headsets/bluetooth-headsets-and-earbuds/focus-series.html',
   'poly-savi-7310':
     'https://www.poly.com/us/en/products/headsets/dect-wireless-headsets/savi-7300-series',
   'poly-encorepro-710':
