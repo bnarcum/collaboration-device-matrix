@@ -21,8 +21,6 @@ export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
     'https://www.cisco.com/c/en/us/support/collaboration-endpoints/webex-desk/model.html',
   'desk-pro-g2':
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/webex-desk-series/desk-pro-g2.html',
-  'desk-mini':
-    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/webex-desk-mini/webex-desk-mini.html',
   'video-phone-8875':
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-8800-series/video-phone-8875-ds.html',
   'desk-phone-8811':
@@ -51,28 +49,14 @@ export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-8800-series/datasheet-c78-739624.html',
   'wireless-9821':
     'https://www.cisco.com/c/en/us/support/collaboration-endpoints/wireless-phone-9821/model.html',
+  'wireless-840':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/webex-wireless-phone/datasheet-c78-744461.html',
   'wireless-860':
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/webex-wireless-phone/datasheet-c78-744461.html',
   'dect-6825':
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-dect-6800-series-multiplatform-firmware/ip-dect-6800-series-ds.html',
-  'wireless-3905':
-    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-sip-phone-3905/data_sheet_c78-651588.html',
-  'desk-phone-6821':
-    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-phone-6800-series-multiplatform-firmware/ip-phone-6800-multiplatform-firmware-ds.html',
   'dect-6823':
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-dect-6800-series-multiplatform-firmware/ip-dect-6800-series-ds.html',
-  'desk-phone-6851':
-    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-phone-6800-series-multiplatform-firmware/ip-phone-6800-multiplatform-firmware-ds.html',
-  'kem-6851':
-    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/ip-phone-6800-series-multiplatform-firmware/ip-phone-6800-multiplatform-firmware-ds.html',
-  'desk-phone-6901':
-    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-6901/data-sheet-c78-584412.html',
-  'desk-phone-7811':
-    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-7800-series/data-sheet-c78-729488.html',
-  'desk-phone-7821':
-    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-7800-series/data-sheet-c78-729488.html',
-  'conference-7832':
-    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-7800-series/ip-conference-phone-7832-ds.html',
   'desk-phone-7841':
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/unified-ip-phone-7800-series/data-sheet-c78-729488.html',
   'desk-phone-7861':
@@ -101,6 +85,8 @@ export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
     'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/collaboration-peripherals/table-microphone-pro-ds.html',
   'ceiling-mic-pro':
     'https://www.cisco.com/c/en/us/support/collaboration-endpoints/ceiling-microphone-pro/model.html',
+  'ceiling-speaker-pro':
+    'https://www.cisco.com/c/en/us/products/collateral/collaboration-endpoints/collaboration-peripherals/ceiling-speaker-pro-ds.html',
   'table-mic':
     'https://www.cisco.com/c/en/us/support/collaboration-endpoints/table-microphone/model.html',
   'ceiling-mic':

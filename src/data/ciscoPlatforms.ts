@@ -74,13 +74,6 @@ export const CISCO_DEVICE_PLATFORMS: Readonly<Record<string, DevicePlatforms>> =
     zoom: 'zoom-sip',
     google: 'guest',
   },
-  'desk-mini': {
-    webex: 'native',
-    teams: 'vimt',
-    zoom: 'zoom-sip',
-    google: 'guest',
-  },
-
   // ── BYOD bar — RoomOS, meetings via connected laptop ──
   'room-bar-byod': {
     webex: 'native',
@@ -111,17 +104,10 @@ export const CISCO_DEVICE_PLATFORMS: Readonly<Record<string, DevicePlatforms>> =
   'kem-9800': { webex: 'app', teams: 'app', zoom: 'app' },
   'conference-8832': { webex: 'app', teams: 'app', zoom: 'app' },
   'wireless-9821': { webex: 'app', teams: 'app', zoom: 'app' },
+  'wireless-840': { webex: 'app', teams: 'app', zoom: 'app' },
   'wireless-860': { webex: 'app', teams: 'app', zoom: 'app' },
   'dect-6825': { webex: 'app', teams: 'app', zoom: 'app' },
-  'wireless-3905': { webex: 'app' },
-  'desk-phone-6821': { webex: 'app', teams: 'app', zoom: 'app' },
   'dect-6823': { webex: 'app', teams: 'app', zoom: 'app' },
-  'desk-phone-6851': { webex: 'app', teams: 'app', zoom: 'app' },
-  'kem-6851': { webex: 'app', teams: 'app', zoom: 'app' },
-  'desk-phone-6901': { webex: 'app' },
-  'desk-phone-7811': { webex: 'app' },
-  'desk-phone-7821': { webex: 'app' },
-  'conference-7832': { webex: 'app' },
   'desk-phone-7841': { webex: 'app' },
   'desk-phone-7861': { webex: 'app' },
 
@@ -138,6 +124,7 @@ export const CISCO_DEVICE_PLATFORMS: Readonly<Record<string, DevicePlatforms>> =
   // ── Room peripherals — Webex room ecosystem ──
   'table-mic-pro': { webex: 'native' },
   'ceiling-mic-pro': { webex: 'native' },
+  'ceiling-speaker-pro': { webex: 'native' },
   'table-mic': { webex: 'native' },
   'ceiling-mic': { webex: 'native' },
   'quad-camera': { webex: 'native' },

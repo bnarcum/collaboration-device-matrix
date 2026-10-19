@@ -10,7 +10,7 @@ function img(hash: string): string {
 }
 
 export const DEVICE_IMAGES: Record<string, string> = {
-  // Cisco (Collaboration Device Product Matrix brochure — June 2026)
+  // Cisco (Collaboration Device Product Matrix brochure — October 2026)
   // Boards & integrators (pages 3–5).
   // Board Pro G3 floor-stand hero (page 3, center column). Page 3 also has
   // Room Bar BYOD (e98bdc9a7b) and Room Kit EQX (e7c7a7391f) — do not swap.
@@ -28,9 +28,8 @@ export const DEVICE_IMAGES: Record<string, string> = {
   // Desk series (pages 11–12)
   desk: img('6717ba491e'),
   'desk-pro-g2': img('1dc86014d2'),
-  'desk-mini': img('6b3e2bab98'),
 
-  // Phones (pages 13–19)
+  // Phones (pages 13–16)
   'desk-phone-8811': img('99520482a5'),
   'desk-phone-8841': img('88a4d0e47d'),
   'desk-phone-8851': img('df909783ab'),
@@ -45,21 +44,14 @@ export const DEVICE_IMAGES: Record<string, string> = {
   'kem-9800': img('bb01b7910c'),
   'conference-8832': img('68cffcece7'),
   'wireless-9821': img('31dabe8c8e'),
+  'wireless-840': img('eb8eeda799'),
   'wireless-860': img('cbda5ccce5'),
   'dect-6825': img('afc9a47cad'),
-  'wireless-3905': img('0d28f6bbe6'),
-  'desk-phone-6821': img('63bb27ab1c'),
   'dect-6823': img('afc9a47cad'),
-  'desk-phone-6851': img('0129b8d622'),
-  'kem-6851': img('c0ced97ac9'),
-  'desk-phone-6901': img('c389c5cddc'),
-  'desk-phone-7811': img('67184c26fd'),
-  'desk-phone-7821': img('06bfb356f2'),
-  'conference-7832': img('7a073e93ce'),
   'desk-phone-7841': img('6463c42a45'),
   'desk-phone-7861': img('78cee49683'),
 
-  // Headsets & earbuds (pages 21–22)
+  // Headsets & earbuds (page 17)
   'headset-320': img('25c4f2bbed'),
   'headset-520': img('5ada38fb4a'),
   'headset-530': img('102a91a2ef'),
@@ -69,17 +61,18 @@ export const DEVICE_IMAGES: Record<string, string> = {
   'headset-bang-olufsen-900': img('976ab4d643'),
   'headset-950': img('8d6d12dc7d'),
 
-  // Room navigators (page 23)
+  // Room navigators (page 18)
   'room-navigator-table': img('4b0fa15cf0'),
   'room-navigator-wall': img('2bfc3204c8'),
 
-  // Microphones (page 23)
+  // Microphones and ceiling speaker (page 19)
   'table-mic-pro': img('cbe669d0f2'),
   'ceiling-mic-pro': img('3b82ce6285'),
+  'ceiling-speaker-pro': img('2c93d757ec'),
   'table-mic': img('76da3a5033'),
   'ceiling-mic': img('5df84a40b4'),
 
-  // Cameras (pages 25–26)
+  // Cameras (pages 20–21)
   'desk-camera-1080': img('adb4b47794'),
   'quad-camera': img('12b412d18f'),
   'room-vision-ptz': img('37e1d7469f'),
@@ -173,19 +166,11 @@ export const DEVICE_PHOTO_ASPECT: Readonly<Partial<Record<string, number>>> = {
   'room-kit-eq': 2.1504,
   'room-kit-pro-g2': 1.4894,
   'desk-pro-g2': 1.1606,
-  'desk-mini': 1.2685,
   'wireless-9821': 1.0703,
+  'wireless-840': 1.0703,
   'wireless-860': 0.5444,
   'dect-6825': 1.0698,
-  'wireless-3905': 1.0996,
-  'desk-phone-6821': 1.0744,
   'dect-6823': 1.0698,
-  'desk-phone-6851': 1.1895,
-  'kem-6851': 0.7599,
-  'desk-phone-6901': 1.0,
-  'desk-phone-7811': 1.0949,
-  'desk-phone-7821': 1.2265,
-  'conference-7832': 1.0111,
   'desk-phone-7841': 1.2135,
   'desk-phone-7861': 1.4526,
   'conference-8832': 1.64,
@@ -213,6 +198,7 @@ export const DEVICE_PHOTO_ASPECT: Readonly<Partial<Record<string, number>>> = {
   'room-navigator-wall': 1.1516,
   'table-mic-pro': 1.6308,
   'ceiling-mic-pro': 1.0105,
+  'ceiling-speaker-pro': 1.042,
   'table-mic': 0.993,
   'ceiling-mic': 1.6959,
   'desk-camera-1080': 1.9201,

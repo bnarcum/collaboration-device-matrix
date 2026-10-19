@@ -645,7 +645,7 @@ export default function App() {
             </span>
             <span className="source-link-text">
               <span className="source-link-label">Source Document</span>
-              <span className="source-link-meta">Cisco · Webex · PDF</span>
+              <span className="source-link-meta">October 2026 · PDF</span>
             </span>
           </a>
           <a

@@ -50,10 +50,6 @@ const CURATED: Record<string, CuratedLink[]> = {
     { id: 'poly-studio-p15', reason: 'Personal desk video device' },
     { id: 'neat-frame', reason: 'Personal desk video device' },
   ],
-  'desk-mini': [
-    { id: 'poly-studio-p15', reason: 'Compact personal video device' },
-    { id: 'neat-frame', reason: 'Compact personal video device' },
-  ],
   'desk-pro-g2': [
     { id: 'poly-studio-p15', reason: 'Premium personal desk device' },
     { id: 'neat-frame', reason: 'Premium personal desk device' },
@@ -64,7 +60,6 @@ const CURATED: Record<string, CuratedLink[]> = {
   'desk-phone-9871': [{ id: 'poly-ccx-700', reason: 'Touch video desk phone' }],
   'video-phone-8875': [{ id: 'poly-ccx-700', reason: 'Touch video desk phone' }],
   'conference-8832': [{ id: 'poly-trio-c60', reason: 'Table conference phone' }],
-  'conference-7832': [{ id: 'poly-trio-8300', reason: 'Table conference phone' }],
   'headset-730': [
     { id: 'logitech-zone-wireless-2', reason: 'Wireless stereo headset' },
     { id: 'poly-voyager-focus-2', reason: 'Wireless stereo headset' },

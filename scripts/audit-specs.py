@@ -71,9 +71,8 @@ DEVICE_TOKENS: dict[str, list[str]] = {
     "room-bar-byod": ["ROOM BAR BYOD"],
     "room-kit-eq": ["ROOM KIT EQ"],  # also matches EQX header; section overlap OK
     "room-kit-pro-g2": ["ROOM KIT PRO G2"],
-    "desk": ["DESK DESK PRO G2 DESK MINI"],  # page header for pp.11-12
+    "desk": ["DESK DESK PRO G2"],  # page header for pp.11-12
     "desk-pro-g2": ["DESK PRO G2"],
-    "desk-mini": ["DESK MINI"],
     "video-phone-8875": ["VIDEO PHONE 8875"],
     "desk-phone-8811": ["8800 SERIES — 8811"],
     "desk-phone-8841": ["8800 SERIES — 8841"],
@@ -88,17 +87,10 @@ DEVICE_TOKENS: dict[str, list[str]] = {
     "kem-9800": ["9800 SERIES — KEY EXPANSION MODULE", "DP-9800-KEM"],
     "conference-8832": ["8832 CONFERENCE PHONE"],
     "wireless-9821": ["Wireless Phone 9821"],
+    "wireless-840": ["840 Wireless Phone"],
     "wireless-860": ["Wireless Phone 860"],
     "dect-6825": ["6825 DECT PHONE"],
-    "wireless-3905": ["3900 SERIES — 3905", "3905"],
-    "desk-phone-6821": ["6800 SERIES — 6821"],
     "dect-6823": ["6823 DECT PHONE"],
-    "desk-phone-6851": ["6800 SERIES — 6851"],
-    "kem-6851": ["6851 KEY EXPANSION MODULE"],
-    "desk-phone-6901": ["6900 SERIES — 6901"],
-    "desk-phone-7811": ["7800 SERIES — 7811"],
-    "desk-phone-7821": ["7800 SERIES — 7821"],
-    "conference-7832": ["7800 SERIES — 7832"],
     "desk-phone-7841": ["7800 SERIES — 7841"],
     "desk-phone-7861": ["7800 SERIES — 7861"],
     "headset-320": ["320 SERIES"],
@@ -113,6 +105,7 @@ DEVICE_TOKENS: dict[str, list[str]] = {
     "room-navigator-wall": ["ROOM NAVIGATOR FOR WALL"],
     "table-mic-pro": ["CISCO TABLE MICROPHONE PRO"],
     "ceiling-mic-pro": ["CISCO CEILING MICROPHONE PRO"],
+    "ceiling-speaker-pro": ["CISCO CEILING SPEAKER PRO"],
     # table-mic + ceiling-mic share page 24 with their PRO siblings; the page
     # text union is fine for "appears in section" style checks.
     "table-mic": ["CISCO TABLE MICROPHONE"],
