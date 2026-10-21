@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
-import { Html, SpotLight } from '@react-three/drei'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Billboard, Html, SpotLight } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import type { Device } from '../data/types'
@@ -18,6 +18,9 @@ import {
 import { TronPlatform } from './TronPlatform'
 import { PhotoBillboard } from './PhotoBillboard'
 import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
+import { isPointOccluded, registerOccluder } from './labelOcclusion'
+
+const labelPoint = new THREE.Vector3()
 
 interface Props {
   device: Device
@@ -79,7 +82,33 @@ export function DevicePedestal({
     }
   })
 
-  const { planeH, footprint } = billboard
+  const { planeW, planeH, footprint } = billboard
+
+  const occluder = useRef<THREE.Mesh>(null)
+  const labelEl = useRef<HTMLDivElement>(null)
+  const labelHidden = useRef(false)
+  const labelY =
+    (imageUrl ? planeH : device.size[1]) + (selected || hovered ? 0.07 : 0.03)
+
+  useEffect(() => {
+    const box = occluder.current
+    return box ? registerOccluder(box) : undefined
+  }, [imageUrl])
+
+  useFrame(({ camera }) => {
+    const el = labelEl.current
+    if (!showLabel || !el || !group.current) return
+    const hide =
+      !(selected || hovered) &&
+      isPointOccluded(
+        labelPoint.set(0, labelY, 0).applyMatrix4(group.current.matrixWorld),
+        camera,
+        occluder.current,
+      )
+    if (hide === labelHidden.current) return
+    labelHidden.current = hide
+    el.style.opacity = hide ? '0' : '1'
+  })
 
   return (
     <group
@@ -104,6 +133,12 @@ export function DevicePedestal({
       {imageUrl ? (
         <>
           <TronPlatform footprint={footprint} selected={selected} />
+          <Billboard position={[0, planeH / 2, 0]}>
+            <mesh ref={occluder} visible={false}>
+              <planeGeometry args={[planeW * 0.82, planeH * 0.92]} />
+              <meshBasicMaterial side={THREE.DoubleSide} />
+            </mesh>
+          </Billboard>
           <mesh position={[0, planeH / 2, 0]} visible={false}>
             <boxGeometry args={[footprint, planeH, 0.3]} />
             <meshBasicMaterial />
@@ -129,31 +164,38 @@ export function DevicePedestal({
           />
           <group scale={scale} position={[0, device.size[1] / 2 + 0.02, 0]}>
           <DeviceModel device={device} highlighted={selected} />
+          <mesh ref={occluder} visible={false}>
+            <boxGeometry args={device.size} />
+            <meshBasicMaterial />
+          </mesh>
         </group>
         </>
       )}
       {selected && <SelectionSpot footprint={footprint} />}
       {showLabel && (
         <Html
-          position={[
-            0,
-            (imageUrl ? planeH : device.size[1]) +
-              (selected || hovered ? 0.07 : 0.03),
-            0,
-          ]}
+          position={[0, labelY, 0]}
           center
           zIndexRange={selected || hovered ? [12, 8] : [1, 0]}
           pointerEvents="none"
         >
-          <DeviceFloatingLabel
-            name={
-              selected || hovered
-                ? device.name
-                : shortShowroomName(device.name)
-            }
-            vendorId={device.vendorId}
-            selected={selected || hovered}
-          />
+          <div
+            ref={labelEl}
+            style={{
+              opacity: labelHidden.current ? 0 : 1,
+              transition: 'opacity 140ms ease-out',
+            }}
+          >
+            <DeviceFloatingLabel
+              name={
+                selected || hovered
+                  ? device.name
+                  : shortShowroomName(device.name)
+              }
+              vendorId={device.vendorId}
+              selected={selected || hovered}
+            />
+          </div>
         </Html>
       )}
     </group>
