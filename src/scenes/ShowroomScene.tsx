@@ -20,6 +20,7 @@ import {
 } from '../three/showroomLayout'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { useNarrowViewport } from '../hooks/useNarrowViewport'
+import { MAGNETIC } from '../theme/magnetic'
 import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 
 interface Props {
@@ -161,7 +162,7 @@ function CategoryRing({
   const uniforms = useMemo(
     () => ({
       uRadius: { value: radius },
-      uColor: { value: new THREE.Color(tron ? TRON.cyan : '#02C8FF') },
+      uColor: { value: new THREE.Color(tron ? TRON.cyan : MAGNETIC.focus) },
       uTime: { value: 0 },
       uTron: { value: tron ? 1 : 0 },
     }),
@@ -250,8 +251,8 @@ const ringFrag = /* glsl */ `
     float pulse = uTron > 0.5
       ? 0.82 + 0.18 * sin(uTime * 2.0 + uRadius * 0.35)
       : 1.0;
-    float coreA = uTron > 0.5 ? 0.92 : 0.5;
-    float bloomA = uTron > 0.5 ? 0.48 : 0.26;
+    float coreA = uTron > 0.5 ? 0.92 : 0.42;
+    float bloomA = uTron > 0.5 ? 0.48 : 0.1;
     float alpha = clamp((core * coreA + bloom * bloomA) * pulse, 0.0, 1.0);
     gl_FragColor = vec4(uColor, alpha);
   }
@@ -272,7 +273,7 @@ const ringBloomFrag = /* glsl */ `
     float pulse = uTron > 0.5
       ? 0.85 + 0.15 * sin(uTime * 1.6 + uRadius * 0.28)
       : 1.0;
-    float alpha = halo * (uTron > 0.5 ? 0.28 : 0.19) * pulse;
+    float alpha = halo * (uTron > 0.5 ? 0.28 : 0.06) * pulse;
     gl_FragColor = vec4(uColor, alpha);
   }
 `
@@ -317,18 +318,19 @@ function RingLabel({
                 textShadow: '0 0 8px rgba(0, 255, 240, 0.85)',
               }
             : {
-                padding: '5px 11px',
-                borderRadius: 999,
-                background: 'rgba(5, 8, 15, 0.78)',
-                border: '1px solid rgba(2, 200, 255, 0.65)',
-                color: '#e6f0fa',
+                padding: '4px 10px',
+                borderRadius: 4,
+                background: MAGNETIC.surfaceGlass,
+                border: `1px solid ${MAGNETIC.border}`,
+                color: MAGNETIC.text2,
                 fontSize: 11,
-                letterSpacing: '0.08em',
+                letterSpacing: '0.04em',
                 textTransform: 'uppercase',
                 fontWeight: 600,
+                fontFamily: MAGNETIC.font,
                 backdropFilter: 'blur(8px)',
                 whiteSpace: 'nowrap',
-                boxShadow: '0 4px 14px rgba(0,0,0,0.45)',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
               }
         }
       >
@@ -371,15 +373,16 @@ function CategoryMarker({
                 whiteSpace: 'nowrap',
               }
             : {
-                padding: '6px 13px',
-                borderRadius: 999,
-                background: 'rgba(5, 8, 15, 0.82)',
-                border: '1px solid rgba(2, 200, 255, 0.7)',
-                color: '#e6f0fa',
+                padding: '5px 11px',
+                borderRadius: 4,
+                background: MAGNETIC.surfaceGlass,
+                border: `1px solid ${MAGNETIC.borderStrong}`,
+                color: MAGNETIC.text,
                 fontSize: 11,
-                letterSpacing: '0.06em',
+                letterSpacing: '0.04em',
                 textTransform: 'uppercase',
-                fontWeight: 600,
+                fontWeight: 700,
+                fontFamily: MAGNETIC.font,
                 whiteSpace: 'nowrap',
               }
         }

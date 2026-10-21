@@ -26,7 +26,7 @@ export function PlatformSwitch({
 
   return (
     <div className="platform-bar">
-      <span className="platform-bar-label">Meeting platforms</span>
+      <span className="platform-bar-label">Platforms</span>
       <nav className="platform-switch" role="group" aria-label="Meeting platforms">
         {MEETING_PLATFORM_ORDER.map((p) => {
           const on = selected.includes(p)
@@ -65,10 +65,12 @@ export function PlatformSwitch({
       >
         <input
           type="checkbox"
+          role="switch"
+          className="mg-switch"
           checked={includeInterop}
           onChange={(e) => onIncludeInteropChange(e.target.checked)}
         />
-        <span>Include interop &amp; client apps</span>
+        <span>Interop &amp; client apps</span>
       </label>
     </div>
   )

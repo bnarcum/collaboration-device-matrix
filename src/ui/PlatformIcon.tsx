@@ -18,8 +18,8 @@ export function PlatformIcon({ platform, active }: Props) {
         src={PLATFORM_ICON_SRC[platform]}
         alt=""
         className="platform-badge-img"
-        width={26}
-        height={26}
+        width={16}
+        height={16}
         decoding="async"
         draggable={false}
       />

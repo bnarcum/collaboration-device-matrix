@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { MAGNETIC } from '../theme/magnetic'
 import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 
 /**
@@ -14,39 +15,41 @@ export function ShowroomBackdrop({ radius = 22 }: { radius?: number }) {
       <mesh>
         <icosahedronGeometry args={[r, 3]} />
         <meshBasicMaterial
-          color={tron ? TRON.cyanDim : '#2a7ab8'}
+          color={tron ? TRON.cyanDim : MAGNETIC.dome}
           wireframe
           transparent
-          opacity={tron ? 0.32 : 0.16}
+          opacity={tron ? 0.32 : 0.12}
           depthWrite={false}
           side={THREE.BackSide}
-        />
-      </mesh>
-      <mesh scale={0.92}>
-        <icosahedronGeometry args={[r, 2]} />
-        <meshBasicMaterial
-          color={tron ? TRON.cyan : '#02C8FF'}
-          wireframe
-          transparent
-          opacity={tron ? 0.2 : 0.09}
-          depthWrite={false}
-          side={THREE.BackSide}
-          blending={THREE.AdditiveBlending}
         />
       </mesh>
       {tron && (
-        <mesh scale={0.78}>
-          <icosahedronGeometry args={[r, 1]} />
-          <meshBasicMaterial
-            color={TRON.orange}
-            wireframe
-            transparent
-            opacity={0.08}
-            depthWrite={false}
-            side={THREE.BackSide}
-            blending={THREE.AdditiveBlending}
-          />
-        </mesh>
+        <>
+          <mesh scale={0.92}>
+            <icosahedronGeometry args={[r, 2]} />
+            <meshBasicMaterial
+              color={TRON.cyan}
+              wireframe
+              transparent
+              opacity={0.2}
+              depthWrite={false}
+              side={THREE.BackSide}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+          <mesh scale={0.78}>
+            <icosahedronGeometry args={[r, 1]} />
+            <meshBasicMaterial
+              color={TRON.orange}
+              wireframe
+              transparent
+              opacity={0.08}
+              depthWrite={false}
+              side={THREE.BackSide}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+        </>
       )}
     </group>
   )

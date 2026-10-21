@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useReducedMotion } from '../hooks/useReducedMotion'
+import { MAGNETIC } from '../theme/magnetic'
 import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 
 interface FloorProps {
@@ -28,7 +29,7 @@ export function ShowroomFloor({ showGrid }: FloorProps = {}) {
       >
         <circleGeometry args={[18, 96]} />
         <meshBasicMaterial
-          color={tron ? TRON.floor : '#050c18'}
+          color={tron ? TRON.floor : MAGNETIC.floor}
           side={THREE.DoubleSide}
         />
       </mesh>
@@ -50,7 +51,7 @@ function GridDisc({ tron }: { tron: boolean }) {
       uMinorWidth: { value: tron ? 0.85 : 0.8 },
       uMajorColor: { value: new THREE.Color(tron ? TRON.gridMajor : '#34557a') },
       uMinorColor: { value: new THREE.Color(tron ? TRON.gridMinor : '#1a283b') },
-      uAccent: { value: new THREE.Color(tron ? TRON.cyan : '#02C8FF') },
+      uAccent: { value: new THREE.Color(tron ? TRON.cyan : MAGNETIC.focus) },
       uFadeInner: { value: tron ? 11.5 : 10.5 },
       uFadeOuter: { value: tron ? 18.5 : 18.5 },
       uOverallAlpha: { value: tron ? 1.0 : 0.92 },

@@ -1,4 +1,5 @@
 import { ShowroomBackdrop } from './ShowroomBackdrop'
+import { MAGNETIC } from '../theme/magnetic'
 import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 
 interface SceneEnvProps {
@@ -16,7 +17,7 @@ export function SceneEnv({ extent = 18 }: SceneEnvProps = {}) {
     <>
       <fog
         attach="fog"
-        args={[tron ? TRON.void : '#051222', fogNear, fogFar]}
+        args={[tron ? TRON.void : MAGNETIC.page, fogNear, fogFar]}
       />
       <ShowroomBackdrop radius={Math.max(22, extent * 1.45)} />
       <ambientLight intensity={tron ? 0.28 : 0.32} color={tron ? '#eef6ff' : '#d8e8ff'} />
@@ -28,7 +29,7 @@ export function SceneEnv({ extent = 18 }: SceneEnvProps = {}) {
       <directionalLight
         position={[-6, 8, -5]}
         intensity={tron ? 0.12 : 0.18}
-        color={TRON.cyanDim}
+        color={tron ? TRON.cyanDim : MAGNETIC.accentOnDark}
       />
     </>
   )

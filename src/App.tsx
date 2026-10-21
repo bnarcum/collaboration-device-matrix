@@ -25,6 +25,7 @@ import {
 } from './data/finder'
 import type { FinderState } from './ui/FinderOverlay'
 import { SearchBar } from './ui/SearchBar'
+import { ResourcesMenu, type ResourceItem } from './ui/ResourcesMenu'
 import { CelestialBackground } from './ui/CelestialBackground'
 import { PlatformSwitch } from './ui/PlatformSwitch'
 import {
@@ -487,6 +488,49 @@ export default function App() {
     [selectedVendors],
   )
 
+  const resourceItems = useMemo<ResourceItem[]>(
+    () => [
+      {
+        label: 'Source Document',
+        meta: 'October 2026 · PDF',
+        url: 'https://www.webex.com/content/dam/wbx/us/documents/pdf/Collaboration_Device_Product_Matrix_Brochure.pdf',
+        icon: '⤓',
+      },
+      {
+        label: 'Cisco Device Brochure',
+        meta: 'Cisco · PDF',
+        url: 'https://www.webex.com/content/dam/www/us/en/documents/pdf/cisco-device-brochure_cm-6028.pdf',
+        icon: '⤓',
+      },
+      {
+        label: 'Cisco RoomOS',
+        meta: 'Device documentation',
+        url: 'https://roomos.cisco.com/doc/Welcome/Welcome',
+        icon: '⊞',
+      },
+      {
+        label: 'Cisco Workspace Designer',
+        meta: 'Plan a room',
+        url: 'https://designer.webex.com/',
+        icon: '⌗',
+      },
+      ...partnerVendors.flatMap((v) => {
+        const link = VENDORS[v].resourceLinks[0]
+        return link
+          ? [
+              {
+                label: link.label.replace(/\s*↗$/, ''),
+                meta: VENDORS[v].name,
+                url: link.url,
+                icon: link.icon,
+              },
+            ]
+          : []
+      }),
+    ],
+    [partnerVendors],
+  )
+
   useEffect(() => {
     const base =
       'Collaboration Device Matrix · Cisco · Logitech · Poly · Neat'
@@ -577,7 +621,8 @@ export default function App() {
             </div>
           </div>
         </div>
-        <nav className="mode-switch" aria-label="View mode">
+        <SearchBar devices={catalog} onSelect={(d) => selectDevice(d)} />
+        <nav className="mode-switch mg-segmented" aria-label="View mode">
           <button
             data-active={mode === 'showroom' ? 'true' : 'false'}
             onClick={() => {
@@ -594,100 +639,10 @@ export default function App() {
             Aisle
           </button>
         </nav>
-        <SearchBar devices={catalog} onSelect={(d) => selectDevice(d)} />
-        <div className="topbar-actions">
-          <a
-            className="source-link"
-            href="https://www.webex.com/content/dam/wbx/us/documents/pdf/Collaboration_Device_Product_Matrix_Brochure.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Open the official Cisco/Webex Collaboration Device Product Matrix source document (PDF, opens in a new tab)"
-            title="Collaboration Device Product Matrix (PDF)"
-          >
-            <span className="source-link-icon" aria-hidden>
-              ⤓
-            </span>
-            <span className="source-link-text">
-              <span className="source-link-label">Source Document</span>
-              <span className="source-link-meta">October 2026 · PDF</span>
-            </span>
-          </a>
-          <a
-            className="source-link"
-            href="https://www.webex.com/content/dam/www/us/en/documents/pdf/cisco-device-brochure_cm-6028.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Open the Cisco Device Brochure (PDF, opens in a new tab)"
-            title="Cisco Device Brochure (PDF)"
-          >
-            <span className="source-link-icon" aria-hidden>
-              ⤓
-            </span>
-            <span className="source-link-text">
-              <span className="source-link-label">Cisco Device Brochure</span>
-              <span className="source-link-meta">Cisco · PDF</span>
-            </span>
-          </a>
-          <a
-            className="source-link"
-            href="https://roomos.cisco.com/doc/Welcome/Welcome"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Open Cisco RoomOS documentation (opens in a new tab)"
-            title="Cisco RoomOS documentation"
-          >
-            <span className="source-link-icon" aria-hidden>
-              ⊞
-            </span>
-            <span className="source-link-text">
-              <span className="source-link-label">Cisco RoomOS ↗</span>
-              <span className="source-link-meta">Device documentation</span>
-            </span>
-          </a>
-          <a
-            className="designer-link"
-            href="https://designer.webex.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Open Cisco Workspace Designer to plan a room (opens in a new tab)"
-            title="Open Cisco Workspace Designer"
-          >
-            <span className="designer-link-icon" aria-hidden>
-              ⌗
-            </span>
-            <span className="designer-link-text">
-              <span className="designer-link-label">Cisco Workspace Designer ↗</span>
-              <span className="designer-link-meta">Plan a room</span>
-            </span>
-          </a>
-          {partnerVendors.map((partnerVendor) => {
-            const cfg = VENDORS[partnerVendor]
-            const link = cfg.resourceLinks[0]
-            if (!link) return null
-            return (
-              <a
-                key={partnerVendor}
-                className="source-link"
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Open ${link.label} (opens in a new tab)`}
-                title={link.label}
-              >
-                <span className="source-link-icon" aria-hidden>
-                  {link.icon ?? '↗'}
-                </span>
-                <span className="source-link-text">
-                  <span className="source-link-label">{link.label}</span>
-                  <span className="source-link-meta">{cfg.name}</span>
-                </span>
-              </a>
-            )
-          })}
-        </div>
+        <ResourcesMenu items={resourceItems} />
         </div>
         <div className="topbar-toolbar">
-        <nav className="vendor-switch" role="group" aria-label="Manufacturers">
+        <nav className="vendor-switch mg-segmented" role="group" aria-label="Manufacturers">
           {VENDOR_ORDER.map((v) => {
             const on = selectedVendors.includes(v)
             return (
