@@ -1,7 +1,6 @@
 import type { CSSProperties } from 'react'
 import type { VendorId } from '../data/types'
-import { vendorConfig } from '../data/vendors'
-import { MAGNETIC } from '../theme/magnetic'
+import { vendorLabelTheme } from '../data/vendors'
 import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 
 /** Idle showroom pills use the model token so dense arcs stay readable. */
@@ -15,7 +14,7 @@ export function shortShowroomName(name: string): string {
   return model
 }
 
-/** Inline styles for 3D Html tags — Magnetic slate tags with a vendor stripe. */
+/** Inline styles for 3D Html pills — same fill as active topbar vendor/mode pills. */
 export function deviceLabelStyles(
   vendorId: VendorId,
   selected = false,
@@ -44,23 +43,24 @@ export function deviceLabelStyles(
     }
   }
 
-  const stripe = vendorConfig(vendorId).primary
+  const theme = vendorLabelTheme(vendorId, selected)
 
   return {
-    padding: selected ? '3px 8px 3px 7px' : '1px 5px 1px 4px',
-    borderRadius: 4,
-    background: selected ? MAGNETIC.accent : MAGNETIC.surfaceGlass,
-    border: `1px solid ${selected ? MAGNETIC.accent : MAGNETIC.borderStrong}`,
-    borderLeft: `3px solid ${selected ? '#ffffff' : stripe}`,
+    padding: selected ? '3px 8px' : '1px 5px',
+    borderRadius: 999,
+    background: theme.background,
+    border: `1px solid ${theme.border}`,
     fontSize: selected ? 11 : 8,
     fontWeight: 600,
-    fontFamily: MAGNETIC.font,
-    color: MAGNETIC.text,
+    color: theme.color,
     whiteSpace: 'nowrap',
     lineHeight: 1.2,
-    boxShadow: selected
-      ? '0 4px 12px rgba(0, 0, 0, 0.45)'
-      : '0 1px 4px rgba(0, 0, 0, 0.35)',
+    boxShadow:
+      vendorId === 'neat' && !selected
+        ? '0 2px 8px rgba(0, 0, 0, 0.4)'
+        : selected
+          ? '0 0 12px rgba(2, 200, 255, 0.4)'
+          : '0 1px 5px rgba(0, 0, 0, 0.3)',
   }
 }
 

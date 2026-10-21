@@ -5,7 +5,6 @@ import {
   computeBillboardPlane,
   type BillboardPlane,
 } from './billboardSizing'
-import { MAGNETIC } from '../theme/magnetic'
 import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 
 const glowVert = /* glsl */ `
@@ -168,7 +167,7 @@ function SelectionGlow({
   const h = planeH * pad
   const uniforms = useMemo(
     () => ({
-      uColor: { value: new THREE.Color(tron ? TRON.cyan : MAGNETIC.accentOnDark) },
+      uColor: { value: new THREE.Color(tron ? TRON.cyan : '#02C8FF') },
       uAspect: { value: w / h },
       uTron: { value: tron ? 1 : 0 },
     }),

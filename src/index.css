@@ -116,8 +116,13 @@ body {
     ),
     radial-gradient(
       ellipse 46% 38% at 50% 88%,
-      rgba(29, 105, 204, 0.16) 0%,
+      rgba(29, 105, 204, 0.22) 0%,
       transparent 62%
+    ),
+    radial-gradient(
+      ellipse 40% 35% at 50% 42%,
+      rgba(2, 200, 255, 0.04) 0%,
+      transparent 70%
     );
   animation: celestial-glow-drift 20s ease-in-out infinite alternate;
 }
@@ -129,11 +134,11 @@ body {
   background: conic-gradient(
     from 210deg at 50% 50%,
     transparent 0deg,
-    rgba(62, 132, 229, 0.55) 32deg,
+    rgba(2, 200, 255, 0.55) 32deg,
     transparent 64deg,
-    rgba(39, 116, 217, 0.45) 128deg,
+    rgba(10, 96, 255, 0.45) 128deg,
     transparent 168deg,
-    rgba(62, 132, 229, 0.35) 248deg,
+    rgba(2, 200, 255, 0.35) 248deg,
     transparent 300deg
   );
   animation: celestial-beams-spin 100s linear infinite;
@@ -144,9 +149,9 @@ body {
   inset: 0;
   opacity: 1;
   background-image:
-    linear-gradient(rgba(62, 132, 229, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(62, 132, 229, 0.06) 1px, transparent 1px),
-    radial-gradient(circle, rgba(62, 132, 229, 0.22) 1px, transparent 1px);
+    linear-gradient(rgba(2, 200, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(2, 200, 255, 0.06) 1px, transparent 1px),
+    radial-gradient(circle, rgba(2, 200, 255, 0.22) 1px, transparent 1px);
   background-size: 72px 72px, 72px 72px, 36px 36px;
   background-position: 0 0, 0 0, 18px 18px;
   animation: celestial-grid-pan 58.33s linear infinite;

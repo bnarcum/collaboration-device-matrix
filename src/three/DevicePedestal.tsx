@@ -17,7 +17,6 @@ import {
 } from './billboardSizing'
 import { TronPlatform } from './TronPlatform'
 import { PhotoBillboard } from './PhotoBillboard'
-import { MAGNETIC } from '../theme/magnetic'
 import { resolveTronShowroom, TRON } from '../theme/tronShowroom'
 
 interface Props {
@@ -179,7 +178,7 @@ function SelectionSpot({ footprint }: { footprint: number }) {
 
   const uniforms = useMemo(
     () => ({
-      uColor: { value: new THREE.Color(tron ? TRON.orange : MAGNETIC.accentOnDark) },
+      uColor: { value: new THREE.Color(tron ? TRON.orange : '#02C8FF') },
       uTime: { value: 0 },
       uPulse: { value: 1 },
     }),
@@ -207,7 +206,7 @@ function SelectionSpot({ footprint }: { footprint: number }) {
       <SpotLight
         position={[0, 3.4, 0]}
         target={target}
-        color={tron ? TRON.orange : MAGNETIC.accentOnDark}
+        color={tron ? TRON.orange : '#02C8FF'}
         intensity={tron ? 12 : 9}
         distance={5.2}
         angle={0.42}
