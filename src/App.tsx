@@ -541,6 +541,7 @@ export default function App() {
       <CelestialBackground tron={tronEnabled} />
       <div
         className="app"
+        data-theme="magnetic-blue-dark"
         data-vendors={selectedVendors.join(',')}
         data-embed={EMBED_MODE ? 'cpn' : undefined}
         style={
@@ -553,6 +554,7 @@ export default function App() {
         }
       >
       <header className="topbar">
+        <div className="topbar-primary">
         <div className="brand">
           <div className="brand-logo" aria-hidden>
             ⩕
@@ -575,44 +577,6 @@ export default function App() {
             </div>
           </div>
         </div>
-        <nav className="vendor-switch" role="group" aria-label="Manufacturers">
-          {VENDOR_ORDER.map((v) => {
-            const on = selectedVendors.includes(v)
-            return (
-              <button
-                key={v}
-                type="button"
-                data-active={on ? 'true' : 'false'}
-                aria-pressed={on}
-                onClick={() => toggleVendor(v)}
-              >
-                {VENDOR_LABELS[v]}
-              </button>
-            )
-          })}
-          <button
-            type="button"
-            className="vendor-switch-all"
-            data-active={allVendorsSelected ? 'true' : 'false'}
-            aria-pressed={allVendorsSelected}
-            title={
-              allVendorsSelected
-                ? 'Show Cisco only'
-                : 'Select all manufacturers'
-            }
-            onClick={toggleAllVendors}
-          >
-            All
-          </button>
-          <button
-            type="button"
-            className="vendor-switch-reset"
-            title="Reset to Cisco only"
-            onClick={resetVendors}
-          >
-            Reset
-          </button>
-        </nav>
         <nav className="mode-switch" aria-label="View mode">
           <button
             data-active={mode === 'showroom' ? 'true' : 'false'}
@@ -721,6 +685,46 @@ export default function App() {
             )
           })}
         </div>
+        </div>
+        <div className="topbar-toolbar">
+        <nav className="vendor-switch" role="group" aria-label="Manufacturers">
+          {VENDOR_ORDER.map((v) => {
+            const on = selectedVendors.includes(v)
+            return (
+              <button
+                key={v}
+                type="button"
+                data-active={on ? 'true' : 'false'}
+                aria-pressed={on}
+                onClick={() => toggleVendor(v)}
+              >
+                {VENDOR_LABELS[v]}
+              </button>
+            )
+          })}
+          <button
+            type="button"
+            className="vendor-switch-all"
+            data-active={allVendorsSelected ? 'true' : 'false'}
+            aria-pressed={allVendorsSelected}
+            title={
+              allVendorsSelected
+                ? 'Show Cisco only'
+                : 'Select all manufacturers'
+            }
+            onClick={toggleAllVendors}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            className="vendor-switch-reset"
+            title="Reset to Cisco only"
+            onClick={resetVendors}
+          >
+            Reset
+          </button>
+        </nav>
         {ciscoInSelection && (
           <PlatformSwitch
             selected={selectedPlatforms}
@@ -730,6 +734,7 @@ export default function App() {
             onIncludeInteropChange={setPlatformInterop}
           />
         )}
+        </div>
       </header>
 
       <div className="canvas-wrap">

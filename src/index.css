@@ -1,24 +1,51 @@
 :root {
-  /* Cisco brand palette */
+  /* Cisco brand palette — kept for vendor identity marks. */
   --cisco-primary: #02c8ff;
   --cisco-indigo: #0a60ff;
   --cisco-ocean: #1abbe9;
-  --brand-primary: var(--cisco-primary);
-  --brand-secondary: var(--cisco-indigo);
+
+  /* Magnetic blue-dark, from the reference app computed styles.
+     The dumped --base-* tokens are the light set; these are the
+     colors the blue-dark theme actually paints. */
+  --mg-radius-control: 6px;
+  --mg-radius-panel: 8px;
+  --mg-radius-chip: 8px;
+  --mg-control-h: 32px;
+  --mg-page: #1b232d;
+  --mg-surface-solid: #23282e;
+  --mg-surface: rgba(35, 40, 46, 0.94);
+  --mg-control: rgba(255, 255, 255, 0.06);
+  --mg-control-hover: rgba(100, 158, 245, 0.18);
+  --mg-accent: #2774d9;
+  --mg-accent-hover: #0d5cbd;
+  --mg-link: #7d8aff;
+  --mg-on-accent: #ffffff;
+  --mg-text: #f7f7f7;
+  --mg-text-2: #c8d1dc;
+  --mg-text-3: #9da7b4;
+  --mg-border: #3f4a57;
+  --mg-border-strong: #656c75;
+  --mg-glow-blue: #233a64;
+  --mg-glow-magenta: #4d3246;
+  --mg-ease: cubic-bezier(0.2, 0, 0, 1);
+  --mg-focus-ring: 0 0 0 2px var(--mg-page), 0 0 0 4px #3e84e5;
+
+  --brand-primary: var(--mg-accent);
+  --brand-secondary: #1d69cc;
 
   /* App tokens */
-  --bg-1: #07182d;
-  --bg-2: #0a2240;
-  --fg-1: #ffffff;
-  --fg-2: rgba(255, 255, 255, 0.78);
-  --fg-3: rgba(180, 185, 192, 0.85);
-  --line: rgba(214, 214, 214, 0.14);
-  --line-strong: rgba(214, 214, 214, 0.22);
-  --accent: var(--brand-primary);
+  --bg-1: var(--mg-page);
+  --bg-2: var(--mg-surface-solid);
+  --fg-1: var(--mg-text);
+  --fg-2: var(--mg-text-2);
+  --fg-3: var(--mg-text-3);
+  --line: var(--mg-border);
+  --line-strong: var(--mg-border-strong);
+  --accent: var(--mg-accent);
 
   color-scheme: dark;
   font-family:
-    'CiscoSansTT', 'Cisco Sans', Inter, -apple-system, BlinkMacSystemFont,
+    Inter, 'CiscoSansTT', 'Cisco Sans', -apple-system, BlinkMacSystemFont,
     'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -46,9 +73,10 @@ body,
 }
 
 body {
-  background: #04101f;
+  background: var(--mg-page);
   color: var(--fg-1);
   overflow: hidden;
+  font-size: 14px;
 }
 
 /* Celestial ambient — Portfolio Navigator parity */
@@ -58,7 +86,7 @@ body {
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
-  background: linear-gradient(165deg, #04101f 0%, #07182d 42%, #0b2a4a 100%);
+  background: var(--mg-page);
 }
 
 .celestial-bg__vignette {
@@ -78,17 +106,17 @@ body {
   background:
     radial-gradient(
       ellipse 58% 48% at 22% 32%,
-      rgba(10, 96, 255, 0.28) 0%,
+      rgba(35, 58, 100, 0.95) 0%,
       transparent 68%
     ),
     radial-gradient(
       ellipse 52% 44% at 78% 68%,
-      rgba(2, 200, 255, 0.22) 0%,
+      rgba(77, 50, 70, 0.9) 0%,
       transparent 65%
     ),
     radial-gradient(
       ellipse 46% 38% at 50% 88%,
-      rgba(255, 144, 0, 0.12) 0%,
+      rgba(29, 105, 204, 0.22) 0%,
       transparent 62%
     ),
     radial-gradient(
@@ -258,25 +286,34 @@ body.tron-showroom .app {
 
 button {
   font: inherit;
+  font-weight: 700;
+  font-size: 14px;
   color: inherit;
   border: 1px solid var(--line-strong);
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 999px;
-  padding: 0.5rem 0.95rem;
+  background: var(--mg-control);
+  border-radius: var(--mg-radius-control);
+  min-height: var(--mg-control-h);
+  padding: 0 12px;
   cursor: pointer;
   transition:
-    background-color 120ms ease,
-    border-color 120ms ease,
-    transform 120ms ease;
+    background-color 160ms var(--mg-ease),
+    border-color 160ms var(--mg-ease),
+    color 160ms var(--mg-ease),
+    box-shadow 160ms var(--mg-ease);
   white-space: nowrap;
 }
 
 button:hover {
-  background: rgba(2, 200, 255, 0.18);
-  border-color: var(--brand-primary);
+  background: var(--mg-control-hover);
+  border-color: var(--mg-accent);
 }
 
-/* Selected / toggled-on pills — scoped so highlight states elsewhere
+button:focus-visible {
+  outline: none;
+  box-shadow: var(--mg-focus-ring);
+}
+
+/* Selected / toggled-on controls — scoped so highlight states elsewhere
    (e.g. search keyboard focus) don't inherit solid-fill + dark text. */
 .vendor-switch button[data-active='true'],
 .platform-switch button[data-active='true'],
@@ -284,14 +321,14 @@ button:hover {
 .filters button[data-active='true'],
 .compare-tray button[data-active='true'],
 .drawer button[data-active='true'] {
-  background: var(--brand-primary);
-  color: #001724;
-  border-color: var(--brand-primary);
-  font-weight: 600;
+  background: var(--mg-accent);
+  color: var(--mg-on-accent);
+  border-color: var(--mg-accent);
+  font-weight: 700;
 }
 
 a {
-  color: var(--brand-primary);
+  color: var(--mg-link);
   text-decoration: none;
 }
 
@@ -306,7 +343,7 @@ a:hover {
 
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
+  border-radius: var(--mg-radius-control);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -347,10 +384,11 @@ a:hover {
   left: 50%;
   transform: translateX(-50%);
   z-index: 12;
-  padding: 0.45rem 0.9rem;
-  border-radius: 999px;
-  border: 1px solid rgba(2, 200, 255, 0.55);
-  background: rgba(5, 8, 15, 0.82);
+  padding: 0 0.9rem;
+  min-height: var(--mg-control-h);
+  border-radius: var(--mg-radius-control);
+  border: 1px solid var(--line-strong);
+  background: var(--mg-surface);
   color: #e6f0fa;
   font-size: 0.72rem;
   font-weight: 700;
@@ -369,14 +407,31 @@ a:hover {
 
 .topbar {
   display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--mg-border);
+  background: rgba(27, 35, 45, 0.8);
+  backdrop-filter: blur(40px);
+  z-index: 5;
+}
+
+.topbar-primary {
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.65rem 1rem;
-  padding: 0.85rem 1.25rem;
-  border-bottom: 1px solid var(--line);
-  background: rgba(5, 8, 15, 0.55);
-  backdrop-filter: blur(14px);
-  z-index: 5;
+  gap: 0.5rem 0.75rem;
+  padding: 0.65rem 1rem;
+}
+
+.topbar-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.45rem 1rem 0.6rem;
+  border-top: 1px solid var(--mg-border);
+  background: rgba(27, 35, 45, 0.55);
 }
 
 .platform-bar {
@@ -384,10 +439,8 @@ a:hover {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem 0.75rem;
-  flex: 1 1 100%;
-  padding-top: 0.35rem;
-  margin-top: 0.15rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .platform-bar-label {
@@ -477,7 +530,7 @@ a:hover {
 .brand-logo {
   width: 28px;
   height: 28px;
-  border-radius: 8px;
+  border-radius: var(--mg-radius-control);
   background: linear-gradient(
     135deg,
     var(--brand-primary) 0%,
@@ -528,7 +581,7 @@ a:hover {
 .mode-switch {
   margin-left: auto;
   display: flex;
-  gap: 0.4rem;
+  gap: 0.35rem;
   flex-wrap: wrap;
   flex: 0 0 auto;
 }
@@ -545,53 +598,42 @@ a:hover {
 .designer-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.45rem 0.85rem 0.45rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid rgba(2, 200, 255, 0.45);
-  background: linear-gradient(
-    135deg,
-    rgba(0, 75, 175, 0.22) 0%,
-    rgba(2, 200, 255, 0.22) 100%
-  );
+  gap: 0.5rem;
+  min-height: var(--mg-control-h);
+  padding: 0 0.7rem 0 0.45rem;
+  border-radius: var(--mg-radius-control);
+  border: 1px solid var(--line-strong);
+  background: var(--mg-control);
   color: var(--fg-1);
   text-decoration: none;
   font-weight: 500;
   line-height: 1;
-  box-shadow: 0 6px 18px rgba(0, 75, 175, 0.22);
   transition:
-    background-color 140ms ease,
-    border-color 140ms ease,
-    transform 140ms ease,
-    box-shadow 140ms ease;
+    background-color 160ms var(--mg-ease),
+    border-color 160ms var(--mg-ease),
+    box-shadow 160ms var(--mg-ease);
 }
 
 .designer-link:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(0, 75, 175, 0.36) 0%,
-    rgba(2, 200, 255, 0.36) 100%
-  );
+  background: var(--mg-control-hover);
   border-color: var(--brand-primary);
-  box-shadow: 0 8px 22px rgba(2, 200, 255, 0.36);
-  transform: translateY(-1px);
   text-decoration: none;
 }
 
 .designer-link:focus-visible {
-  outline: 2px solid var(--brand-primary);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--mg-focus-ring);
 }
 
 .designer-link-icon {
   display: grid;
   place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
-  background: rgba(0, 75, 175, 0.45);
+  width: 22px;
+  height: 22px;
+  border-radius: var(--mg-radius-chip);
+  background: rgba(10, 96, 255, 0.35);
   color: #fff;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -617,23 +659,20 @@ a:hover {
 }
 
 @media (max-width: 1100px) {
-  .vendor-switch {
-    order: 8;
-    flex: 1 1 100%;
-    margin-left: 0;
-  }
-
   .mode-switch {
     margin-left: 0;
   }
 
   .search-wrap {
-    order: 10;
-    flex: 1 1 100%;
+    flex: 1 1 180px;
   }
 
   .search-input-wrap {
     max-width: none;
+  }
+
+  .topbar-toolbar .vendor-switch {
+    flex: 1 1 auto;
   }
 }
 
@@ -675,16 +714,19 @@ a:hover {
   align-items: center;
   width: 100%;
   max-width: 280px;
-  padding: 0.4rem 0.55rem 0.4rem 0.55rem;
-  border-radius: 999px;
+  min-height: var(--mg-control-h);
+  padding: 0 0.55rem;
+  border-radius: var(--mg-radius-control);
   border: 1px solid var(--line-strong);
-  background: rgba(255, 255, 255, 0.04);
-  transition: border-color 140ms ease, background-color 140ms ease;
+  background: var(--mg-control);
+  transition: border-color 160ms var(--mg-ease), background-color 160ms var(--mg-ease),
+    box-shadow 160ms var(--mg-ease);
 }
 
 .search-input-wrap:focus-within {
   border-color: var(--brand-primary);
-  background: rgba(2, 200, 255, 0.08);
+  background: var(--mg-control-hover);
+  box-shadow: var(--mg-focus-ring);
 }
 
 .search-input-icon {
@@ -728,9 +770,9 @@ a:hover {
   width: min(360px, 80vw);
   max-height: 340px;
   overflow-y: auto;
-  background: rgba(8, 12, 22, 0.96);
+  background: var(--mg-surface);
   border: 1px solid var(--line-strong);
-  border-radius: 12px;
+  border-radius: var(--mg-radius-panel);
   box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
   padding: 4px;
   z-index: 20;
@@ -742,8 +784,9 @@ a:hover {
   justify-content: space-between;
   gap: 0.6rem;
   width: 100%;
-  padding: 0.55rem 0.7rem;
-  border-radius: 8px;
+  min-height: var(--mg-control-h);
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--mg-radius-control);
   border: 0;
   background: transparent;
   color: var(--fg-1);
@@ -789,7 +832,7 @@ a:hover {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 3px 8px;
-  border-radius: 999px;
+  border-radius: var(--mg-radius-chip);
   background: rgba(2, 200, 255, 0.18);
   border: 1px solid rgba(2, 200, 255, 0.4);
   color: #cfe7f5;
@@ -806,36 +849,25 @@ a:hover {
 .source-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.45rem 0.85rem 0.45rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid rgba(2, 200, 255, 0.45);
-  background: linear-gradient(
-    135deg,
-    rgba(2, 200, 255, 0.18) 0%,
-    rgba(0, 75, 175, 0.18) 100%
-  );
+  gap: 0.5rem;
+  min-height: var(--mg-control-h);
+  padding: 0 0.7rem 0 0.45rem;
+  border-radius: var(--mg-radius-control);
+  border: 1px solid var(--line-strong);
+  background: var(--mg-control);
   color: var(--fg-1);
   text-decoration: none;
   font-weight: 500;
   line-height: 1;
-  box-shadow: 0 6px 18px rgba(2, 200, 255, 0.18);
   transition:
-    background-color 140ms ease,
-    border-color 140ms ease,
-    transform 140ms ease,
-    box-shadow 140ms ease;
+    background-color 160ms var(--mg-ease),
+    border-color 160ms var(--mg-ease),
+    box-shadow 160ms var(--mg-ease);
 }
 
 .source-link:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(2, 200, 255, 0.32) 0%,
-    rgba(0, 75, 175, 0.32) 100%
-  );
+  background: var(--mg-control-hover);
   border-color: var(--brand-primary);
-  box-shadow: 0 8px 22px rgba(2, 200, 255, 0.32);
-  transform: translateY(-1px);
   text-decoration: none;
 }
 
@@ -857,19 +889,19 @@ a:hover {
 }
 
 .source-link:focus-visible {
-  outline: 2px solid var(--brand-primary);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--mg-focus-ring);
 }
 
 .source-link-icon {
   display: grid;
   place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
-  background: rgba(2, 200, 255, 0.35);
+  width: 22px;
+  height: 22px;
+  border-radius: var(--mg-radius-chip);
+  background: rgba(2, 200, 255, 0.28);
   color: #fff;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -931,12 +963,12 @@ body.tron-showroom .canvas-wrap canvas {
   left: 1rem;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   flex-wrap: wrap;
   max-width: 70%;
-  padding: 0.6rem 0.7rem;
-  border-radius: 18px;
-  background: rgba(5, 8, 15, 0.55);
+  padding: 0.4rem;
+  border-radius: var(--mg-radius-panel);
+  background: var(--mg-surface);
   border: 1px solid var(--line);
   backdrop-filter: blur(10px);
 }
@@ -956,12 +988,12 @@ body.tron-showroom .canvas-wrap canvas {
   left: 1rem;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   flex-wrap: wrap;
   max-width: calc(100% - 2rem);
-  padding: 0.6rem 0.7rem;
-  border-radius: 18px;
-  background: rgba(5, 8, 15, 0.55);
+  padding: 0.4rem;
+  border-radius: var(--mg-radius-panel);
+  background: var(--mg-surface);
   border: 1px solid var(--line);
   backdrop-filter: blur(10px);
 }
@@ -992,8 +1024,8 @@ body.tron-showroom .canvas-wrap canvas {
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.7rem 0.9rem;
-  border-radius: 14px;
-  background: rgba(5, 8, 15, 0.55);
+  border-radius: var(--mg-radius-panel);
+  background: var(--mg-surface);
   border: 1px solid var(--line);
   backdrop-filter: blur(10px);
   max-width: 320px;
@@ -1035,7 +1067,7 @@ body.tron-showroom .canvas-wrap canvas {
   right: 0;
   bottom: 0;
   width: min(440px, 100%);
-  background: rgba(8, 12, 22, 0.92);
+  background: var(--mg-surface);
   border-left: 1px solid var(--line-strong);
   padding: 1.25rem;
   overflow-y: auto;
@@ -1073,7 +1105,7 @@ body.tron-showroom .canvas-wrap canvas {
   margin-left: 0.5rem;
   margin-bottom: 0.4rem;
   padding: 0.2rem 0.55rem;
-  border-radius: 999px;
+  border-radius: var(--mg-radius-chip);
   border: 1px solid transparent;
 }
 
@@ -1117,7 +1149,7 @@ body.tron-showroom .canvas-wrap canvas {
     rgba(2, 200, 255, 0.12),
     transparent 65%
   );
-  border-radius: 14px;
+  border-radius: var(--mg-radius-panel);
   min-height: 170px;
 }
 
@@ -1189,8 +1221,9 @@ body.tron-showroom .canvas-wrap canvas {
   min-width: 0;
   padding: 0.45rem 0.55rem;
   text-align: left;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--mg-control);
   border: 1px solid var(--line);
+  border-radius: var(--mg-radius-control);
 }
 
 .compared-open:hover {
@@ -1252,7 +1285,7 @@ body.tron-showroom .canvas-wrap canvas {
   display: inline-block;
   padding: 0.3rem 0.65rem;
   font-size: 0.85rem;
-  border-radius: 999px;
+  border-radius: var(--mg-radius-chip);
   background: rgba(2, 200, 255, 0.15);
   border: 1px solid rgba(2, 200, 255, 0.4);
   color: var(--brand-primary);
@@ -1282,8 +1315,8 @@ body.tron-showroom .canvas-wrap canvas {
   transform: translateX(-50%);
   width: min(640px, calc(100% - 2rem));
   padding: 1rem 1.1rem 1.1rem;
-  border-radius: 16px;
-  background: rgba(8, 12, 22, 0.78);
+  border-radius: var(--mg-radius-panel);
+  background: var(--mg-surface);
   border: 1px solid var(--line-strong);
   backdrop-filter: blur(14px);
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
@@ -1322,8 +1355,8 @@ body.tron-showroom .canvas-wrap canvas {
 
 .finder-choice {
   padding: 0.6rem 0.8rem;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--mg-radius-control);
+  background: var(--mg-control);
   border: 1px solid var(--line-strong);
   text-align: left;
   cursor: pointer;
@@ -1361,9 +1394,9 @@ body.tron-showroom .canvas-wrap canvas {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.55rem 0.7rem;
-  border-radius: 999px;
-  background: rgba(8, 12, 22, 0.78);
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--mg-radius-panel);
+  background: var(--mg-surface);
   border: 1px solid var(--line-strong);
   backdrop-filter: blur(14px);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
@@ -1390,7 +1423,7 @@ body.tron-showroom .canvas-wrap canvas {
 
 .chip {
   padding: 0.25rem 0.75rem;
-  border-radius: 999px;
+  border-radius: var(--mg-radius-chip);
   background: rgba(2, 200, 255, 0.15);
   border: 1px solid rgba(2, 200, 255, 0.4);
   color: var(--fg-1);
@@ -1434,8 +1467,10 @@ body.tron-showroom .canvas-wrap canvas {
 
 /* Mobile — chrome and touch targets only; 3D layout math stays desktop. */
 @media (max-width: 720px) {
-  .topbar {
-    padding: 0.5rem 0.7rem;
+  .topbar-primary,
+  .topbar-toolbar {
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
     gap: 0.45rem 0.55rem;
   }
 
@@ -1487,7 +1522,7 @@ body.tron-showroom .canvas-wrap canvas {
     max-height: min(72dvh, 640px);
     border-left: none;
     border-top: 1px solid var(--line-strong);
-    border-radius: 16px 16px 0 0;
+    border-radius: var(--mg-radius-panel) var(--mg-radius-panel) 0 0;
     box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.45);
     padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
   }
@@ -1506,14 +1541,11 @@ body.tron-showroom .canvas-wrap canvas {
   align-items: center;
   gap: 0.45rem;
   margin-top: 0.85rem;
+  min-height: var(--mg-control-h);
   padding: 0.5rem 0.8rem;
-  border-radius: 999px;
-  border: 1px solid rgba(2, 200, 255, 0.45);
-  background: linear-gradient(
-    135deg,
-    rgba(0, 75, 175, 0.18) 0%,
-    rgba(2, 200, 255, 0.18) 100%
-  );
+  border-radius: var(--mg-radius-control);
+  border: 1px solid var(--line-strong);
+  background: var(--mg-control);
   color: var(--fg-1);
   text-decoration: none;
   font-size: 0.85rem;
@@ -1523,12 +1555,13 @@ body.tron-showroom .canvas-wrap canvas {
 
 .drawer-external-link:hover {
   border-color: var(--brand-primary);
-  background: linear-gradient(
-    135deg,
-    rgba(0, 75, 175, 0.32) 0%,
-    rgba(2, 200, 255, 0.32) 100%
-  );
+  background: var(--mg-control-hover);
   text-decoration: none;
+}
+
+.drawer-external-link:focus-visible {
+  outline: none;
+  box-shadow: var(--mg-focus-ring);
 }
 
 .drawer-external-link--gated {
@@ -1558,17 +1591,17 @@ body.tron-showroom .canvas-wrap canvas {
 
 /* ── Compare modal: copy-link button ───────────────────────────── */
 .compare-copy-link {
-  padding: 0.35rem 0.75rem;
+  padding: 0 0.75rem;
   font-size: 0.78rem;
-  border-radius: 999px;
-  border: 1px solid rgba(2, 200, 255, 0.45);
-  background: rgba(2, 200, 255, 0.14);
+  border-radius: var(--mg-radius-control);
+  border: 1px solid var(--line-strong);
+  background: var(--mg-control);
   color: var(--fg-1);
   cursor: pointer;
   transition:
-    background-color 140ms ease,
-    border-color 140ms ease,
-    color 140ms ease;
+    background-color 160ms var(--mg-ease),
+    border-color 160ms var(--mg-ease),
+    color 160ms var(--mg-ease);
 }
 
 .compare-copy-link:hover {
@@ -1577,10 +1610,22 @@ body.tron-showroom .canvas-wrap canvas {
 }
 
 .compare-copy-link[data-copied='true'] {
-  background: rgba(2, 200, 255, 0.4);
+  background: var(--brand-primary);
   border-color: var(--brand-primary);
-  color: #ffffff;
+  color: var(--mg-on-accent);
   font-weight: 600;
+}
+
+.compare-dialog {
+  position: absolute;
+  inset: 5%;
+  z-index: 31;
+  background: var(--mg-surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--mg-radius-panel);
+  padding: 1.25rem;
+  overflow: auto;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -1664,9 +1709,9 @@ body.tron-showroom .canvas-wrap canvas {
   align-self: center;
   margin: auto;
   padding: 1rem 1.5rem;
-  border-radius: 16px;
-  background: rgba(8, 14, 26, 0.7);
-  border: 1px solid rgba(2, 200, 255, 0.45);
+  border-radius: var(--mg-radius-panel);
+  background: var(--mg-surface);
+  border: 1px solid var(--line-strong);
   color: #e5eaf0;
   font-size: 0.95rem;
   backdrop-filter: blur(8px);
@@ -1685,9 +1730,9 @@ body.tron-showroom .canvas-wrap canvas {
   align-self: center;
   margin: 6px 0 14px;
   padding: 6px 14px;
-  border-radius: 999px;
-  background: rgba(8, 14, 26, 0.7);
-  border: 1px solid rgba(2, 200, 255, 0.55);
+  border-radius: var(--mg-radius-chip);
+  background: var(--mg-surface);
+  border: 1px solid var(--line-strong);
   color: #e5eaf0;
   font-size: 0.7rem;
   font-weight: 700;
@@ -1991,7 +2036,7 @@ body.tron-showroom .canvas-wrap canvas {
   display: inline-block;
   max-width: 100%;
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: var(--mg-radius-chip);
   background: #00b8fc;
   border: 1px solid #00b8fc;
   color: #001724;
@@ -2001,7 +2046,7 @@ body.tron-showroom .canvas-wrap canvas {
   display: inline-block;
   max-width: 100%;
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: var(--mg-radius-chip);
   background: #6161ff;
   border: 1px solid #6161ff;
   color: #001724;
@@ -2011,7 +2056,7 @@ body.tron-showroom .canvas-wrap canvas {
   display: inline-block;
   max-width: 100%;
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: var(--mg-radius-chip);
   background: #ffffff;
   border: 1px solid #a3a3a3;
   color: #001724;
@@ -2076,9 +2121,9 @@ body.tron-showroom .canvas-wrap canvas {
   padding: 0;
   display: grid;
   place-items: center;
-  border-radius: 999px;
-  border: 1px solid rgba(2, 200, 255, 0.4);
-  background: rgba(8, 14, 26, 0.75);
+  border-radius: var(--mg-radius-control);
+  border: 1px solid var(--line-strong);
+  background: var(--mg-surface);
   color: #e5eaf0;
   font-size: 1.5rem;
   line-height: 1;

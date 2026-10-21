@@ -107,22 +107,13 @@ export function CompareModal({ items, open, onClose }: Props) {
             style={{ background: 'rgba(0,0,0,0.6)', zIndex: 30 }}
           />
           <motion.div
+            className="compare-dialog"
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
             transition={{ type: 'spring', damping: 22, stiffness: 200 }}
             role="dialog"
             aria-label="Compare devices"
-            style={{
-              position: 'absolute',
-              inset: '5% 5%',
-              zIndex: 31,
-              background: 'rgba(8,12,22,0.96)',
-              border: '1px solid var(--line-strong)',
-              borderRadius: 18,
-              padding: '1.25rem',
-              overflow: 'auto',
-            }}
           >
             <div
               style={{
